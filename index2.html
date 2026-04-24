@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PortfolioX</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Page layers — clearly stepped */
+  --bg:#07090f;       /* deepest — page background */
+  --bg2:#0f1420;      /* cards / surfaces */
+  --bg3:#161d2e;      /* elevated — inputs, mini-cards, hover */
+  --bg4:#1d2640;      /* highest elevation — sub-headers, dropdowns */
+  /* Borders — graduated visibility */
+  --b1:#22304a;       /* subtle dividers */
+  --b2:#2e4060;       /* stronger borders, focus rings */
+  --b3:#3a5070;       /* accent borders */
+  /* Text */
+  --t1:#eceef4;       /* primary */
+  --t2:#7e8ea8;       /* secondary */
+  --t3:#445268;       /* muted / placeholders */
+  /* Accent colours */
+  --blue:#4fc3f7;     --bd:#0d2236;  --bdd:#071827;
+  --green:#4caf82;    --gd:#0d2419;
+  --red:#f06060;      --rd:#2e1212;
+  --amber:#f0a840;
+  /* Shared */
+  --r:8px;--rl:12px;
+  /* Section accent — thin left border on cards */
+  --card-border-top: 1px solid var(--b1);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);font-size:13px;min-height:100vh}
+
+/* ── Inputs & selects ────────────────────────────────────────────── */
+input,select{font-family:inherit;font-size:13px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:7px 10px;outline:none;width:100%;transition:border .15s}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,195,247,.1)}
+select option{background:var(--bg4)}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+button{font-family:inherit;font-size:12px;cursor:pointer;border-radius:var(--r);border:1px solid var(--b2);padding:6px 14px;background:transparent;color:var(--t1);transition:all .15s}
+button:hover{background:var(--bg3);border-color:var(--b3)}
+button.pri{background:var(--bd);border-color:var(--blue);color:var(--blue);font-weight:600}
+button.pri:hover{background:#122d46}
+button.dng{background:var(--rd);border-color:var(--red);color:var(--red)}
+button.gdng{border-color:var(--red);color:var(--red);background:transparent}
+button.amb{border-color:var(--amber);color:var(--amber);background:transparent}
+button.sm{padding:4px 10px;font-size:11px}
+button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
+
+/* ── Cards — clearly elevated surfaces with accent top border ────── */
+.card{
+  background:var(--bg2);
+  border:1px solid var(--b1);
+  border-top:2px solid var(--b2);   /* slightly thicker top = section feel */
+  border-radius:var(--rl);
+  padding:1.125rem 1.25rem;
+  margin-bottom:1rem;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl thead{background:var(--bg4)}
+.tbl th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:2px solid var(--b2);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--b1);vertical-align:middle;white-space:nowrap;text-align:center}
+.tbl th.r{text-align:center;white-space:nowrap}
+.tbl td.r{text-align:center;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl tbody tr:hover td{background:var(--bg3)}
+.tbl tbody tr.ck:hover td{background:var(--bg3);cursor:pointer}
+.tbl tfoot td{padding:8px 10px;border-top:2px solid var(--b2);font-weight:600;border-bottom:none;background:var(--bg4);white-space:nowrap;color:var(--amber);text-align:center}
+.tbl tfoot td.r{text-align:center}
+.tbl tfoot td:first-child{text-align:left}
+
+/* ── Colour utility ──────────────────────────────────────────────── */
+.g{color:var(--green)}.rr{color:var(--red)}.m{color:var(--t2)}.am{color:var(--amber)}
+
+/* ── Tabs ────────────────────────────────────────────────────────── */
+.tab{
+  border:none;border-bottom:2px solid transparent;border-radius:0;
+  padding:9px 16px;font-size:13px;color:var(--t2);background:transparent;white-space:nowrap;
+  transition:color .15s;
+}
+.tab:hover{color:var(--t1)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+/* ── Misc UI ─────────────────────────────────────────────────────── */
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.ib{border:none;background:transparent;padding:3px 6px;font-size:13px;color:var(--t3);cursor:pointer}
+.ib:hover{color:var(--t1)}
+
+/* Section label — now has a tinted bg strip for visual separation */
+.stl{
+  font-size:10px;font-weight:700;color:var(--t2);
+  text-transform:uppercase;letter-spacing:.7px;
+  margin-bottom:.75rem;
+  padding:.3rem .5rem;
+  background:var(--bg4);
+  border-radius:5px;
+  display:inline-block;
+}
+
+.lbl{font-size:11px;color:var(--t2);margin-bottom:5px;display:block}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px} .full{grid-column:1/-1}
+
+/* CCY tag — now blue-tinted so it reads as "currency" immediately */
+.ctag{
+  font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;
+  background:var(--bd);color:var(--blue);display:inline-block;
+  border:1px solid var(--b2);
+}
+
+.pill{border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;transition:all .15s}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--gd);border:1px solid var(--green);color:var(--green);padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+/* Overlay & modal */
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
+#ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-top:2px solid var(--blue);border-radius:var(--rl);padding:1.75rem;width:580px;max-width:96vw;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem;color:var(--t1)}
+
+/* Header bar — deeper, clearly separated from content */
+#hd{
+  background:var(--bg2);
+  border-bottom:1px solid var(--b2);
+  padding:0 16px;display:flex;align-items:center;gap:8px;min-height:50px;
+  position:sticky;top:0;z-index:100;flex-wrap:wrap;
+}
+#hd .logo{font-size:15px;font-weight:700;letter-spacing:-.5px;white-space:nowrap}
+#hd .logo span{color:var(--blue)}
+
+/* Tab bar — subtle bg to distinguish from content below */
+#tb-wrap{background:var(--bg2);border-bottom:1px solid var(--b1);}
+
+#mn{max-width:1300px;margin:0 auto;padding:16px 16px 60px}
+
+/* Back button */
+.bb{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--blue);cursor:pointer;margin-bottom:1rem;padding:4px 0}
+.bb:hover{color:var(--t1)}
+
+/* KPI grid — stat cards */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem}
+.kc{
+  background:var(--bg3);
+  border:1px solid var(--b1);
+  border-top:2px solid var(--b2);
+  border-radius:var(--r);
+  padding:.75rem 1rem;
+}
+.kl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kv{font-size:15px;font-weight:700;letter-spacing:-.3px}
+
+/* Stock rows */
+.srow{display:flex;align-items:center;padding:.6rem .75rem;border-radius:var(--r);border:1px solid var(--b1);margin-bottom:4px;cursor:pointer;transition:all .15s;background:var(--bg2);gap:10px}
+.srow:hover{background:var(--bg3);border-color:var(--b3)}
+
+/* Autocomplete */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--bg4);border:1px solid var(--b2);border-radius:var(--r);z-index:300;max-height:180px;overflow-y:auto;display:none}
+.ac-list.open{display:block}
+.ac-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;justify-content:space-between}
+.ac-item:hover{background:var(--bg3)}
+.ac-ccy{font-size:11px;color:var(--t2)}
+
+/* Pie centre */
+.pie-centre{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;overflow:hidden;cursor:pointer;background:var(--bg3);display:flex;align-items:center;justify-content:center;border:2px solid var(--b2)}
+.pie-centre img{width:100%;height:100%;object-fit:cover;display:block}
+.pie-centre-hint{font-size:9px;color:var(--t3);text-align:center;line-height:1.3;padding:4px}
+.pie-img-ctrl{display:flex;gap:6px;margin-top:.4rem;justify-content:center}
+
+/* Misc */
+.orig-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:12px}
+.orig-row:last-child{border-bottom:none}
+.orig-lbl{color:var(--t2)} .orig-val{font-weight:500}
+.search-bar{display:flex;gap:8px;margin-bottom:.75rem;align-items:center}
+.drag-handle{cursor:grab;color:var(--t3);padding:0 4px;font-size:14px;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.pf-chip{display:flex;align-items:center;gap:4px;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:500;transition:all .15s;cursor:grab}
+/* ── Cash balance ── */
+.cash-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--bg4);border:1px dashed var(--b2);font-size:11px;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cash-chip:hover{border-color:var(--amber);color:var(--amber)}
+.cash-chip.has-val{border-style:solid;border-color:var(--b2);color:var(--amber);background:rgba(240,168,64,.06)}
+.cash-modal{background:var(--bg2);border:1px solid var(--b2);border-top:2px solid var(--amber);border-radius:var(--rl);padding:1.25rem;width:340px;max-width:96vw}
+.cash-modal h4{font-size:13px;font-weight:600;margin-bottom:1rem;color:var(--amber)}
+.cash-ccy-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cash-ccy-row label{font-size:11px;color:var(--t2);min-width:38px}
+</style>
+</head>
+<body>
+<div id="welcome-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,17,23,.97);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#1e2538;border-radius:12px;padding:2.5rem;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.6);border:1px solid #2a3350">
+    <div style="font-size:22px;font-weight:700;color:#e8eaf0;margin-bottom:.5rem">Welcome to PortfolioX</div>
+    <div style="font-size:13px;color:#8892aa;margin-bottom:1.75rem">No saved data found on this device. Do you have a backup file from another device?</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="document.getElementById('welcome-restore-input').click()" style="width:100%;padding:12px;background:#4fc3f7;color:#0f1117;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">&#8593; Restore from backup file</button>
+      <button onclick="dismissWelcome()" style="width:100%;padding:12px;background:transparent;color:#8892aa;border:1px solid #2a3350;border-radius:8px;font-size:13px;cursor:pointer">Start fresh with demo data</button>
+    </div>
+    <div style="font-size:11px;color:#555e78;margin-top:1.25rem;text-align:center">Select the .json file exported via the Backup button</div>
+  </div>
+</div>
+<input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
+<div id="hd">
+  <div class="logo"><span>◈</span> PortfolioX</div>
+  <div id="pftabs" style="display:flex;gap:5px;align-items:center;flex:1;flex-wrap:wrap;margin-left:6px"></div>
+  <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;padding:6px 0">
+    <button class="sm ghost" id="bep">Edit</button>
+    <button class="sm gdng" id="bdp">Delete</button>
+    <button class="sm amb" id="bbk">Backup</button>
+    <button class="sm ghost" id="brs" style="border-color:var(--green);color:var(--green)">Restore</button>
+    <button class="sm ghost" id="bxl" style="border-color:var(--blue);color:var(--blue)">&#8595; Excel</button>
+  </div>
+</div>
+<div id="mn">
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--b1);margin-bottom:1rem;align-items:center;overflow-x:auto">
+    <button class="tab on" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="transactions">Transactions</button>
+    <button class="tab" data-tab="closed">Closed Trades</button>
+    <button class="tab" data-tab="journey">Journey</button>
+    <button class="tab" data-tab="options">Options</button>
+    <button class="tab" data-tab="deposits">Capital Flows</button>
+    <div style="flex:1;min-width:8px"></div>
+    <button class="sm ghost" id="bpx" style="margin-bottom:3px;white-space:nowrap">Update Prices</button>
+    <button class="pri sm" id="bat" style="margin-left:5px;margin-bottom:3px;white-space:nowrap">+ Transaction</button>
+  </div>
+  <div id="ct"></div>
+</div>
+<div id="ov"><div class="modal" id="mi"></div></div>
+<div class="toast" id="toast">Saved ✓</div>
+<input type="file" id="restore-input" accept=".json" style="display:none">
+
+<script>
+const SK='pfx_v6';
+const CCYS=['MYR','SGD','USD','HKD','GBP','EUR'];
+const TYPES=['Buy','Sell','Dividend','Platform Fee'];
+const PAL=['#4fc3f7','#66bb6a','#ffb74d','#ce93d8','#ef9a9a','#80deea','#f48fb1','#a5d6a7','#90caf9','#ffcc02'];
+const PFPAL=['#e57373','#64b5f6','#81c784','#ffb300','#ab47bc','#26c6da','#ff7043','#9ccc65','#5c6bc0','#f06292'];
+const SYM={MYR:'RM',SGD:'S$',USD:'US$',HKD:'HK$',GBP:'£',EUR:'€'};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const $=id=>document.getElementById(id);
+let charts={};
+
+function defData(){return{activeId:'p1',pieImages:{},portfolios:[
+  {id:'p1',name:'PKM MooMoo SG',color:'#64b5f6',transactions:[
+    {id:'t1',date:'2025-11-05',type:'Buy',stock:'MapleTree',qty:5000,price:2.04,fee:11.13,ccy:'SGD',amount:null,note:''},
+    {id:'t2',date:'2025-11-20',type:'Buy',stock:'Harta',qty:51400,price:6.429,fee:0,ccy:'MYR',amount:null,note:''},
+    {id:'t3',date:'2026-01-28',type:'Buy',stock:'Alpha',qty:72500,price:0.275,fee:41.94,ccy:'MYR',amount:null,note:''},
+    {id:'t4',date:'2026-01-28',type:'Buy',stock:'TopGlove SG',qty:13800,price:1.978,fee:0,ccy:'SGD',amount:null,note:''},
+    {id:'t5',date:'2025-12-15',type:'Dividend',stock:'TopGlove SG',qty:0,price:0,fee:0,ccy:'SGD',amount:20.98,note:'Q4 div'},
+    {id:'t6',date:'2026-02-09',type:'Buy',stock:'MSFT',qty:10,price:404.47,fee:1.11,ccy:'USD',amount:null,note:''},
+    {id:'t7',date:'2026-03-13',type:'Dividend',stock:'MapleTree',qty:5000,price:0,fee:0,ccy:'SGD',amount:158.50,note:''},
+    {id:'t8',date:'2026-03-13',type:'Dividend',stock:'MSFT',qty:0,price:0,fee:0,ccy:'USD',amount:6.37,note:''},
+    {id:'t9',date:'2026-03-19',type:'Buy',stock:'AMD',qty:5,price:199.70,fee:1.09,ccy:'USD',amount:null,note:''},
+    {id:'t10',date:'2026-03-25',type:'Buy',stock:'CapLand Ascendas',qty:4100,price:2.47,fee:11.04,ccy:'SGD',amount:null,note:''},
+    {id:'t11',date:'2026-04-30',type:'Dividend',stock:'CapLand Ascendas',qty:0,price:0,fee:0,ccy:'SGD',amount:153.75,note:''},
+  ],prices:{'MapleTree':{price:1.97,ccy:'SGD'},'Harta':{price:0.925,ccy:'MYR'},'Alpha':{price:0.275,ccy:'MYR'},'TopGlove SG':{price:0.178,ccy:'SGD'},'MSFT':{price:363.97,ccy:'USD'},'AMD':{price:199.92,ccy:'USD'},'CapLand Ascendas':{price:2.49,ccy:'SGD'}},optionTrades:[]},
+  {id:'p2',name:'TTC MooMoo SG',color:'#e57373',transactions:[
+    {id:'u1',date:'2024-02-20',type:'Buy',stock:'TSLA',qty:6,price:195.50,fee:2.18,ccy:'USD',amount:null,note:''},
+    {id:'u2',date:'2024-05-16',type:'Buy',stock:'TSLA',qty:2,price:174.50,fee:1.09,ccy:'USD',amount:null,note:''},
+    {id:'u3',date:'2025-06-25',type:'Buy',stock:'TSLA',qty:5,price:339.30,fee:1.10,ccy:'USD',amount:null,note:''},
+    {id:'u4',date:'2025-07-07',type:'Buy',stock:'TSLA',qty:7,price:291.86,fee:2.18,ccy:'USD',amount:null,note:''},
+    {id:'u5',date:'2025-07-17',type:'Buy',stock:'TSLA',qty:3,price:321.66,fee:3.24,ccy:'USD',amount:null,note:''},
+    {id:'u6',date:'2025-07-21',type:'Buy',stock:'TSLA',qty:2,price:329.69,fee:2.16,ccy:'USD',amount:null,note:''},
+    {id:'u7',date:'2025-07-24',type:'Buy',stock:'TSLA',qty:1,price:332.40,fee:1.08,ccy:'USD',amount:null,note:''},
+    {id:'u8',date:'2025-06-11',type:'Sell',stock:'TSLA',qty:16,price:452.50,fee:1.14,ccy:'USD',amount:null,note:''},
+    {id:'u9',date:'2026-02-04',type:'Buy',stock:'CRM',qty:20,price:197.00,fee:6.30,ccy:'USD',amount:null,note:''},
+    {id:'u10',date:'2026-02-04',type:'Buy',stock:'ORCL',qty:20,price:156.00,fee:5.30,ccy:'USD',amount:null,note:''},
+    {id:'u11',date:'2026-02-04',type:'Buy',stock:'NOW',qty:10,price:109.00,fee:2.62,ccy:'USD',amount:null,note:''},
+    {id:'u12',date:'2026-01-29',type:'Buy',stock:'NOW',qty:10,price:114.00,fee:2.63,ccy:'USD',amount:null,note:''},
+    {id:'u13',date:'2026-01-28',type:'Buy',stock:'NOW',qty:20,price:132.00,fee:4.57,ccy:'USD',amount:null,note:''},
+    {id:'u14',date:'2026-02-04',type:'Buy',stock:'NVDA',qty:20,price:180.00,fee:5.95,ccy:'USD',amount:null,note:''},
+    {id:'u15',date:'2026-02-06',type:'Buy',stock:'IBIT',qty:50,price:38.00,fee:1.24,ccy:'USD',amount:null,note:''},
+    {id:'u16',date:'2026-02-02',type:'Buy',stock:'MSFT',qty:5,price:430.00,fee:1.10,ccy:'USD',amount:null,note:''},
+    {id:'u17',date:'2020-08-01',type:'Buy',stock:'Harta',qty:90200,price:5.815,fee:0,ccy:'MYR',amount:null,note:''},
+    {id:'u18',date:'2020-08-01',type:'Buy',stock:'Harta (dad)',qty:14700,price:6.803,fee:0,ccy:'MYR',amount:null,note:''},
+    {id:'u19',date:'2026-02-18',type:'Buy',stock:'MSFT',qty:5,price:399.50,fee:1.10,ccy:'USD',amount:null,note:''},
+    {id:'u20',date:'2026-03-13',type:'Dividend',stock:'MSFT',qty:0,price:0,fee:0,ccy:'USD',amount:6.37,note:''},
+  ],prices:{'TSLA':{price:362.75,ccy:'USD'},'CRM':{price:186.11,ccy:'USD'},'ORCL':{price:141.89,ccy:'USD'},'NOW':{price:104.31,ccy:'USD'},'NVDA':{price:169.91,ccy:'USD'},'IBIT':{price:37.82,ccy:'USD'},'MSFT':{price:364.07,ccy:'USD'},'Harta':{price:0.925,ccy:'MYR'},'Harta (dad)':{price:0.925,ccy:'MYR'}},optionTrades:[
+    {id:'bsafydw',ticker:'INTC C38/50 VERTICAL SPREAD',openDate:'2025-12-15',openValue:'-1815.00',openFee:'14.87',closeDate:'',closeValue:null,closeFee:null,mktValue:'1316.75',note:'exp 18/12/2026'},
+    {id:'gl66eq0',ticker:'NVDA C175/250 VERTICAL SPREAD',openDate:'2026-03-21',openValue:'-2228.00',openFee:'6.69',closeDate:'',closeValue:null,closeFee:null,mktValue:'116.14',note:'exp 3/19/2027'},
+    {id:'9im1w3j',ticker:'ONDS C12/30 VERTICAL SPREAD',openDate:'2026-01-22',openValue:'-924.00',openFee:'705.00',closeDate:'',closeValue:null,closeFee:null,mktValue:'-288.00',note:'exp 1/15/2027'},
+    {id:'d9jtc4a',ticker:'ONDS C10/20 VERTICAL SPREAD',openDate:'2026-03-21',openValue:'-555.00',openFee:'7.05',closeDate:'',closeValue:null,closeFee:null,mktValue:'-1.44',note:'exp 1/21/2028'},
+    {id:'7ed6usd',ticker:'SOFI C17/30 VERTICAL SPREAD',openDate:'2026-03-13',openValue:'-1050.00',openFee:null,closeDate:'',closeValue:null,closeFee:null,mktValue:'-238.62',note:'exp 6/17/2027'},
+    {id:'rok7ewv',ticker:'SOFI C20/32 VERTICAL SPREAD',openDate:'2026-02-05',openValue:'-1645.00',openFee:'11.29',closeDate:'',closeValue:null,closeFee:null,mktValue:'-615.40',note:'exp 6/17/2027'},
+    {id:'ppq4hva',ticker:'NVO C40/60 VERTICAL SPREAD',openDate:'2026-03-13',openValue:'-916.00',openFee:'3.65',closeDate:'',closeValue:null,closeFee:null,mktValue:'-36.88',note:'exp 12/17/2027'},
+    {id:'kp925mp',ticker:'NVO C45/90 VERTICAL SPREAD',openDate:'2026-04-05',openValue:'-1820.00',openFee:'2.85',closeDate:'',closeValue:null,closeFee:null,mktValue:'-760.00',note:'exp 12/27/2027'}
+  ]},
+  {id:'p3',name:'Personal MYR',color:'#81c784',transactions:[],prices:{},optionTrades:[],cashBalances:{}}
+]};}
+
+let S=load(),TAB='dashboard',MM=null,ETX=null,DTX=null,VIEW=null,TT=null;
+let journeyFilter=null; // {ccy, yr} for drill from journey
+
+function load(){try{const d=localStorage.getItem(SK);const p=d?JSON.parse(d):defData();if(p.portfolios)p.portfolios.forEach(function(pf,idx){pf.color=PFPAL[idx%PFPAL.length];if(!pf.cashBalances)pf.cashBalances={};if(!pf.deposits)pf.deposits=[];});if(!p.pieImages)p.pieImages={};p.portfolios.forEach(pf=>{if(!pf.optionTrades)pf.optionTrades=[];});if(p.optionTrades&&p.optionTrades.length&&p.portfolios.length){p.portfolios[0].optionTrades=p.optionTrades;delete p.optionTrades;}return p;}catch{return defData();}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(S));const t=$('toast');t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>t.classList.remove('show'),1800);}catch(e){alert('Save failed — localStorage may be full. Try clearing old data.');}}
+function pf(){return S.portfolios.find(p=>p.id===S.activeId)||S.portfolios[0];}
+function stockDict(){const d={};pf().transactions.filter(t=>t.stock&&t.type==='Buy').forEach(t=>{d[t.stock]=t.ccy;});return d;}
+
+// ── Finance ────────────────────────────────────────────────────────────────────
+function getHoldings(p0,ao){
+  const h={};
+  [...p0.transactions].sort((a,b)=>a.date.localeCompare(b.date)).forEach(tx=>{
+    if(tx.type==='Buy'&&tx.stock){if(!h[tx.stock])h[tx.stock]={qty:0,cost:0,ccy:tx.ccy,divs:0,realized:0,firstDate:tx.date};h[tx.stock].qty+=+tx.qty;h[tx.stock].cost+=(+tx.qty)*(+tx.price)+(+tx.fee||0);h[tx.stock].ccy=tx.ccy;}
+    else if(tx.type==='Sell'&&tx.stock&&h[tx.stock]){const avg=h[tx.stock].qty>0?h[tx.stock].cost/h[tx.stock].qty:0;h[tx.stock].realized+=(+tx.qty)*(+tx.price)-(+tx.fee||0)-avg*(+tx.qty);h[tx.stock].cost-=avg*(+tx.qty);h[tx.stock].qty-=+tx.qty;}
+    else if(tx.type==='Dividend'&&tx.stock){if(!h[tx.stock])h[tx.stock]={qty:0,cost:0,ccy:tx.ccy,divs:0,realized:0,firstDate:tx.date};h[tx.stock].divs+=tx.amount!=null?+tx.amount:0;}
+  });
+  return Object.entries(h).map(([stock,v])=>{const mp=p0.prices[stock];const mktP=mp?+mp.price:0,mktCcy=mp?mp.ccy:v.ccy,mktVal=v.qty*mktP,avg=v.qty>0?v.cost/v.qty:0,unreal=v.qty>0?mktVal-v.cost:0;return{stock,...v,avg,mktP,mktCcy,mktVal,unreal};}).filter(h=>ao?h.qty>0:(h.qty>0||h.divs!==0||h.realized!==0));
+}
+function getSummary(p0){
+  const divs={},unreal={},mktVal={},cost={},realized={},firstDate={};
+  p0.transactions.forEach(tx=>{
+    if(tx.type==='Dividend')divs[tx.ccy]=(divs[tx.ccy]||0)+(+tx.amount||0);
+    if(tx.type==='Platform Fee')realized[tx.ccy]=(realized[tx.ccy]||0)-(+tx.amount||0);
+    if(tx.type==='Buy'&&(!firstDate[tx.ccy]||tx.date<firstDate[tx.ccy]))firstDate[tx.ccy]=tx.date;
+  });
+  getHoldings(p0,true).forEach(h=>{const c=h.ccy;unreal[c]=(unreal[c]||0)+h.unreal;mktVal[c]=(mktVal[c]||0)+h.mktVal;cost[c]=(cost[c]||0)+h.cost;realized[c]=(realized[c]||0)+h.realized;});
+  getHoldings(p0,false).filter(h=>h.qty<=0&&h.realized!==0).forEach(h=>{realized[h.ccy]=(realized[h.ccy]||0)+h.realized;});
+  return{divs,unreal,mktVal,cost,realized,firstDate};
+}
+// ── Cash Balance helpers ───────────────────────────────────────────
+// Returns total cash for a portfolio per-ccy  e.g. {SGD:500, USD:200}
+function getCash(p0){return p0.cashBalances||{};}
+// Returns total cash across all portfolios per-ccy
+function getAllCash(ccy){
+  return S.portfolios.reduce(function(s,p0){return s+(p0.cashBalances&&p0.cashBalances[ccy]?+p0.cashBalances[ccy]:0);},0);
+}
+// Build the clickable cash chip for overview (editable) - pfId, ccy
+function cashChipHtml(pfId,ccy,editable){
+  const p0=S.portfolios.find(function(p){return p.id===pfId;});
+  const val=(p0&&p0.cashBalances&&p0.cashBalances[ccy])||0;
+  const hasVal=val>0;
+  const label=hasVal?fc(val,ccy)+' cash':'+ Cash';
+  if(editable){
+    return '<span class="cash-chip'+(hasVal?' has-val':'')+'" onclick="openCashModal(\''+pfId+'\',\''+ccy+'\')" title="Edit cash balance">💵 '+label+'</span>';
+  }else{
+    if(!hasVal)return'';
+    return '<span class="cash-chip has-val" title="Cash balance">💵 '+label+'</span>';
+  }
+}
+// Open cash balance edit modal
+// Open cash balance edit modal
+let _cashModalState={pfId:null,ccyList:[]};
+function openCashModal(pfId,ccy){
+  const p0=S.portfolios.find(function(p){return p.id===pfId;});
+  if(!p0)return;
+  if(!p0.cashBalances)p0.cashBalances={};
+  const activeCcys=[...new Set(p0.transactions.filter(function(t){return t.ccy;}).map(function(t){return t.ccy;}))];
+  if(activeCcys.length===0)activeCcys.push(ccy);
+  // Requested ccy first, then the rest
+  const ccyList=[ccy,...activeCcys.filter(function(cc){return cc!==ccy;})];
+  // Deduplicate
+  const uniq=[...new Set(ccyList)];
+  _cashModalState={pfId:pfId,ccyList:uniq};
+
+  const rows=uniq.map(function(cc){
+    const v=(p0.cashBalances&&p0.cashBalances[cc])||0;
+    return '<div class="cash-ccy-row">'
+      +'<label>'+cc+'</label>'
+      +'<div style="position:relative;flex:1">'
+      +'<span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--t2);pointer-events:none;min-width:28px;text-align:left">'+(SYM[cc]||cc)+'</span>'
+      +'<input id="cash-inp-'+cc+'" type="number" min="0" step="0.01" value="'+(v>0?v:'')+'" placeholder="0.00" style="padding-left:42px">'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  const html='<div class="cash-modal">'
+    +'<h4>💵 Cash Balance — '+p0.name+'</h4>'
+    +'<p style="font-size:11px;color:var(--t2);margin-bottom:.875rem">Enter uninvested cash sitting in each currency wallet. It will be added to your total holding value.</p>'
+    +rows
+    +'<div style="display:flex;gap:8px;margin-top:1rem">'
+    +'<button class="pri sm" style="flex:1" onclick="saveCashModal()">Save</button>'
+    +'<button class="sm ghost" onclick="cmm()">Cancel</button>'
+    +'</div>'
+    +'</div>';
+  omm('_cash',html);
+}
+function saveCashModal(){
+  const pfId=_cashModalState.pfId;
+  const ccyList=_cashModalState.ccyList;
+  if(!pfId||!ccyList.length)return;
+  const p0=S.portfolios.find(function(p){return p.id===pfId;});
+  if(!p0)return;
+  if(!p0.cashBalances)p0.cashBalances={};
+  ccyList.forEach(function(cc){
+    const el=document.getElementById('cash-inp-'+cc);
+    if(el){
+      const v=parseFloat(el.value)||0;
+      if(v>0)p0.cashBalances[cc]=v;
+      else delete p0.cashBalances[cc];
+    }
+  });
+  save();cmm();renderContent();
+}
+
+function journeyData(p0){
+  const txs=[...p0.transactions].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!txs.length)return{};
+  const firstYr=parseInt(txs[0].date.slice(0,4)),curYr=new Date().getFullYear();
+  const ccys=[...new Set(txs.filter(t=>t.type==='Buy').map(t=>t.ccy))];
+  const result={};
+  ccys.forEach(ccy=>{
+    result[ccy]=[];
+    // Replay ALL transactions in chronological order per ccy to get correct avg cost
+    const hh={};
+    const realByYr={};
+    txs.filter(t=>t.ccy===ccy&&t.stock).forEach(t=>{
+      const yr=t.date.slice(0,4);
+      if(t.type==='Buy'){
+        if(!hh[t.stock])hh[t.stock]={qty:0,cost:0};
+        hh[t.stock].qty+=+t.qty;
+        hh[t.stock].cost+=(+t.qty)*(+t.price)+(+t.fee||0);
+      } else if(t.type==='Sell'){
+        const hs=hh[t.stock]||{qty:0,cost:0};
+        const avg=hs.qty>0?hs.cost/hs.qty:0;
+        const pnl=(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
+        realByYr[yr]=(realByYr[yr]||0)+pnl;
+        // Reduce holding after sell
+        if(hh[t.stock]){hh[t.stock].cost-=avg*(+t.qty);hh[t.stock].qty-=+t.qty;}
+      }
+    });
+    const divByYr={};
+    txs.filter(t=>t.ccy===ccy&&t.type==='Dividend').forEach(t=>{
+      const yr=t.date.slice(0,4);
+      divByYr[yr]=(divByYr[yr]||0)+(t.amount!=null?+t.amount:0);
+    });
+    for(let yr=firstYr;yr<=curYr;yr++){
+      const divYr=divByYr[String(yr)]||0;
+      const realYr=realByYr[String(yr)]||0;
+      if(divYr>0||realYr!==0)result[ccy].push({yr,divYr,realYr});
+    }
+  });
+  return result;
+}
+
+// ── Format ─────────────────────────────────────────────────────────────────────
+function fc(v,ccy,dp=2){const s=SYM[ccy]||ccy;return`${s} ${Math.abs(+v).toLocaleString('en',{minimumFractionDigits:dp,maximumFractionDigits:dp})}`;}
+function sgn(v,ccy){return(v>=0?'+':'-')+fc(Math.abs(v),ccy);}
+function sc(v){return+v>0?'g':+v<0?'rr':'';}
+function fp(v){return(v>=0?'+':'')+v.toFixed(2)+'%';}
+function pnlPill(pct){if(pct===null||pct===undefined)return'';const col=pct>=0?'var(--green)':'var(--red)',bg=pct>=0?'var(--gd)':'var(--rd)';return`<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;color:${col};background:${bg};margin-left:5px">${fp(pct)}</span>`;}
+function bdg(type){const M={Buy:'#185fa5,#1a2d42',Sell:'#a32d2d,#2e1a1a',Dividend:'#375623,#1a2e1a','Platform Fee':'#7c3aed,#1e1432'};const[fg,bg]=(M[type]||'#555,#1e2538').split(',');return`<span class="badge" style="color:${fg};background:${bg}">${type}</span>`;}
+function todayStr(){return new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+
+// ── Pie ─────────────────────────────────────────────────────────────────────────
+function drawPie(id,labels,values,colors,ccy,mktCcys){
+  if(charts[id]){try{charts[id].destroy();}catch(e){}delete charts[id];}
+  const c=document.getElementById(id);if(!c)return;
+  const total=values.reduce((a,b)=>a+b,0);
+  const sym=SYM[ccy]||ccy;
+  charts[id]=new Chart(c,{type:'doughnut',data:{labels,datasets:[{data:values,backgroundColor:colors,borderColor:'#161b27',borderWidth:2,hoverBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{
+    const pct=total>0?((ctx.parsed/total)*100).toFixed(1):'0.0';
+    const mktCcy=mktCcys?mktCcys[ctx.dataIndex]:ccy;
+    const mktSym=SYM[mktCcy]||mktCcy;
+    const val=ctx.parsed.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+    return ctx.label+': '+mktSym+' '+val+' ('+pct+'%)';
+  }}}},cutout:'68%'}});
+}
+function triggerPieImg(pfId,ccy){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.pieImages[pfId+'_'+ccy]=ev.target.result;save();renderContent();};r.readAsDataURL(f);};inp.click();}
+function removePieImg(pfId,ccy){delete S.pieImages[pfId+'_'+ccy];save();renderContent();}
+
+// ── Portfolio tabs with drag-to-reorder ────────────────────────────────────────
+function renderPfTabs(){
+  const tabs=$('pftabs');
+  tabs.innerHTML=S.portfolios.map((p,i)=>{
+    const isActive=S.activeId===p.id;
+    return '<div class="pf-chip" draggable="true" data-pfid="'+p.id+'" data-pfi="'+i+'"'
+      +' onclick="swPf(\''+p.id+'\')"'
+      +' style="border:1.5px solid '+(isActive?p.color:'var(--b1)')+';color:'+(isActive?p.color:'var(--t2)')+';background:'+(isActive?p.color+'18':'transparent')+';font-weight:'+(isActive?600:400)+';cursor:grab;user-select:none">'
+      +'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+p.color+';flex-shrink:0"></span>'
+      +'<span>'+p.name+'</span>'
+      +'</div>';
+  }).join('')
+  +'<button class="pill" onclick="omm(\'ap\')" style="border:1px dashed var(--b2);color:var(--t2);cursor:pointer">+ Portfolio</button>';
+  $('bdp').style.display=S.portfolios.length>1?'':'none';
+  // Wire up drag-and-drop on pf chips
+  initPfDrag();
+}
+function movePf(idx,dir){
+  const arr=[...S.portfolios];
+  const ni=idx+dir;
+  if(ni<0||ni>=arr.length)return;
+  [arr[idx],arr[ni]]=[arr[ni],arr[idx]];
+  S.portfolios=arr;save();renderPfTabs();
+}
+
+
+function renderDashboard(){
+  const CCY_ORDER=['MYR','SGD','USD'];
+  const grandTotals={};
+
+  S.portfolios.forEach(function(pf0){
+    const sum=getSummary(pf0);
+    const rawCcys=[...new Set([...Object.keys(sum.mktVal),...Object.keys(sum.divs)])].filter(Boolean);
+    rawCcys.forEach(function(ccy){
+      if(!grandTotals[ccy])grandTotals[ccy]={mv:0,co:0,u:0,d:0,r:0};
+      grandTotals[ccy].mv+=(sum.mktVal[ccy]||0);
+      grandTotals[ccy].co+=(sum.cost[ccy]||0);
+      grandTotals[ccy].u+=(sum.unreal[ccy]||0);
+      grandTotals[ccy].d+=(sum.divs[ccy]||0);
+      grandTotals[ccy].r+=(sum.realized[ccy]||0);
+    });
+  });
+
+  // Add cash balances per CCY to grand totals
+  S.portfolios.forEach(function(pf0){
+    Object.entries(pf0.cashBalances||{}).forEach(function([ccy,v]){
+      if(!grandTotals[ccy])grandTotals[ccy]={mv:0,co:0,u:0,d:0,r:0,cash:0};
+      grandTotals[ccy].cash=(grandTotals[ccy].cash||0)+(+v||0);
+    });
+  });
+  // Also ensure cash key exists on all
+  Object.keys(grandTotals).forEach(function(ccy){if(!grandTotals[ccy].cash)grandTotals[ccy].cash=0;});
+
+  const allCcys=[...CCY_ORDER.filter(function(c){return grandTotals[c];}),...Object.keys(grandTotals).filter(function(c){return!CCY_ORDER.includes(c);})];
+
+  const summaryCcyCards=allCcys.map(function(ccy){
+    const g=grandTotals[ccy];
+    const cashTotal=g.cash||0;
+    const tot=g.u+g.d+g.r;
+    const totPct=g.co>0?tot/g.co*100:null;
+    const pct=g.co>0?(g.mv+cashTotal-g.co)/g.co*100:null;
+
+    // Build portfolio rows with inline allocation bar
+    const activePfs=S.portfolios.filter(function(pf0){
+      const sum=getSummary(pf0);
+      const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
+      return mv||co||d||r;
+    });
+
+    const pfRows=activePfs.map(function(pf0){
+      const sum=getSummary(pf0);
+      const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0;
+      const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
+      const t=u+d+r;
+      const tp=co>0?t/co*100:null;
+      // Allocation % of this portfolio in the total for this CCY
+      const allocPct=g.mv>0?(mv/g.mv*100):0;
+      const allocPctStr=allocPct.toFixed(1);
+      const pfCash=(pf0.cashBalances&&pf0.cashBalances[ccy])||0;
+      const mvPlusCash=mv+pfCash;
+
+      return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')">'
+        +'<td style="min-width:170px">'
+        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap">'
+        +'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+pf0.color+';flex-shrink:0"></span>'
+        +'<span style="font-size:12px;font-weight:600">'+pf0.name+'</span>'
+
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+        +'<div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden">'
+        +'<div style="width:'+allocPct.toFixed(2)+'%;height:100%;background:'+pf0.color+';border-radius:3px;transition:width .4s ease"></div>'
+        +'</div>'
+        +'<span style="font-size:10px;color:var(--t2);white-space:nowrap;min-width:30px">'+allocPctStr+'%</span>'
+        +'</div>'
+        +'</td>'
+        +'<td class="r" style="font-weight:600">'+fc(mvPlusCash,ccy)+'</td>'
+        +'<td class="r">'+fc(co,ccy)+'</td>'
+        +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
+        +'<td class="r '+sc(r)+'">'+sgn(r,ccy)+'</td>'
+        +'<td class="r '+(d>0?'g':'m')+'">'+(d>0?fc(d,ccy):'—')+'</td>'
+        +'<td class="r '+sc(t)+'" style="font-weight:600;white-space:nowrap">'+sgn(t,ccy)
+        +(tp!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(t>=0?'var(--gd)':'var(--rd)')+'">'+fp(tp)+'</span>':'')
+        +'</td>'
+        +'<td style="color:var(--t3);font-size:11px">›</td>'
+        +'</tr>';
+    }).join('');
+
+
+    const mvWithCash=g.mv+cashTotal;
+    return '<div style="'+ccyCardStyle(ccy)+'">'
+      // Header — just CCY tag + total value
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
+      +'<div>'
+      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
+      +'<div style="font-size:10px;color:var(--t2)">Total Value (Cash + Holdings only)</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:20px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
+      +(pct!==null?pnlPill(pct):'')
+      +'</div>'
+      +'</div>'
+      +'</div>'
+      // Total P&L full-width card (distinct background)
+      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap;color:#fff">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';" class="'+sc(tot)+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
+      +'</div>'
+      // Row 1: Invested | Unrealized | Realized  (each with unique accent colour)
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.co,ccy)+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.u)+'">'+sgn(g.u,ccy)+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 2: Dividends | Cash  (amber accent)
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
+      +'</div>'
+      +'</div>'
+      // Table with allocation bars
+      +'<div style="overflow-x:auto"><table class="tbl">'
+      +'<thead><tr>'
+      +'<th style="text-align:center">Portfolio</th>'
+      +'<th class="r">Holding Value</th><th class="r">Invested</th>'
+      +'<th class="r">Unrealized</th><th class="r">Realized</th>'
+      +'<th class="r">Dividends</th><th class="r">Total P&L / % (incl. div)</th>'
+      +'<th style="width:24px"></th>'
+      +'</tr></thead>'
+      +'<tbody>'+pfRows+'</tbody>'
+      +'<tfoot><tr>'
+      +'<td style="font-weight:600">Total ('+ccy+')</td>'
+      +'<td class="r">'+fc(mvWithCash,ccy)+'</td>'
+      +'<td class="r">'+fc(g.co,ccy)+'</td>'
+      +'<td class="r '+sc(g.u)+'">'+sgn(g.u,ccy)+'</td>'
+      +'<td class="r '+sc(g.r)+'">'+sgn(g.r,ccy)+'</td>'
+      +'<td class="r '+(g.d>0?'g':'m')+'">'+(g.d>0?fc(g.d,ccy):'—')+'</td>'
+      +'<td class="r '+sc(tot)+'" style="font-weight:600;white-space:nowrap">'+sgn(tot,ccy)
+      +(totPct!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'">'+fp(totPct)+'</span>':'')
+      +'</td>'
+      +'<td></td>'
+      +'</tr></tfoot>'
+      +'</table></div>'
+      +'</div>';
+  }).join('');
+
+  const dateBar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding:.5rem .75rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--amber)">'
+    +'<span style="font-size:11px;color:var(--t2)">All Portfolios — Dashboard</span>'
+    +'<span style="font-size:13px;font-weight:600">'+todayStr()+'</span>'
+    +'</div>';
+
+  if(!allCcys.length)return dateBar+'<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
+  return dateBar+summaryCcyCards;
+}
+
+
+function drawDashboardCharts(){}
+
+function goPortfolio(id){
+  S.activeId=id;
+  TAB='overview';
+  VIEW=null;
+  save();
+  render();
+}
+
+function renderContent(){
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  const p=pf();
+  if(VIEW&&VIEW.type==='stock'){$('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);return;}
+  if(TAB==='dashboard'){$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
+  else if(TAB==='overview'){$('ct').innerHTML=renderOverview(p);}
+  else if(TAB==='holdings')$('ct').innerHTML=renderHoldings(p);
+  else if(TAB==='transactions')$('ct').innerHTML=renderTx(p);
+  else if(TAB==='closed')$('ct').innerHTML=renderClosed(p);
+  else if(TAB==='journey')$('ct').innerHTML=renderJourney(p);
+  else if(TAB==='options')$('ct').innerHTML=renderOptions();
+  else if(TAB==='deposits')$('ct').innerHTML=renderDeposits(p);
+}
+
+// ── Overview ────────────────────────────────────────────────────────────────────
+function renderOverview(p){
+  const holdings=getHoldings(p,true),sum=getSummary(p);
+  const CCY_ORDER=['MYR','SGD','USD'];
+  const rawCcys=[...new Set([...Object.keys(sum.mktVal),...Object.keys(sum.divs)])].filter(Boolean);
+  const allCcys=[...CCY_ORDER.filter(c=>rawCcys.includes(c)),...rawCcys.filter(c=>!CCY_ORDER.includes(c))];
+
+  const dateBar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding:.5rem .75rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--blue)">'
+    +'<span style="font-size:11px;color:var(--t2)">Today</span>'
+    +'<span style="font-size:13px;font-weight:600">'+todayStr()+'</span>'
+    +'</div>';
+  if(!allCcys.length)return dateBar+'<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
+
+  return dateBar+allCcys.map((ccy,ci)=>{
+    const rows=holdings.filter(h=>h.ccy===ccy);
+    const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
+    const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=u+d+r;
+    const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
+    const mvWithCash=mv+cashBal;
+    const pct=co>0?(mvWithCash-co)/co*100:null;
+    const totPct=co>0?tot/co*100:null;
+    const totalMV=rows.reduce((s,h)=>s+h.mktVal,0)||1;
+
+    // Fix 4: Sort rows by mkt value descending (highest allocation first)
+    const sortedRows=[...rows].sort((a,b)=>b.mktVal-a.mktVal);
+
+    // Mini-cards — row 1: Invested / Unrealized / Realized, row 2: Dividends / Cash
+    const miniCards=
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(co,ccy)+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(u)+'">'+sgn(u,ccy)+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 10px;background:#000;border-radius:var(--r);border:1px dashed rgba(255,255,255,.2);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
+      +'</div>'
+      +'</div>';
+
+    // Colour bar (sorted)
+    const barSegs=sortedRows.map((h,i)=>{
+      const w=(h.mktVal/totalMV*100).toFixed(2);
+      return '<div title="'+h.stock+' '+w+'%" style="height:100%;width:'+w+'%;background:'+PAL[i%PAL.length]+';flex-shrink:0"></div>';
+    }).join('');
+    const colourBar=rows.length?'<div style="display:flex;height:6px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:.75rem;background:var(--bg4)">'+barSegs+'</div>':'';
+
+    // Holdings table (sorted by allocation)
+    let tbody='';
+    sortedRows.forEach((hh,i)=>{
+      const tot2=hh.unreal+hh.divs+hh.realized;
+      const pct2=hh.cost>0?tot2/hh.cost*100:null;
+      const barW=(hh.mktVal/totalMV*100).toFixed(1);
+      tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
+        +`<td style="white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${PAL[i%PAL.length]};margin-right:5px;vertical-align:middle;flex-shrink:0"></span><span style="font-weight:600">${hh.stock}</span><span style="font-size:10px;color:var(--t3);margin-left:4px">${barW}%</span></td>`
+        +`<td class="r m">${(+hh.qty).toLocaleString()}</td>`
+        +`<td class="r m" style="font-size:11px">${hh.avg>0?fc(hh.avg,ccy,3):'—'}</td>`
+        +`<td class="r">${fc(hh.cost,ccy)}</td>`
+        +`<td class="r m" style="font-size:11px">${hh.mktP>0?hh.mktCcy+' '+hh.mktP.toFixed(3):'—'}</td>`
+        +`<td class="r" style="font-weight:600">${hh.mktVal>0?fc(hh.mktVal,hh.mktCcy):'—'}</td>`
+        +`<td class="r ${sc(hh.unreal)}">${sgn(hh.unreal,ccy)}</td>`
+        +`<td class="r ${hh.divs>0?'g':''}">${hh.divs>0?fc(hh.divs,ccy):'—'}</td>`
+        +`<td class="r ${sc(tot2)}" style="font-weight:600;white-space:nowrap">${sgn(tot2,ccy)}${pct2!==null?'<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;background:'+(pct2>=0?'var(--gd)':' var(--rd)')+'">'+fp(pct2)+'</span>':''}</td>`
+        +'<td style="color:var(--t3);font-size:11px">›</td>'
+        +'</tr>';
+    });
+
+    // Fix 3: Footer with Cost Basis sum
+    const sumMkt=sortedRows.reduce((s,h)=>s+h.mktVal,0);
+    const sumCost=sortedRows.reduce((s,h)=>s+h.cost,0);
+    const sumU=sortedRows.reduce((s,h)=>s+h.unreal,0);
+    const sumD=sortedRows.reduce((s,h)=>s+h.divs,0);
+    const sumT=sortedRows.reduce((s,h)=>s+h.unreal+h.divs+h.realized,0);
+    const sumC=sortedRows.reduce((s,h)=>s+h.cost,0);
+    const fp2=sumC>0?sumT/sumC*100:null;
+    const holdingsTable=rows.length
+      ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'">'
+        +'<thead><tr><th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
+        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Dividends</th><th class="r">P&L / % (incl. div)</th><th></th>'
+        +'</tr></thead><tbody>'+tbody+'</tbody>'
+        +'<tfoot><tr><td style="font-weight:600">Total ('+ccy+')</td><td colspan="2"></td>'
+        +'<td class="r" style="font-weight:600">'+fc(sumCost,ccy)+'</td>'
+        +'<td></td>'
+        +'<td class="r">'+fc(sumMkt+cashBal,ccy)+'</td>'
+        +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
+        +'<td class="r g">'+(d>0?fc(d,ccy):'—')+'</td>'
+        +'<td class="r '+sc(tot)+'" style="font-weight:600;white-space:nowrap">'+sgn(tot,ccy)
+        +(totPct!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'">'+fp(totPct)+'</span>':'')
+        +'</td>'
+        +'<td></td></tr></tfoot>'
+        +'</table></div>'
+      :'<p class="m" style="font-size:12px;padding:.5rem 0">No active holdings in '+ccy+'.</p>';
+
+    // Fix 1: Header — remove right-side Total P&L (it's in pie centre now)
+    // Header — CCY tag + total value
+    const pctBadge=pct!==null?pnlPill(pct):'';
+    const header='<div style="margin-bottom:.75rem">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
+      +'<div>'
+      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
+      +'<div style="font-size:10px;color:var(--t2)">Total Value (Cash + Holdings only)</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
+      +'<span style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
+      +pctBadge
+      +(rows.length?'<input id="hld-s-'+ccy+'" placeholder="Search holdings\u2026" oninput="filterOvHoldings(\''+ccy+'\')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:130px">':'')
+      +'</div>'
+      +'</div>'
+      +'</div>'
+      // Total P&L full-width card
+      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap;color:#fff">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'" class="'+sc(tot)+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
+      +'</div>'
+      +'</div>';
+
+    const miniRow='<div style="margin-bottom:.875rem">'+miniCards+'</div>';
+
+    const pieHtml="";
+
+    return '<div style="'+ccyCardStyle(ccy)+'">'
+      +header
+      +miniRow
+      +colourBar
+      +holdingsTable
+      +'</div>';
+  }).join('');
+}
+function drawOverviewCharts(p){
+  const h=getHoldings(p,true);
+  [...new Set(h.map(x=>x.ccy))].forEach(ccy=>{
+    const rows=[...h.filter(x=>x.ccy===ccy)].sort((a,b)=>b.mktVal-a.mktVal);
+    const mktVals=rows.map(x=>Math.max(+x.mktVal,0));
+    drawPie('pie-'+ccy,rows.map(x=>x.stock),mktVals,rows.map((_,i)=>PAL[i%PAL.length]),ccy,rows.map(x=>x.mktCcy||ccy));
+  });
+}
+
+// ── Holdings tab ────────────────────────────────────────────────────────────────
+function renderHoldings(p){
+  const h=getHoldings(p,true);
+  if(!h.length)return'<div class="card m" style="text-align:center;padding:2rem">No active holdings.</div>';
+  const byCcy={};
+  h.forEach(hh=>{if(!byCcy[hh.ccy])byCcy[hh.ccy]=[];byCcy[hh.ccy].push(hh);});
+  let tables='';
+  for(const [ccy,rows] of Object.entries(byCcy)){
+    let tbody='';
+    for(const hh of rows){
+      const tot=hh.unreal+hh.divs+hh.realized;
+      const pct=hh.cost>0?tot/hh.cost*100:null;
+      tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
+        +`<td style="font-weight:600">${hh.stock}</td>`
+        +`<td class="r m">${(+hh.qty).toLocaleString()}</td>`
+        +`<td class="r m" style="font-size:11px">${hh.avg>0?fc(hh.avg,ccy,3):'—'}</td>`
+        +`<td class="r">${fc(hh.cost,ccy)}</td>`
+        +`<td class="r m" style="font-size:11px">${hh.mktP>0?hh.mktCcy+' '+hh.mktP.toFixed(3):'—'}</td>`
+        +`<td class="r" style="font-weight:600">${hh.mktVal>0?fc(hh.mktVal,hh.mktCcy):'—'}</td>`
+        +`<td class="r ${sc(hh.unreal)}">${sgn(hh.unreal,ccy)}</td>`
+        +`<td class="r ${hh.divs>0?'g':''}">${hh.divs>0?fc(hh.divs,ccy):'—'}</td>`
+        +`<td class="r ${sc(tot)}" style="font-weight:600">${tot>=0?'+':''}${fc(Math.abs(tot),ccy)}</td>`
+        +`<td class="r">${pct!==null?'<span style="color:'+(pct>=0?'var(--green)':'var(--red)')+';font-weight:600">'+fp(pct)+'</span>':'—'}</td>`
+        +'</tr>';
+    }
+    const sumMkt=rows.reduce((s,h)=>s+h.mktVal,0);
+    const sumU=rows.reduce((s,h)=>s+h.unreal,0);
+    const sumD=rows.reduce((s,h)=>s+h.divs,0);
+    const sumT=rows.reduce((s,h)=>s+h.unreal+h.divs+h.realized,0);
+    const sumC=rows.reduce((s,h)=>s+h.cost,0);
+    const fp2=sumC>0?sumT/sumC*100:null;
+    tables+=`<div class="hld-grp" style="margin-bottom:1.5rem">`
+      +ccyTag(ccy,'margin-bottom:.5rem')
+      +`<div style="overflow-x:auto;margin-top:.5rem"><table class="tbl"><thead><tr>`
+      +`<th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>`
+      +`<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Dividends</th><th class="r">Total P&L</th><th class="r">P&L %</th>`
+      +`</tr></thead><tbody>${tbody}</tbody>`
+      +`<tfoot><tr><td>Total (${ccy})</td><td colspan="4"></td>`
+      +`<td class="r">${fc(sumMkt,ccy)}</td>`
+      +`<td class="r ${sc(sumU)}">${sumU>=0?'+':''}${fc(Math.abs(sumU),ccy)}</td>`
+      +`<td class="r g">${fc(sumD,ccy)}</td>`
+      +`<td class="r ${sc(sumT)}">${sumT>=0?'+':''}${fc(Math.abs(sumT),ccy)}</td>`
+      +`<td class="r">${fp2!==null?'<span style="color:'+(fp2>=0?'var(--green)':'var(--red)')+';font-weight:600">'+fp(fp2)+'</span>':'—'}</td>`
+      +`</tr></tfoot></table></div></div>`;
+  }
+  return `<div class="search-bar">`
+    +`<input id="hld-search" placeholder="Search stock…" oninput="filterHoldings()" style="max-width:300px">`
+    +`<span class="m" style="font-size:12px" id="hld-cnt">${h.length} holding${h.length!==1?'s':''}</span>`
+    +`</div><div id="hld-wrap">${tables}</div>`;
+}
+// ── Stock detail ─────────────────────────────────────────────────────────────────
+function drillStock(stock,ccy){VIEW={type:'stock',stock,ccy};renderContent();}
+function renderStockDetail(p,stock,ccy){
+  const h=getHoldings(p,false).find(h=>h.stock===stock)||{};
+  let txs=p.transactions.filter(t=>t.stock===stock&&['Buy','Sell','Dividend'].includes(t.type));
+  const tot=(h.unreal||0)+(h.divs||0)+(h.realized||0);
+  const closed=h.qty<=0;
+  const pct=h.cost>0?tot/h.cost*100:null;
+
+  // Rolling avg cost for yearly summary
+  const byYr={},hh2={qty:0,cost:0};
+  [...txs].sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{
+    const yr=t.date.slice(0,4);
+    if(!byYr[yr])byYr[yr]={divs:0,realized:0};
+    if(t.type==='Dividend'){byYr[yr].divs+=t.amount!=null?+t.amount:0;}
+    else if(t.type==='Buy'){hh2.qty+=+t.qty;hh2.cost+=(+t.qty)*(+t.price)+(+t.fee||0);}
+    else if(t.type==='Sell'){
+      const avg=hh2.qty>0?hh2.cost/hh2.qty:0;
+      byYr[yr].realized+=(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
+      hh2.cost-=avg*(+t.qty);hh2.qty-=+t.qty;
+    }
+  });
+  const allYrs=Object.keys(byYr).sort();
+
+  // ── Header row 1: Holdings, Avg Cost, Cost Basis, Current Price, Holding Value ─────
+  const row1=[
+    ['Holdings',    h.qty>0?(+h.qty).toLocaleString():'Closed',  'var(--t1)'],
+    ['Avg Cost',    h.avg>0?fc(h.avg,ccy,3):'—',                 'var(--t1)'],
+    ['Cost Basis',  h.cost>0?fc(h.cost,ccy):'—',                 'var(--t1)'],
+    ['Current Price',   h.mktP>0?h.mktCcy+' '+(+h.mktP).toFixed(3):'—', 'var(--t1)'],
+    ['Holding Value',h.mktVal>0?fc(h.mktVal,h.mktCcy||ccy):'—',  'var(--t1)'],
+  ].map(([l,v,c])=>'<div class="kc"><div class="kl">'+l+'</div><div class="kv" style="color:'+c+'">'+v+'</div></div>').join('');
+
+  // ── Header row 2: Unrealized, Realized, Dividends, Total P&L, P&L% ──────────
+  const row2=[
+    ['Unrealized P&L', h.unreal!=null&&h.qty>0?sgn(h.unreal,ccy):'—',  sc(h.unreal||0)==='g'?'var(--green)':sc(h.unreal||0)==='rr'?'var(--red)':'var(--t2)'],
+    ['Realized P&L',   h.realized?sgn(h.realized,ccy):'—',              sc(h.realized||0)==='g'?'var(--green)':sc(h.realized||0)==='rr'?'var(--red)':'var(--t2)'],
+    ['Dividends',      h.divs>0?fc(h.divs,ccy):'—',                     'var(--green)'],
+    ['Total P&L', sgn(tot,ccy),                                     tot>=0?'var(--green)':'var(--red)'],
+    ['P&L %',          pct!==null?fp(pct):'—',                           pct!==null&&pct>=0?'var(--green)':'var(--red)'],
+  ].map(([l,v,c])=>'<div class="kc"><div class="kl">'+l+'</div><div class="kv" style="color:'+c+'">'+v+'</div></div>').join('');
+
+  // ── Build transactions HTML matching renderTx style ──────────────────────────
+  function buildSdTxTable(filterType){
+    const filtered=filterType?txs.filter(t=>t.type===filterType):txs;
+    const sorted=[...filtered].sort((a,b)=>b.date.localeCompare(a.date));
+    let rows='';
+    sorted.forEach(tx=>{
+      const isPF=tx.type==='Platform Fee';const amt=tx.amount!=null?+tx.amount:tx.type==='Sell'?(+tx.qty)*(+tx.price)-(+tx.fee||0):(+tx.qty)*(+tx.price)+(+tx.fee||0);
+      const ds=((tx.stock||'').toLowerCase()+' '+tx.type.toLowerCase()+' '+(tx.note||'').toLowerCase()+' '+tx.date+' '+(tx.ccy||'').toLowerCase()).replace(/"/g,'');
+      rows+='<tr data-search="'+ds+'">'
+        +'<td class="m">'+tx.date+'</td>'
+        +'<td>'+bdg(tx.type)+'</td>'
+        +'<td class="r m">'+(tx.qty>0?(+tx.qty).toLocaleString():'—')+'</td>'
+        +'<td class="r">'+(tx.price>0?fc(+tx.price,tx.ccy,4):'—')+'</td>'
+        +'<td class="r m">'+(tx.fee>0?fc(+tx.fee,tx.ccy):'—')+'</td>'
+        +'<td class="r" style="font-weight:600">'+(amt>0?fc(amt,tx.ccy):'—')+'</td>'
+        +'<td class="m">'+(tx.note||'—')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="ib" onclick="oet(\''+tx.id+'\')">✎</button>'
+        +'<button class="ib" onclick="odt(\''+tx.id+'\')" style="color:var(--red)">✕</button>'
+        +'</td>'
+        +'</tr>';
+    });
+    return rows;
+  }
+
+  const typeOpts=['','Buy','Sell','Dividend','Platform Fee'].map(t=>
+    '<option value="'+t+'">'+( t||'All types')+'</option>'
+  ).join('');
+
+  const txSection='<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap">'
+    +'<span class="stl" style="margin:0">All transactions</span>'
+    +'<span class="m" style="font-size:12px" id="sd-tx-count">'+txs.length+' transactions</span>'
+    +'</div>'
+    +'<div class="search-bar" style="margin-bottom:.75rem">'
+    +'<input id="sd-tx-search" placeholder="Search note, date…" oninput="filterSdTx()" style="max-width:260px">'
+    +'<select id="sd-tx-type" onchange="filterSdTx()" style="width:120px">'
+    +typeOpts
+    +'</select>'
+    +'</div>'
+    +'<div style="overflow-x:auto"><table class="tbl" id="sd-tx-table"><thead><tr>'
+    +'<th>Date</th><th>Type</th><th class="r">Qty</th><th class="r">Price</th>'
+    +'<th class="r">Fee</th><th class="r">Amount</th><th>Note</th><th style="width:52px"></th>'
+    +'</tr></thead><tbody>'+buildSdTxTable()+'</tbody></table></div>'
+    +(txs.length===0?'<div class="m" style="text-align:center;padding:2rem;font-size:12px">No transactions found.</div>':'')
+    +'</div>';
+
+  return'<div class="bb" onclick="VIEW=null;renderContent()">← Back</div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap">'
+    +'<span style="font-size:20px;font-weight:700">'+stock+'</span>'
+    +'<span class="ctag">'+ccy+'</span>'
+    +'<span class="badge" style="color:'+(closed?'var(--t3)':'var(--green)')+';background:'+(closed?'var(--bg4)':'var(--gd)')+'">'+(closed?'Closed':'Active')+'</span>'
+    +(pct!==null?pnlPill(pct):'')
+    +(h.firstDate?'<span class="m" style="font-size:12px">since '+h.firstDate+'</span>':'')
+    +'</div>'
+    +'<div class="kgrid">'+row1+'</div>'
+    +'<div class="kgrid" style="margin-top:.5rem">'+row2+'</div>'
+    +(allYrs.length?'<div class="card"><div class="stl">Yearly summary</div>'
+      +'<table class="tbl"><thead><tr><th>Year</th><th class="r">Dividends</th><th class="r">Realized P&L</th></tr></thead>'
+      +'<tbody>'+allYrs.map(yr=>'<tr><td style="font-weight:600">'+yr+'</td>'
+        +'<td class="r '+(byYr[yr].divs>0?'g':'')+'">'+(byYr[yr].divs>0?fc(byYr[yr].divs,ccy):'—')+'</td>'
+        +'<td class="r '+sc(byYr[yr].realized)+'">'+(byYr[yr].realized?sgn(byYr[yr].realized,ccy):'—')+'</td>'
+        +'</tr>').join('')+'</tbody>'
+      +'<tfoot><tr><td>Total</td>'
+      +'<td class="r g">'+fc(Object.values(byYr).reduce((a,b)=>a+b.divs,0),ccy)+'</td>'
+      +'<td class="r '+sc(Object.values(byYr).reduce((a,b)=>a+b.realized,0))+'">'+sgn(Object.values(byYr).reduce((a,b)=>a+b.realized,0),ccy)+'</td>'
+      +'</tr></tfoot></table></div>'
+      :'')
+    +txSection;
+}
+
+// ── Transactions tab with search ─────────────────────────────────────────────────
+function renderTx(p,filterYrCcy){
+  let txs=[...p.transactions].filter(t=>['Buy','Sell','Dividend','Platform Fee'].includes(t.type));
+  if(filterYrCcy){txs=txs.filter(t=>t.type==='Dividend'&&t.date.slice(0,4)===String(filterYrCcy.yr)&&t.ccy===filterYrCcy.ccy);}
+  txs.sort((a,b)=>b.date.localeCompare(a.date));
+  const isFiltered=!!filterYrCcy;
+  let html='';
+  if(isFiltered){
+    html+='<div class="bb" onclick="TAB=\'journey\';journeyFilter=null;renderContent()">← Back to Journey</div>';
+    html+='<div style="margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bd);border-radius:var(--r);font-size:12px;color:var(--blue)">Dividends for '+filterYrCcy.ccy+' in '+filterYrCcy.yr+'</div>';
+  } else {
+    // P&L summary — 2 rows per currency: row1: CCY | Realized | Unrealized, row2: Dividends
+    const _sum=getSummary(p);
+    const _allTxCcys=[...new Set(p.transactions.map(t=>t.ccy).filter(Boolean))];
+    const CCY_ORDER=['MYR','SGD','USD'];
+    const _ccys=[...CCY_ORDER.filter(c=>_allTxCcys.includes(c)),..._allTxCcys.filter(c=>!CCY_ORDER.includes(c))];
+    if(_ccys.length){
+      html+='<div style="margin-bottom:.875rem;display:flex;flex-direction:column;gap:8px">';
+      _ccys.forEach(function(c){
+        const _r=_sum.realized[c]||0,_u=_sum.unreal[c]||0,_d=_sum.divs[c]||0;
+        html+='<div style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden">'
+          // Row 1: Currency | Realized | Unrealized
+          +'<div style="display:flex;align-items:center;gap:0;padding:8px 12px">'
+          +ccyTag(c)
+          +'<div style="width:1px;background:var(--b1);height:28px;margin:0 14px;flex-shrink:0"></div>'
+          +'<div style="flex:1">'
+          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Realized P&L</div>'
+          +'<div style="font-size:13px;font-weight:700" class="'+sc(_r)+'">'+sgn(_r,c)+'</div>'
+          +'</div>'
+          +'<div style="width:1px;background:var(--b1);height:28px;margin:0 14px;flex-shrink:0"></div>'
+          +'<div style="flex:1">'
+          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Unrealized P&L</div>'
+          +'<div style="font-size:13px;font-weight:700" class="'+sc(_u)+'">'+sgn(_u,c)+'</div>'
+          +'</div>'
+          +'</div>'
+          // Row 2: Dividends
+          +'<div style="border-top:1px solid var(--b1);padding:7px 12px;display:flex;align-items:center;gap:14px">'
+          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;min-width:60px">Dividends</div>'
+          +'<div style="font-size:13px;font-weight:700;color:'+(_d>0?'var(--green)':'var(--t3)')+'">'+(_d>0?'+'+fc(_d,c):'—')+'</div>'
+          +'</div>'
+          +'</div>';
+      });
+      html+='</div>';
+    }
+    const typeFilterOpts=['','Buy','Sell','Dividend','Platform Fee'].map(t=>'<option value="'+t+'">'+(t||'All types')+'</option>').join('');
+    html+='<div class="search-bar">'
+      +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="max-width:240px">'
+      +'<select id="tx-type-filter" onchange="filterTxTable()" style="width:120px">'+typeFilterOpts+'</select>'
+      +'<span class="m" style="font-size:12px" id="tx-count">'+txs.length+' transactions</span>'
+      +'</div>';
+  }
+  html+='<div style="overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
+    +'<th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th>'
+    +'<th class="r">Fee</th><th class="r">Amount</th><th>Note</th>'
+    +(isFiltered?'':'<th style="width:52px"></th>')
+    +'</tr></thead><tbody>';
+  txs.forEach(tx=>{
+    const amt=tx.amount!=null?+tx.amount:tx.type==='Sell'?(+tx.qty)*(+tx.price)-(+tx.fee||0):(+tx.qty)*(+tx.price)+(+tx.fee||0);
+    const ds=((tx.stock||'').toLowerCase()+' '+tx.type.toLowerCase()+' '+(tx.note||'').toLowerCase()+' '+tx.date).replace(/"/g,'');
+    html+='<tr data-search="'+ds+'">'
+      +'<td class="m">'+tx.date+'</td>'
+      +'<td>'+bdg(tx.type)+'</td>'
+      +'<td style="font-weight:600">'+(tx.stock||'—')+'</td>'
+      +'<td class="r m">'+(tx.qty>0?(+tx.qty).toLocaleString():'—')+'</td>'
+      +'<td class="r">'+(tx.price>0?fc(+tx.price,tx.ccy,4):'—')+'</td>'
+      +'<td class="r m">'+(tx.fee>0?fc(+tx.fee,tx.ccy):'—')+'</td>'
+      +'<td class="r" style="font-weight:600">'+(amt>0?fc(amt,tx.ccy):'—')+'</td>'
+      +'<td class="m">'+(tx.note||'—')+'</td>';
+    if(!isFiltered){
+      html+='<td style="white-space:nowrap">'
+        +'<button class="ib" onclick="oet(\''+tx.id+'\')">✎</button>'
+        +'<button class="ib" onclick="odt(\''+tx.id+'\')" style="color:var(--red)">✕</button>'
+        +'</td>';
+    }
+    html+='</tr>';
+  });
+  html+='</tbody></table></div>';
+  if(txs.length===0)html+='<div class="m" style="text-align:center;padding:2rem;font-size:12px">No transactions found.</div>';
+  return html;
+}
+function filterSdTx(){
+  const q=(document.getElementById('sd-tx-search')||{value:''}).value.toLowerCase();
+  const type=(document.getElementById('sd-tx-type')||{value:''}).value;
+  const rows=document.querySelectorAll('#sd-tx-table tbody tr');
+  let visible=0;
+  rows.forEach(r=>{
+    const matchSearch=!q||(r.dataset.search||'').includes(q);
+    const matchType=!type||(r.dataset.search||'').includes(type.toLowerCase());
+    const show=matchSearch&&matchType;
+    r.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  const c=document.getElementById('sd-tx-count');
+  if(c)c.textContent=visible+' transactions';
+}
+
+function filterTxTable(){
+  const q=(document.getElementById('tx-search')||{value:''}).value.toLowerCase();
+  const type=(document.getElementById('tx-type-filter')||{value:''}).value;
+  const rows=document.querySelectorAll('#tx-table tbody tr');
+  let visible=0;
+  rows.forEach(r=>{
+    const matchSearch=!q||(r.dataset.search||'').includes(q);
+    const matchType=!type||(r.dataset.search||'').includes(type.toLowerCase());
+    const show=matchSearch&&matchType;
+    r.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  const c=document.getElementById('tx-count');if(c)c.textContent=visible+' transactions';
+}
+
+// ── Closed trades tab ────────────────────────────────────────────────────────────
+function renderClosed(p){
+  const all=getHoldings(p,false).filter(h=>h.qty<=0&&(h.realized!==0||h.divs!==0));
+  // Overall closed P&L by CCY
+  const _clByCcy={};
+  all.forEach(h=>{if(!_clByCcy[h.ccy])_clByCcy[h.ccy]={r:0,d:0};_clByCcy[h.ccy].r+=h.realized;_clByCcy[h.ccy].d+=h.divs;});
+  const _clCards=Object.entries(_clByCcy).map(([c,v])=>{
+    return '<div style="display:flex;gap:12px;padding:6px 12px;background:#000;border-radius:var(--r);border:1px solid rgba(255,255,255,.2)">'
+      +'<div><div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">'+c+' Realized</div>'
+      +'<div style="font-size:13px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,c)+'</div></div>'
+      +(v.d>0?'<div><div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Dividends</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--green)">'+fc(v.d,c)+'</div></div>':'')
+      +'</div>';
+  }).join('');
+  const _clSummary=_clCards?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:.75rem">${_clCards}</div>`:'';
+  return _clSummary+`<div class="search-bar"><input id="cl-search" placeholder="Search stock…" oninput="filterClosedTable()" style="max-width:320px"><span class="m" style="font-size:12px" id="cl-count">${all.length} closed position${all.length!==1?'s':''}</span></div>
+  ${!all.length?`<div class="card m" style="text-align:center;padding:2rem">No closed positions yet.</div>`:
+  `<div style="overflow-x:auto"><table class="tbl" id="cl-table"><thead><tr>
+    <th>Stock</th><th>CCY</th><th class="r">Realized P&L</th><th class="r">Dividends</th><th class="r">Total P&L</th><th class="r">P&L %</th><th>First buy</th>
+  </tr></thead><tbody>
+  ${all.map(h=>{const tot=h.realized+h.divs;const pct=h.cost>0?tot/h.cost*100:null;return`<tr class="ck" data-search="${h.stock.toLowerCase()} ${h.ccy.toLowerCase()}" onclick="drillStock('${h.stock}','${h.ccy}')">
+    <td style="font-weight:600">${h.stock}</td><td><span class="ctag">${h.ccy}</span></td>
+    <td class="r ${sc(h.realized)}" style="font-weight:600">${h.realized?sgn(h.realized,h.ccy):'—'}</td>
+    <td class="r g">${h.divs>0?fc(h.divs,h.ccy):'—'}</td>
+    <td class="r ${sc(tot)}" style="font-weight:600">${tot>=0?'+':''}${fc(Math.abs(tot),h.ccy)}</td>
+    <td class="r">${pct!==null?`<span style="color:${pct>=0?'var(--green)':'var(--red)'};font-weight:600">${fp(pct)}</span>`:'—'}</td>
+    <td class="m" style="font-size:11px">${h.firstDate||'—'}</td>
+  </tr>`;}).join('')}
+  </tbody></table></div>`}`;
+}
+function filterClosedTable(){
+  const q=($('cl-search')||{}).value?.toLowerCase()||'';
+  const rows=document.querySelectorAll('#cl-table tbody tr');
+  let v=0;rows.forEach(r=>{const show=!q||r.dataset.search.includes(q);r.style.display=show?'':'none';if(show)v++;});
+  const c=$('cl-count');if(c)c.textContent=v+' closed position'+(v!==1?'s':'');
+}
+
+// ── Journey tab ───────────────────────────────────────────────────────────────────
+function renderJourney(p){
+  const data=journeyData(p),ccys=Object.keys(data);
+  if(!ccys.length)return`<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>`;
+  const sum=getSummary(p);
+
+  // Sub-tab state stored on window so it survives re-renders
+  if(window.jSubTab===undefined)window.jSubTab='dividend';
+
+  function tabBtn(key,label){
+    const on=window.jSubTab===key;
+    return`<button onclick="window.jSubTab='${key}';renderContent()" style="padding:6px 18px;font-size:12px;font-weight:${on?700:500};border-radius:20px;border:1.5px solid ${on?'var(--blue)':'var(--b2)'};color:${on?'var(--blue)':'var(--t2)'};background:${on?'var(--bd)':'transparent'};cursor:pointer;transition:all .15s">${label}</button>`;
+  }
+  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem">${tabBtn('dividend','Dividend')}${tabBtn('pnl','PnL')}</div>`;
+
+  const sections=ccys.map(ccy=>{
+    const rows=data[ccy];if(!rows.length)return'';
+    if(window.jSubTab==='dividend'){
+      const totalDiv=rows.reduce((s,r)=>s+r.divYr,0);
+      if(!totalDiv)return`<div style="margin-bottom:1.5rem"><span class="ctag">${ccy}</span><p class="m" style="font-size:12px;margin-top:.5rem">No dividends recorded.</p></div>`;
+      const rowsHtml=rows.filter(r=>r.divYr>0).map(r=>{
+        const isCur=r.yr===new Date().getFullYear();
+        return`<tr style="${isCur?'background:var(--bdd)':''}">
+          <td style="font-weight:600;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="jDrill('div','${ccy}',${r.yr})">${r.yr}${isCur?' ◂':''}</td>
+          <td class="r g" style="font-weight:600">${fc(r.divYr,ccy)}</td>
+        </tr>`;
+      }).join('');
+      return`<div style="margin-bottom:2rem">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
+          <span class="ctag">${ccy}</span>
+          <span style="font-size:12px;color:var(--green);font-weight:600">Total: ${fc(totalDiv,ccy)}</span>
+        </div>
+        <p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see full dividend transactions for that year.</p>
+        <div style="overflow-x:auto"><table class="tbl" style="max-width:320px">
+          <thead><tr><th>Year</th><th class="r">Dividends received</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+          <tfoot><tr><td style="font-weight:600">Total</td><td class="r g" style="font-weight:700">${fc(totalDiv,ccy)}</td></tr></tfoot>
+        </table></div>
+      </div>`;
+    } else {
+      // PnL tab
+      const totalReal=rows.reduce((s,r)=>s+r.realYr,0);
+      const totalUnreal=sum.unreal[ccy]||0;
+      const hasReal=rows.some(r=>r.realYr!==0);
+      const rowsHtml=rows.filter(r=>r.realYr!==0).map(r=>{
+        const isCur=r.yr===new Date().getFullYear();
+        return`<tr style="${isCur?'background:var(--bdd)':''}">
+          <td style="font-weight:600;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="jDrill('pnl','${ccy}',${r.yr})">${r.yr}${isCur?' ◂':''}</td>
+          <td class="r ${sc(r.realYr)}" style="font-weight:600">${sgn(r.realYr,ccy)}</td>
+        </tr>`;
+      }).join('');
+      return`<div style="margin-bottom:2rem">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
+          <span class="ctag">${ccy}</span>
+          ${hasReal?`<span style="font-size:12px;font-weight:600" class="${sc(totalReal)}">Realized: ${sgn(totalReal,ccy)}</span>`:''}
+          <span style="font-size:12px;font-weight:600" class="${sc(totalUnreal)}">Unrealized now: ${sgn(totalUnreal,ccy)}</span>
+        </div>
+        ${hasReal?`<p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see the Buy/Sell transactions that generated that P&L.</p>
+        <div style="overflow-x:auto"><table class="tbl" style="max-width:320px">
+          <thead><tr><th>Year</th><th class="r">Realized P&L</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+          <tfoot>
+            <tr><td style="font-weight:600">Total realized</td><td class="r ${sc(totalReal)}" style="font-weight:700">${sgn(totalReal,ccy)}</td></tr>
+            <tr style="background:var(--bg4)"><td style="color:var(--t2)">Unrealized (now)</td><td class="r ${sc(totalUnreal)}" style="font-weight:600">${sgn(totalUnreal,ccy)}</td></tr>
+            <tr style="background:var(--bg4)"><td style="font-weight:600">Total P&L</td>${(()=>{const t=totalReal+totalUnreal;return`<td class="r ${sc(t)}" style="font-weight:700">${sgn(t,ccy)}</td>`;})()}</tr>
+          </tfoot>
+        </table></div>`:
+        `<p class="m" style="font-size:12px">No realized P&L yet. Unrealized: <strong class="${sc(totalUnreal)}">${sgn(totalUnreal,ccy)}</strong></p>`}
+      </div>`;
+    }
+  }).join('');
+
+  return`<div class="card"><div class="stl">${window.jSubTab==='dividend'?'Dividend history':'PnL history'}</div>
+  ${subTabs}${sections}</div>`;
+}
+
+function jDrill(mode,ccy,yr){
+  const p=pf();
+  let txs=[];
+  let realizedPnl=0, unrealizedPnl=0;
+
+  if(mode==='div'){
+    txs=p.transactions.filter(t=>t.type==='Dividend'&&t.ccy===ccy&&t.date.slice(0,4)===String(yr));
+    txs.sort((a,b)=>b.date.localeCompare(a.date));
+    const totalDiv=txs.reduce((s,t)=>s+(t.amount!=null?+t.amount:0),0);
+    const backBtn='<div class="bb" onclick="window.jSubTab=\'dividend\';renderContent()">← Back to Dividend</div>';
+    const banner='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.75rem;padding:.75rem 1rem;background:var(--gd);border-radius:var(--r);border-left:3px solid var(--green)">'
+      +'<span style="font-size:13px;font-weight:600;color:var(--green)">Dividends — '+ccy+' '+yr+'</span>'
+      +'<span style="font-size:15px;font-weight:700;color:var(--green)">+'+fc(totalDiv,ccy)+'</span>'
+      +'<span class="m" style="font-size:11px">total received</span>'
+      +'<span class="m" style="font-size:11px;margin-left:auto">'+txs.length+' transaction'+(txs.length!==1?'s':'')+'</span>'
+      +'</div>';
+    const searchBar='<div class="search-bar"><input id="jd-search" placeholder="Search stock…" oninput="filterJdrillTable()" style="max-width:280px">'
+      +'<span class="m" style="font-size:12px" id="jd-cnt">'+txs.length+' record'+(txs.length!==1?'s':'')+'</span></div>';
+    let tbody='';
+    txs.forEach(t=>{
+      const ds=(t.stock||'').toLowerCase()+' '+(t.note||'').toLowerCase();
+      tbody+='<tr data-jd="'+ds.replace(/"/g,'')+'">'
+        +'<td class="m">'+t.date+'</td>'
+        +'<td style="font-weight:600">'+(t.stock||'—')+'</td>'
+        +'<td class="r g" style="font-weight:600">'+fc(t.amount!=null?+t.amount:0,ccy)+'</td>'
+        +'<td class="m">'+(t.note||'—')+'</td>'
+        +'</tr>';
+    });
+    const tableHtml=txs.length
+      ?'<div style="overflow-x:auto"><table class="tbl" id="jd-table">'
+        +'<thead><tr><th>Date</th><th>Stock</th><th class="r">Amount</th><th>Note</th></tr></thead>'
+        +'<tbody>'+tbody+'</tbody>'
+        +'<tfoot><tr><td colspan="2">Total</td><td class="r g" style="font-weight:700">'+fc(totalDiv,ccy)+'</td><td></td></tr></tfoot>'
+        +'</table></div>'
+      :'<p class="m" style="padding:1rem 0;font-size:12px">No dividend transactions for this period.</p>';
+    TAB='journey';
+    $('ct').innerHTML=backBtn+banner+searchBar+tableHtml;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab==='journey'));
+    return;
+  }
+
+  // PnL drill
+  txs=p.transactions.filter(t=>['Buy','Sell'].includes(t.type)&&t.ccy===ccy&&t.date.slice(0,4)===String(yr));
+  txs.sort((a,b)=>b.date.localeCompare(a.date));
+
+  // Compute realized P&L for this year using FIFO avg cost
+  const hh={};
+  p.transactions.filter(t=>t.type==='Buy'&&t.ccy===ccy&&t.stock).forEach(t=>{
+    if(!hh[t.stock])hh[t.stock]={qty:0,cost:0};
+    hh[t.stock].qty+=+t.qty; hh[t.stock].cost+=(+t.qty)*(+t.price)+(+t.fee||0);
+  });
+  realizedPnl=p.transactions.filter(t=>t.type==='Sell'&&t.ccy===ccy&&t.date.slice(0,4)===String(yr)&&t.stock).reduce((s,t)=>{
+    const hs=hh[t.stock]||{}; const avg=(hs.qty||0)>0?(hs.cost||0)/(hs.qty):0;
+    return s+(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
+  },0);
+
+  // Unrealized P&L for this year: current unrealized for stocks bought in this year or earlier
+  // Use getSummary for current portfolio unrealized
+  const sumData=getSummary(p);
+  unrealizedPnl=sumData.unreal[ccy]||0;
+
+  const totalPnl=realizedPnl+unrealizedPnl;
+  const backBtn='<div class="bb" onclick="window.jSubTab=\'pnl\';renderContent()">← Back to PnL</div>';
+
+  // Summary cards
+  const cards='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1rem">'
+    +'<div class="kc"><div class="kl">Realized P&L '+yr+'</div><div class="kv '+sc(realizedPnl)+'">'+sgn(realizedPnl,ccy)+'</div></div>'
+    +'<div class="kc"><div class="kl">Unrealized P&L (now)</div><div class="kv '+sc(unrealizedPnl)+'">'+sgn(unrealizedPnl,ccy)+'</div></div>'
+    +'<div class="kc"><div class="kl">Total P&L</div><div class="kv '+sc(totalPnl)+'" style="font-size:14px;font-weight:700">'+sgn(totalPnl,ccy)+'</div></div>'
+    +'</div>';
+
+  const banner='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.75rem;padding:.75rem 1rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--blue)">'
+    +'<span style="font-size:13px;font-weight:600;color:var(--blue)">Buy &amp; Sell — '+ccy+' '+yr+'</span>'
+    +'<span class="m" style="font-size:11px;margin-left:auto">'+txs.length+' transaction'+(txs.length!==1?'s':'')+'</span>'
+    +'</div>';
+
+  const searchBar='<div class="search-bar"><input id="jd-search" placeholder="Search stock…" oninput="filterJdrillTable()" style="max-width:280px">'
+    +'<span class="m" style="font-size:12px" id="jd-cnt">'+txs.length+' record'+(txs.length!==1?'s':'')+'</span></div>';
+
+  let tbody='';
+  txs.forEach(t=>{
+    const amt=t.type==='Sell'?(+t.qty)*(+t.price)-(+t.fee||0):(+t.qty)*(+t.price)+(+t.fee||0);
+    const ds=(t.stock||'').toLowerCase()+' '+t.type.toLowerCase()+' '+(t.note||'').toLowerCase();
+    tbody+='<tr data-jd="'+ds.replace(/"/g,'')+'">'
+      +'<td class="m">'+t.date+'</td>'
+      +'<td>'+bdg(t.type)+'</td>'
+      +'<td style="font-weight:600">'+(t.stock||'—')+'</td>'
+      +'<td class="r m">'+(+t.qty).toLocaleString()+'</td>'
+      +'<td class="r">'+fc(+t.price,t.ccy,4)+'</td>'
+      +'<td class="r m">'+(t.fee>0?fc(+t.fee,t.ccy):'—')+'</td>'
+      +'<td class="r" style="font-weight:600">'+fc(amt,t.ccy)+'</td>'
+      +'<td class="m">'+(t.note||'—')+'</td>'
+      +'</tr>';
+  });
+  const tableHtml=txs.length
+    ?'<div style="overflow-x:auto"><table class="tbl" id="jd-table">'
+      +'<thead><tr><th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Fee</th><th class="r">Total</th><th>Note</th></tr></thead>'
+      +'<tbody>'+tbody+'</tbody>'
+      +'<tfoot><tr><td colspan="5">Realized P&L this year</td><td colspan="2" class="r '+sc(realizedPnl)+'" style="font-weight:700">'+sgn(realizedPnl,ccy)+'</td><td></td></tr></tfoot>'
+      +'</table></div>'
+    :'<p class="m" style="padding:1rem 0;font-size:12px">No Buy/Sell transactions found for this period.</p>';
+
+  TAB='journey';
+  $('ct').innerHTML=backBtn+banner+cards+searchBar+tableHtml;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab==='journey'));
+}
+
+function filterJdrillTable(){
+  const q=(document.getElementById('jd-search')||{value:''}).value.toLowerCase();
+  const rows=document.querySelectorAll('#jd-table tbody tr');
+  let v=0;
+  rows.forEach(r=>{const show=!q||(r.dataset.jd||'').includes(q);r.style.display=show?'':'none';if(show)v++;});
+  const c=document.getElementById('jd-cnt');
+  if(c)c.textContent=v+' record'+(v!==1?'s':'');
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────────
+function omm(mode,data){
+  if(mode==='_cash'&&data){
+    // data is already-built HTML for cash modal
+    $('mi').innerHTML=data;
+    $('ov').classList.add('open');
+    MM='_cash';
+    return;
+  }
+  MM=mode;ETX=data||null;renderModal();$('ov').classList.add('open');
+}
+function cmm(){$('ov').classList.remove('open');MM=null;ETX=null;DTX=null;}
+$('ov').addEventListener('click',e=>{if(e.target===$('ov'))cmm();});
+function setupAC(){const inp=$('ts'),list=$('ac-list');if(!inp||!list)return;const dict=stockDict(),stocks=Object.keys(dict);inp.addEventListener('input',()=>{const q=inp.value.trim().toLowerCase();const m=stocks.filter(s=>s.toLowerCase().includes(q)&&q.length>0);if(!m.length){list.classList.remove('open');return;}list.innerHTML=m.map(s=>`<div class="ac-item" onclick="selStk('${s}','${dict[s]}')"><span>${s}</span><span class="ac-ccy">${dict[s]}</span></div>`).join('');list.classList.add('open');});inp.addEventListener('blur',()=>setTimeout(()=>list.classList.remove('open'),200));}
+function selStk(n,c){const i=$('ts'),cc=$('tc'),l=$('ac-list');if(i)i.value=n;if(cc)cc.value=c;if(l)l.classList.remove('open');}
+
+function renderModal(){
+  const p=pf();let h='';
+  if(MM==='ap'||MM==='ep'){const ep=MM==='ep'?p:null;h=`<h3>${ep?'Edit portfolio':'New portfolio'}</h3><div style="margin-bottom:12px"><label class="lbl">Name</label><input id="pn" value="${ep?ep.name:''}" placeholder="e.g. My Bursa"></div><label class="lbl">Color</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center">${PFPAL.map(c=>`<div onclick="slc('${c}')" data-c="${c}" style="width:24px;height:24px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${ep&&ep.color===c?'#fff':'transparent'}"></div>`).join('')}<input type="color" id="pc" value="${ep?ep.color:PAL[0]}" style="width:30px;height:30px;padding:2px;border-radius:6px"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="pri" onclick="${ep?'dep()':'aap()'}">${ep?'Save':'Create'}</button></div>`;}
+  else if(MM==='dp'){h=`<h3>Delete portfolio?</h3><p style="color:var(--t2);line-height:1.7;margin-bottom:1.25rem">Delete <strong style="color:var(--t1)">${p.name}</strong> and all ${p.transactions.length} transactions? Cannot be undone.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="dng" onclick="ddp()">Delete</button></div>`;}
+  else if(MM==='at'||MM==='et'){
+    const isEdit=MM==='et';
+    const tx=ETX||{id:uid(),date:new Date().toISOString().split('T')[0],type:'Buy',stock:'',qty:'',price:'',fee:'',ccy:'USD',amount:'',note:''};
+    const isF=tx.type==='Dividend'||tx.type==='Platform Fee';
+
+    // ── Original values panel (edit mode only) ───────────────────────────────
+    let origHtml='';
+    if(isEdit){
+      const origAmt=tx.amount!=null&&tx.amount!==''?+tx.amount
+        :tx.type==='Sell'?(+tx.qty)*(+tx.price)-(+tx.fee||0)
+        :(+tx.qty)*(+tx.price)+(+tx.fee||0);
+      origHtml='<div style="background:var(--bg4);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:1.25rem;border-left:3px solid var(--amber)">'
+        +'<div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">Original values</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">';
+      // Always show these fields
+      const origFields=[
+        ['Date',     tx.date||'—'],
+        ['Type',     tx.type],
+        ['Stock',    tx.stock||'—'],
+        ['Currency', tx.ccy],
+        ...(isF?[
+          ['Amount', tx.amount!=null?fc(+tx.amount,tx.ccy):'—'],
+        ]:[
+          ['Quantity', tx.qty?((+tx.qty).toLocaleString()):'—'],
+          ['Price',    tx.price?fc(+tx.price,tx.ccy,4):'—'],
+          ['Fee',      tx.fee?fc(+tx.fee,tx.ccy):'—'],
+          ['Amount',   origAmt>0?fc(origAmt,tx.ccy):'—'],
+        ]),
+        ['Note',     tx.note||'—'],
+      ];
+      origFields.forEach(([lbl,val])=>{
+        origHtml+='<div style="padding:3px 0;font-size:12px">'
+          +'<div style="color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">'+lbl+'</div>'
+          +'<div style="font-weight:600;color:var(--t1)">'+val+'</div>'
+          +'</div>';
+      });
+      origHtml+='</div></div>'
+        +'<div style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">Edit below</div>';
+    }
+
+    // ── Form fields ──────────────────────────────────────────────────────────
+    const ccyOpts=CCYS.map(c=>'<option '+(tx.ccy===c?'selected':'')+'>'+c+'</option>').join('');
+    const typeOpts=TYPES.map(t=>'<option '+(tx.type===t?'selected':'')+'>'+t+'</option>').join('');
+    const qShow=isF?'style="display:none"':'';
+    const pShow=isF?'style="display:none"':'';
+    const fShow=isF?'style="display:none"':'';
+    const aShow=!isF?'style="display:none"':'';
+    h='<h3>'+(isEdit?'Edit transaction':'Add transaction')+'</h3>'
+      +origHtml
+      +'<div class="fg">'
+      +'<div><label class="lbl">Type</label><select id="tt" onchange="ttc()">'+typeOpts+'</select></div>'
+      +'<div><label class="lbl">Date</label><input type="date" id="td" value="'+tx.date+'"></div>'
+      +'<div id="tsw" class="full"><label class="lbl">Stock / Asset</label><div class="ac-wrap"><input id="ts" value="'+(tx.stock||'')+'" placeholder="e.g. TSLA" autocomplete="off"><div id="ac-list" class="ac-list"></div></div></div>'
+      +'<div><label class="lbl">Currency</label><select id="tc">'+ccyOpts+'</select></div>'
+      +'<div id="tqw" '+qShow+'><label class="lbl">Quantity</label><input type="number" id="tq" value="'+(tx.qty||'')+'"></div>'
+      +'<div id="tpw" '+pShow+'><label class="lbl">Price per unit</label><input type="number" id="tp" step="0.0001" value="'+(tx.price||'')+'"></div>'
+      +'<div id="tfw" '+fShow+'><label class="lbl">Fee</label><input type="number" id="tf" step="0.01" value="'+(tx.fee||'')+'"></div>'
+      +'<div id="taw" '+aShow+'><label class="lbl">Amount</label><input type="number" id="ta" step="0.01" value="'+(tx.amount!=null&&tx.amount!==''?tx.amount:'')+'"></div>'
+      +'<div class="full"><label class="lbl">Note</label><input id="tn" value="'+(tx.note||'')+'"></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end">'
+      +'<button onclick="cmm()">Cancel</button>'
+      +'<button class="pri" onclick="'+(isEdit?'eet()':'aat()')+'\">'+(isEdit?'Save changes':'Add')+'</button>'
+      +'</div>';
+  }
+    else if(MM==='dxt'){h=`<h3>Delete transaction?</h3><p style="color:var(--t2);line-height:1.7;margin-bottom:1.25rem">Remove this transaction? All P&L recalculates immediately.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="dng" onclick="ddt()">Delete</button></div>`;}
+  else if(MM==='px'){
+    // Build unified stock list from ALL portfolios
+    // Preserve stored order from prices{}, group by CCY
+    const seen={};
+    const allStocks=[]; // [{stock, price, ccy, pfIds}] in order
+
+    // Step 1: collect ALL stocks from all portfolios' prices (in stored order)
+    S.portfolios.forEach(function(pf0){
+      Object.keys(pf0.prices).forEach(function(stock){
+        if(!seen[stock]){
+          seen[stock]=true;
+          const mp=pf0.prices[stock];
+          allStocks.push({stock:stock,price:mp.price,ccy:mp.ccy,pfIds:[pf0.id]});
+        } else {
+          var existing=allStocks.find(function(x){return x.stock===stock;});
+          if(existing&&existing.pfIds.indexOf(pf0.id)<0)existing.pfIds.push(pf0.id);
+        }
+      });
+    });
+
+    // Step 2: add active holdings not yet in prices (appended at end)
+    S.portfolios.forEach(function(pf0){
+      getHoldings(pf0,true).forEach(function(h){
+        if(!seen[h.stock]){
+          seen[h.stock]=true;
+          allStocks.push({stock:h.stock,price:0,ccy:h.ccy,pfIds:[pf0.id]});
+        }
+      });
+    });
+
+    // Step 3: group by CCY (MYR → SGD → USD → others), preserve order within each group
+    const CCY_ORDER=['MYR','SGD','USD'];
+    const byCcy={};
+    allStocks.forEach(function(s){
+      if(!byCcy[s.ccy])byCcy[s.ccy]=[];
+      byCcy[s.ccy].push(s);
+    });
+    const ccyOrder=[...CCY_ORDER.filter(function(c){return byCcy[c];}),
+                    ...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
+
+    let rowsHtml='';
+    if(allStocks.length){
+      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+
+      ccyOrder.forEach(function(ccy){
+        const group=byCcy[ccy];
+        const accent=CCY_ACCENT[ccy]||'rgba(79,195,247,.4)';
+        // CCY group header
+        rowsHtml+='<div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;padding:4px 6px;border-left:3px solid '+accent+';background:var(--bg3);border-radius:0 4px 4px 0">'
+          +'<span style="font-size:11px;font-weight:700;color:'+accent+'">'+ccy+'</span>'
+          +'<span style="font-size:10px;color:var(--t3)">'+group.length+' stock'+(group.length!==1?'s':'')+'</span>'
+          +'</div>';
+        // Column headers (once per group)
+        rowsHtml+='<div style="display:grid;grid-template-columns:20px 1fr 75px 115px 32px;gap:6px;margin-bottom:4px;padding:0 2px">'
+          +'<span></span>'
+          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">Stock</span>'
+          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">CCY</span>'
+          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">Price</span>'
+          +'<span></span></div>';
+
+        group.forEach(function(item,idx){
+          const stock=item.stock;
+          const k=stock.replace(/[^a-z0-9]/gi,'_');
+          const opts=CCYS.map(function(c){return '<option '+(item.ccy===c?'selected':'')+'>'+c+'</option>';}).join('');
+          const pfBadges=item.pfIds.map(function(pid){
+            const pf0=S.portfolios.find(function(x){return x.id===pid;})||{};
+            return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(pf0.color||'#888')+';margin-left:2px" title="'+pf0.name+'"></span>';
+          }).join('');
+          rowsHtml+='<div class="px-row" data-k="'+k+'" data-ccy="'+ccy+'" draggable="true"'
+            +' style="display:grid;grid-template-columns:20px 1fr 75px 115px 32px;gap:6px;margin-bottom:6px;align-items:center">'
+            +'<div class="drag-handle" title="Drag to reorder" style="cursor:grab;color:var(--t3);font-size:14px;text-align:center;padding-top:2px">⠿</div>'
+            +'<div style="display:flex;align-items:center;gap:4px">'
+            +'<input id="pn-'+k+'" data-orig="'+stock.replace(/"/g,'&quot;')+'" value="'+stock.replace(/"/g,'&quot;')+'" style="font-weight:600;flex:1">'
+            +pfBadges
+            +'</div>'
+            +'<select id="pc-'+k+'" style="padding:5px 4px">'+opts+'</select>'
+            +'<input type="number" id="pp-'+k+'" step="0.0001" value="'+item.price+'">'
+            +'<button class="ib" onclick="delPrice(\''+k+'\')" style="font-size:13px;padding:2px 5px;border:1px solid var(--red);border-radius:6px;color:var(--red)" title="Remove">&#10005;</button>'
+            +'</div>';
+        });
+      });
+    } else {
+      rowsHtml='<p class="m" style="font-size:12px;margin-bottom:1rem">No holdings yet.</p>';
+    }
+    h='<h3>Update market prices — All portfolios</h3>'
+      +'<p style="font-size:11px;color:var(--t2);margin-bottom:1rem">&#9650;&#9660; to reorder within currency group &middot; Edit name to rename &middot; &#10005; removes entry</p>'
+      +'<div id="px-list" style="margin-bottom:1rem">'+rowsHtml+'</div>'
+      +'<div style="border-top:1px solid var(--b1);padding-top:1rem">'
+      +'<label class="lbl">Add new stock price</label>'
+      +'<div style="display:flex;gap:8px">'
+      +'<input id="nsn" placeholder="Stock name" style="flex:1">'
+      +'<select id="nsc" style="width:80px">'+CCYS.map(function(c){return '<option>'+c+'</option>';}).join('')+'</select>'
+      +'<input type="number" id="nsp" placeholder="0.00" step="0.0001" style="width:95px">'
+      +'<button onclick="ans()">Add</button>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">'
+      +'<button onclick="cmm()">Cancel</button>'
+      +'<button class="pri" onclick="spx()">Save all</button>'
+      +'</div>';
+  }  $('mi').innerHTML=h;
+  if(MM==='at'||MM==='et'){setTimeout(setupAC,50);setTimeout(ttc,20);}
+  if(MM==='px'){setTimeout(initPxDrag,50);}
+}
+
+// ── Backup & Restore (separate buttons, no modal) ──────────────────────────────
+function doBackup(){
+  const d=new Date().toISOString().slice(0,10);
+  const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download='portfoliox_backup_'+d+'.json';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(u);},100);
+  const t=$('toast');t.textContent='Backup downloaded ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2500);
+}
+function doRestore(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.portfolios||!Array.isArray(data.portfolios))throw new Error('Invalid format');
+      if(!confirm(`Restore backup? This will replace all current data with ${data.portfolios.length} portfolio(s) from the backup.`))return;
+      S=data;
+      if(!S.pieImages)S.pieImages={};
+      // Migrate older backups — add any missing fields
+      S.portfolios.forEach(function(pf,idx){
+        pf.color=PFPAL[idx%PFPAL.length];
+        if(!pf.optionTrades)pf.optionTrades=[];
+        if(!pf.cashBalances)pf.cashBalances={};
+        if(!pf.deposits)pf.deposits=[];if(!pf.deposits)pf.deposits=[];
+      });
+      save();render();
+      const t=$('toast');t.textContent='Restored ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2500);
+    }catch(err){alert('Error: invalid or corrupted backup file. Please use a valid .json backup.');}
+    e.target.value='';
+  };
+  r.readAsText(f);
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save();render();}
+function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderContent();}
+function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>el.style.border=el.dataset.c===c?'3px solid #fff':'3px solid transparent');}
+function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;cmm();save();render();}
+function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);cmm();save();render();}
+function ddp(){S.portfolios=S.portfolios.filter(p=>p.id!==S.activeId);S.activeId=S.portfolios[0].id;cmm();save();render();}
+function ttc(){const t=($('tt')||{}).value,isF=t==='Dividend'||t==='Platform Fee',isPF=t==='Platform Fee';['tqw','tpw','tfw'].forEach(id=>{const e=$(id);if(e)e.style.display=isF?'none':'';});const aw=$('taw');if(aw)aw.style.display=isF?'':'none';const sw=$('tsw');if(sw)sw.style.display=isPF?'none':'';const al=aw?aw.querySelector('label'):null;if(al)al.textContent=isPF?'Fee Amount (deducted from Realized P&L)':'Amount';}
+function gTx(){const type=($('tt')||{}).value,isF=type==='Dividend'||type==='Platform Fee',isPF=type==='Platform Fee';return{date:($('td')||{}).value||'',type,stock:isPF?'':($('ts')?$('ts').value.trim():''),ccy:($('tc')||{}).value||'USD',qty:isF?0:+(($('tq')||{}).value||0),price:isF?0:+(($('tp')||{}).value||0),fee:isF?0:+(($('tf')||{}).value||0),amount:isF?+(($('ta')||{}).value||0):null,note:($('tn')||{}).value||''};}
+function aat(){const d=gTx();if(['Buy','Sell'].includes(d.type)&&!d.stock){alert('Please enter a stock name.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.qty>0)){alert('Please enter a valid quantity.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.price>0)){alert('Please enter a valid price.');return;}const tx={id:uid(),...d};S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,transactions:[...p.transactions,tx]});cmm();save();render();}
+function eet(){const d=gTx();S.portfolios=S.portfolios.map(p=>{if(p.id!==S.activeId)return p;return{...p,transactions:p.transactions.map(t=>t.id===ETX.id?{...t,...d}:t)};});cmm();save();render();}
+function oet(id){const tx=pf().transactions.find(t=>t.id===id);if(!tx)return;ETX={...tx};omm('et');}
+function odt(id){DTX=id;omm('dxt');}
+function ddt(){S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,transactions:p.transactions.filter(t=>t.id!==DTX)});cmm();save();render();}
+function ans(){const n=($('nsn')||{}).value?.trim(),c=($('nsc')||{}).value,pr=+(($('nsp')||{}).value||0);if(!n)return;S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,prices:{...p.prices,[n]:{price:pr,ccy:c}}});save();omm('px');}
+
+function delPrice(k){
+  // Remove the row from the modal DOM so it won't be saved in spx()
+  const inputs=['pn-'+k,'pc-'+k,'pp-'+k];
+  const el=document.getElementById('pn-'+k);
+  if(el){
+    const row=el.closest('div[style*="grid"]');
+    if(row)row.remove();
+  }
+}
+function movePxRow(btn,dir){
+  const row=btn.closest('.px-row');if(!row)return;
+  const ccy=row.dataset.ccy;
+  const list=row.parentElement;
+  // Only move within same CCY group
+  const allRows=[].slice.call(list.querySelectorAll('.px-row'));
+  const sameGroup=allRows.filter(function(r){return r.dataset.ccy===ccy;});
+  const idx=sameGroup.indexOf(row),ni=idx+dir;
+  if(ni<0||ni>=sameGroup.length)return;
+  if(dir===-1){
+    sameGroup[ni].parentNode.insertBefore(row,sameGroup[ni]);
+  } else {
+    sameGroup[ni].parentNode.insertBefore(sameGroup[ni],row);
+  }
+}
+function delPrice(k){
+  const el=document.getElementById('pn-'+k);
+  if(el){const row=el.closest('.px-row');if(row)row.remove();}
+}
+function spx(){
+  // Read rows IN DOM ORDER — this preserves the user's drag arrangement
+  const orderedUpdates=[]; // [{orig, newName, price, ccy}] in DOM order
+  const updatesByOrig={};  // for quick lookup by original name
+  const pxRows=document.querySelectorAll('#px-list .px-row');
+  [].forEach.call(pxRows,function(row){
+    const k=row.dataset.k;if(!k)return;
+    const ni=document.getElementById('pn-'+k);
+    const pi=document.getElementById('pp-'+k);
+    const ci=document.getElementById('pc-'+k);
+    if(!pi||!ci)return;
+    const orig=((row.querySelector('[data-orig]')||{}).dataset||{}).orig||k;
+    const newName=(ni?ni.value.trim():orig)||orig;
+    const entry={orig:orig,newName:newName,price:+pi.value,ccy:ci.value};
+    orderedUpdates.push(entry);
+    updatesByOrig[orig]=entry;
+  });
+
+  // Apply to ALL portfolios — build np IN THE SAME DOM ORDER
+  S.portfolios=S.portfolios.map(function(pf0){
+    const np={};
+    const activeStocks=getHoldings(pf0,true).map(function(h){return h.stock;});
+    // Insert prices in DOM order (only stocks relevant to this portfolio)
+    orderedUpdates.forEach(function(u){
+      const inPrices=pf0.prices.hasOwnProperty(u.orig);
+      const inActive=activeStocks.indexOf(u.orig)>=0||activeStocks.indexOf(u.newName)>=0;
+      if(inPrices||inActive){
+        np[u.newName]={price:u.price,ccy:u.ccy};
+      }
+    });
+    // Apply renames to transactions
+    let txs=pf0.transactions;
+    orderedUpdates.forEach(function(u){
+      if(u.newName!==u.orig){
+        txs=txs.map(function(t){return t.stock===u.orig?Object.assign({},t,{stock:u.newName}):t;});
+      }
+    });
+    return Object.assign({},pf0,{transactions:txs,prices:np});
+  });
+  cmm();save();render();
+}
+
+function filterHoldings(){
+  const q=(document.getElementById('hld-search')||{value:''}).value.toLowerCase();
+  let v=0;
+  document.querySelectorAll('.hld-row').forEach(r=>{
+    const show=!q||(r.dataset.s||'').includes(q);
+    r.style.display=show?'':'none';
+    if(show)v++;
+  });
+  document.querySelectorAll('.hld-grp').forEach(g=>{
+    const vis=[...g.querySelectorAll('.hld-row')].some(r=>r.style.display!=='none');
+    g.style.display=vis?'':'none';
+  });
+  const c=document.getElementById('hld-cnt');
+  if(c)c.textContent=v+' holding'+(v!==1?'s':'');
+}
+
+// ── Options Tab ────────────────────────────────────────────────────────────────
+function renderOptions(){
+  const trades=pf().optionTrades||[];
+  const isOpen=t=>t.closeValue===null||t.closeValue===undefined||t.closeValue==='';
+  const openT=trades.filter(isOpen);
+  const closedT=trades.filter(t=>!isOpen(t));
+  const fmtN=(v,dp=2)=>{const a=Math.abs(v).toLocaleString('en',{minimumFractionDigits:dp,maximumFractionDigits:dp});return(v>=0?'+':'-')+'US$ '+a;};
+  const fmtAbs=v=>{const a=Math.abs(v).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});return(v<0?'-':'')+'US$ '+a;};
+  const pctBadge=(pnl,base)=>{if(!base)return'';const p=(pnl/Math.abs(base))*100;return` <span style="font-size:10px;color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${p.toFixed(1)}%</span>`;};
+  const realPnl=closedT.reduce((s,t)=>s+(parseFloat(t.openValue)||0)+(parseFloat(t.closeValue)||0)-(parseFloat(t.openFee)||0)-(parseFloat(t.closeFee)||0),0);
+  const unrPnl=openT.reduce((s,t)=>{const o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0;return t.mktValue!=null&&t.mktValue!==''?s+o+(parseFloat(t.mktValue)||0)-of0:s;},0);
+  const openExp=openT.reduce((s,t)=>s+(parseFloat(t.openValue)||0),0);
+  const hasMktCount=openT.filter(t=>t.mktValue!=null&&t.mktValue!=='').length;
+  const summary=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1.25rem">
+    <div class="kc"><div class="kl">Open trades</div><div class="kv">${openT.length}</div></div>
+    <div class="kc"><div class="kl">Closed trades</div><div class="kv">${closedT.length}</div></div>
+    <div class="kc"><div class="kl">Realized P&L</div><div class="kv ${realPnl>=0?'g':'rr'}">${fmtN(realPnl)}</div></div>
+    <div class="kc"><div class="kl">Unrealized P&L</div><div class="kv ${unrPnl>0?'g':unrPnl<0?'rr':'m'}">${hasMktCount?fmtN(unrPnl):'<span style="font-size:11px">Add mkt value</span>'}</div></div>
+    <div class="kc"><div class="kl">Open exposure</div><div class="kv m" style="font-size:13px">${fmtAbs(openExp)}</div></div>
+  </div>`;
+  const thead=`<thead><tr>
+    <th>Ticker</th><th>Open date</th><th class="r">Open value</th><th class="r">Open fee</th>
+    <th>Close date</th><th class="r">Close / Mkt value</th><th class="r">Close fee</th>
+    <th class="r">P&L (USD)</th><th>Note</th><th style="width:52px"></th>
+  </tr></thead>`;
+  function mkRow(t,i){
+    const open=isOpen(t);
+    const o=parseFloat(t.openValue)||0;
+    const c=!open?parseFloat(t.closeValue)||0:null;
+    const hasMkt=open&&t.mktValue!=null&&t.mktValue!=='';
+    const m=hasMkt?parseFloat(t.mktValue)||0:null;
+    // P&L = openValue + closeValue (both signed). e.g. -500 open + 800 close = +300
+    const of0=parseFloat(t.openFee)||0, cf0=parseFloat(t.closeFee)||0;
+    const pnl=!open?(o+c-of0-cf0):null;
+    const uPnl=hasMkt?(o+m-of0):null;
+    let pnlHtml,pnlCls;
+    if(pnl!==null){pnlCls=pnl>=0?'g':'rr';pnlHtml=fmtN(pnl)+pctBadge(pnl,o);}
+    else if(uPnl!==null){pnlCls=uPnl>=0?'g':'rr';pnlHtml=fmtN(uPnl)+pctBadge(uPnl,o)+'<span style="font-size:10px;color:var(--t2);margin-left:2px">(unreal)</span>';}
+    else{pnlCls='m';pnlHtml='<span style="font-size:11px;color:var(--t2)">No mkt value</span>';}
+    const closeMktHtml=!open?fmtAbs(c):hasMkt?('<span class="m" style="font-size:11px">Mkt: </span>'+fmtAbs(m)):'<span class="badge" style="color:var(--blue);background:var(--bd)">Open</span>';
+    return`<tr>
+      <td style="font-weight:600">${t.ticker||'—'}</td>
+      <td class="m">${t.openDate||'—'}</td>
+      <td class="r" style="color:${o>=0?'var(--green)':'var(--red)'};font-weight:600">${fmtN(o)}</td>
+      <td class="r m">${of0>0?fmtAbs(of0):'—'}</td>
+      <td class="m">${!open?(t.closeDate||'—'):'—'}</td>
+      <td class="r">${closeMktHtml}</td>
+      <td class="r m">${cf0>0?fmtAbs(cf0):'—'}</td>
+      <td class="r ${pnlCls}" style="font-weight:600">${pnlHtml}</td>
+      <td class="m" style="font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.note||''}">${t.note||'—'}</td>
+      <td style="white-space:nowrap">
+        <button class="ib" onclick="editOpt(${i})">✎</button>
+        <button class="ib" onclick="delOpt(${i})" style="color:var(--red)">✕</button>
+      </td>
+    </tr>`;
+  }
+  const openRows=trades.map((t,i)=>({t,i})).filter(x=>isOpen(x.t));
+  const closedRows=trades.map((t,i)=>({t,i})).filter(x=>!isOpen(x.t));
+  const closedSumPnl=closedRows.reduce((s,x)=>s+(parseFloat(x.t.openValue)||0)+(parseFloat(x.t.closeValue)||0)-(parseFloat(x.t.openFee)||0)-(parseFloat(x.t.closeFee)||0),0);
+  const openSec=openRows.length?`<div style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem">
+      <span style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px">Open positions (${openRows.length})</span>
+    </div>
+    <div style="overflow-x:auto"><table class="tbl">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>
+  </div>`:'';
+  const closedSec=closedRows.length?`<div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px">Closed trades (${closedRows.length})</span>
+      <span style="font-size:12px;font-weight:600;color:${closedSumPnl>=0?'var(--green)':'var(--red)'}">Realized: ${fmtN(closedSumPnl)}</span>
+    </div>
+    <div style="overflow-x:auto"><table class="tbl">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>
+  </div>`:'';
+  const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Option Trade</strong> to add one.</div>`:'';
+  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
+      <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
+    </div>
+    <button class="pri" onclick="addOpt()">+ Option Trade</button>
+  </div>${summary}${openSec}${closedSec}${empty}`;
+}
+function addOpt(){showOptModal({id:uid(),ticker:'',openDate:new Date().toISOString().split('T')[0],openValue:'',closeDate:'',closeValue:null,mktValue:null,note:''},-1);}
+function editOpt(i){showOptModal(Object.assign({},pf().optionTrades[i]),i);}
+function delOpt(i){if(!confirm('Delete this option trade?'))return;pf().optionTrades.splice(i,1);save();renderContent();}
+function showOptModal(t,idx){
+  const isEdit=idx>=0;
+  const cv=(t.closeValue!=null&&t.closeValue!=='')?t.closeValue:'';
+  const mv=(t.mktValue!=null&&t.mktValue!=='')?t.mktValue:'';
+  const of_=(t.openFee!=null&&t.openFee!=='')?t.openFee:'';
+  const cf_=(t.closeFee!=null&&t.closeFee!=='')?t.closeFee:'';
+  const h=`<h3>${isEdit?'Edit option trade':'Add option trade'}</h3>
+  <div style="background:var(--bg3);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1.25rem;font-size:12px;line-height:1.8;color:var(--t2)">
+    P&L = <strong style="color:var(--t1)">Open value + Close value &minus; fees</strong> (values are signed)<br>
+    <span style="color:var(--t3)">e.g. paid PMCC: open <strong style="color:var(--red)">-500</strong>, received <strong style="color:var(--green)">+800</strong>, fees 5 &rarr; P&L = <strong style="color:var(--green)">+295</strong></span>
+  </div>
+  <div class="fg">
+    <div class="full"><label class="lbl">Ticker / Symbol</label><input id="op-tk" value="${t.ticker||''}" placeholder="e.g. TSLA, SPY"></div>
+    <div><label class="lbl">Open date</label><input type="date" id="op-od" value="${t.openDate||''}"></div>
+    <div><label class="lbl">Open value (USD) — signed</label><input type="number" id="op-ov" step="0.01" value="${t.openValue||''}" placeholder="-500 if paid, +200 if credit"></div>
+    <div><label class="lbl">Open fee (USD) <span style="color:var(--t3)">platform fee, always +ve</span></label><input type="number" id="op-of" step="0.01" min="0" value="${of_}" placeholder="e.g. 2.50"></div>
+    <div><label class="lbl">Close date <span style="color:var(--t3)">(blank = open)</span></label><input type="date" id="op-cd" value="${t.closeDate||''}"></div>
+    <div><label class="lbl">Close value (USD) <span style="color:var(--t3)">(blank = open)</span></label><input type="number" id="op-cv" step="0.01" value="${cv}" placeholder="Leave blank if still open"></div>
+    <div><label class="lbl">Close fee (USD) <span style="color:var(--t3)">platform fee, always +ve</span></label><input type="number" id="op-cf" step="0.01" min="0" value="${cf_}" placeholder="e.g. 2.50"></div>
+    <div><label class="lbl">Current holding value (USD) <span style="color:var(--t3)">unrealized P&L only</span></label><input type="number" id="op-mv" step="0.01" value="${mv}" placeholder="Current position value"></div>
+    <div class="full"><label class="lbl">Note</label><input id="op-nt" value="${t.note||''}" placeholder="e.g. TSLA 300C Jan25…"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end">
+    <button onclick="cmm()">Cancel</button>
+    <button class="pri" onclick="saveOpt(${idx})">Save</button>
+  </div>`;
+  $('mi').innerHTML=h;
+  $('ov').classList.add('open');
+}
+function saveOpt(idx){
+  const cv=($('op-cv').value||'').trim();
+  const mv=($('op-mv').value||'').trim();
+  const ofv=($('op-of').value||'').trim();
+  const cfv=($('op-cf').value||'').trim();
+  const trade={
+    id:idx>=0?((pf().optionTrades[idx]||{}).id||uid()):uid(),
+    ticker:($('op-tk').value||'').toUpperCase().trim(),
+    openDate:$('op-od').value||'',
+    openValue:$('op-ov').value||'0',
+    openFee:ofv!==''?ofv:null,
+    closeDate:$('op-cd').value||'',
+    closeValue:cv!==''?cv:null,
+    closeFee:cfv!==''?cfv:null,
+    mktValue:mv!==''?mv:null,
+    note:$('op-nt').value||''
+  };
+  const p0=pf();if(!p0.optionTrades)p0.optionTrades=[];
+  if(idx>=0)p0.optionTrades[idx]=trade;else p0.optionTrades.push(trade);
+  cmm();save();renderContent();
+}
+
+function filterOvHoldings(ccy){
+  const q=(document.getElementById('hld-s-'+ccy)||{value:''}).value.toLowerCase();
+  const tbl=document.getElementById('hld-tbl-'+ccy);
+  if(!tbl)return;
+  [].forEach.call(tbl.querySelectorAll('tbody tr'),r=>{
+    r.style.display=(!q||(r.dataset.s||'').includes(q))?'':'none';
+  });
+}
+
+// ── Excel Export ─────────────────────────────────────────────────────────────
+function doExcel(){
+  if(typeof XLSX==='undefined'){alert('SheetJS not loaded.');return;}
+  const wb=XLSX.utils.book_new();
+  const dt=new Date().toISOString().slice(0,10);
+
+  // ── Style helpers (dark theme matching HTML) ─────────────────────────────
+  const BG={bg0:'0F1117',bg2:'161B27',bg3:'1E2538',bg4:'252D3E',b1:'2A3350'};
+  const FG={t1:'E8EAF0',t2:'8892AA',t3:'555E78',green:'66BB6A',red:'EF5350',amber:'FFB74D',blue:'4FC3F7'};
+
+  function bd(){return{top:{style:'thin',color:{rgb:BG.b1}},bottom:{style:'thin',color:{rgb:BG.b1}},left:{style:'thin',color:{rgb:BG.b1}},right:{style:'thin',color:{rgb:BG.b1}}};}
+  function s(fg,bg,bold,align,fmt){
+    var o={s:{font:{color:{rgb:fg||FG.t1},bold:!!bold,name:'Arial',sz:10},fill:{fgColor:{rgb:bg||BG.bg0}},alignment:{horizontal:align||'left',vertical:'center',wrapText:false},border:bd()}};
+    if(fmt)o.z=fmt; return o;
+  }
+  function hdr(v){return Object.assign({t:'s',v:v},s(FG.t1,BG.bg3,true,'center'));}
+  function subhdr(v){return Object.assign({t:'s',v:v},s(FG.amber,BG.bg4,true,'left'));}
+  function tv(v,fg,bg,bold,align,fmt){// text/value cell
+    var base=s(fg,bg,bold,align,fmt);
+    if(v===null||v===undefined||v===''){base.t='s';base.v='—';return base;}
+    if(typeof v==='number'){base.t='n';base.v=v;return base;}
+    base.t='s';base.v=String(v);return base;
+  }
+  function fv(f,fg,bg,bold,fmt){// formula cell
+    return{t:'n',f:f,v:0,z:fmt||'#,##0.00',s:{font:{color:{rgb:fg||FG.t1},bold:!!bold,name:'Arial',sz:10},fill:{fgColor:{rgb:bg||BG.bg0}},alignment:{horizontal:'right',vertical:'center',wrapText:false},border:bd()}};
+  }
+  function nv(v,fmt,fg,bg,bold){// numeric value cell (right-aligned)
+    var base=s(fg||FG.t1,bg||BG.bg0,bold,'right',fmt||'#,##0.00');
+    if(v===null||v===undefined){base.t='s';base.v='—';return base;}
+    base.t='n';base.v=+v; return base;
+  }
+  function pnl(v,bg){// P&L coloured cell - red if negative, green if positive
+    var fg=(+v>0)?FG.green:(+v<0)?FG.red:FG.t2;
+    return nv(v,'#,##0.00',fg,bg||BG.bg0,true);
+  }
+  function pnlf(f,bg){// P&L formula cell
+    return fv(f,null,bg||BG.bg0,true,'#,##0.00');// colour handled by value at open time
+  }
+  function pct(v,bg){// percentage cell
+    var fg=(+v>0)?FG.green:(+v<0)?FG.red:FG.t2;
+    return nv(v/100,'0.00%',fg,bg||BG.bg0,true);
+  }
+  function yel(v,fmt){// yellow editable input
+    return{t:'n',v:+v||0,z:fmt||'#,##0.0000',s:{font:{bold:true,name:'Arial',sz:10},fill:{fgColor:{rgb:'FFF176'}},alignment:{horizontal:'right',vertical:'center'},border:bd()}};
+  }
+  function tot(v,fmt){// total row cell (amber)
+    return nv(v,fmt||'#,##0.00',FG.amber,BG.bg3,true);
+  }
+  function totf(f,fmt){return fv(f,FG.amber,BG.bg3,true,fmt||'#,##0.00');}
+  function blank(bg){return Object.assign({t:'s',v:''},s(FG.t1,bg||BG.bg0,false,'left'));}
+  function CL(n){var s='';while(n>0){s=String.fromCharCode(65+(n-1)%26)+s;n=Math.floor((n-1)/26);}return s;}
+  function setCell(ws,r,c,cell){ws[CL(c+1)+(r+1)]=cell;}
+  function setRange(ws,R,C){ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:R-1,c:C-1}});}
+  function cw(ws,arr){ws['!cols']=arr.map(function(w){return{wch:w};});}
+  function freeze(ws,row){ws['!freeze']={xSplit:0,ySplit:row,topLeftCell:'A'+(row+1)};}
+
+  // ─── Compute data using app's own functions ───────────────────────────────
+  // For each portfolio, compute everything the same way as getHoldings/getSummary
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 1: Prices  (one editable table per portfolio — yellow input cells)
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    // Title
+    setCell(ws,R,0,Object.assign({t:'s',v:'Market Prices — Update here to recalculate Holdings'},s(FG.blue,BG.bg4,true,'left')));
+    setCell(ws,R,1,blank(BG.bg4));setCell(ws,R,2,blank(BG.bg4));setCell(ws,R,3,blank(BG.bg4));
+    R++;
+
+    S.portfolios.forEach(function(pf){
+      var stocks=Object.keys(pf.prices);
+      if(!stocks.length)return;
+      // Portfolio label
+      setCell(ws,R,0,subhdr(pf.name));
+      setCell(ws,R,1,blank(BG.bg4));setCell(ws,R,2,blank(BG.bg4));setCell(ws,R,3,blank(BG.bg4));
+      R++;
+      // Headers
+      [hdr('Stock'),hdr('CCY'),hdr('Current Price'),hdr('As Of')].forEach(function(c,ci){setCell(ws,R,ci,c);});
+      R++;
+      stocks.forEach(function(stock){
+        var mp=pf.prices[stock];
+        setCell(ws,R,0,tv(stock,FG.t1,BG.bg2,true,'left'));
+        setCell(ws,R,1,tv(mp.ccy||'USD',FG.t2,BG.bg2,false,'center'));
+        setCell(ws,R,2,yel(+mp.price||0,'#,##0.0000'));
+        setCell(ws,R,3,tv(dt,FG.t2,BG.bg2));
+        R++;
+      });
+      R++;// spacer
+    });
+    setRange(ws,R,4);
+    cw(ws,[24,8,16,14]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Prices');
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 2: Transactions  (Date|Type|Stock|CCY|Qty|Price|Fee|Amount|Note)
+  //   — mirrors Transactions tab exactly, all portfolios, formula for Amount
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    // Headers
+    ['Date','Portfolio','Type','Stock','CCY','Qty','Price','Fee','Amount','Note'].forEach(function(h,ci){
+      setCell(ws,R,ci,hdr(h));
+    });
+    R++;
+
+    // Collect all txs from all portfolios sorted newest first
+    var allTxs=[];
+    S.portfolios.forEach(function(pf){
+      pf.transactions.filter(function(t){return['Buy','Sell','Dividend'].includes(t.type);})
+        .forEach(function(t){allTxs.push(Object.assign({},t,{_pf:pf.name}));});
+    });
+    allTxs.sort(function(a,b){return b.date.localeCompare(a.date);});
+
+    allTxs.forEach(function(t,i){
+      var bg=i%2===0?BG.bg0:BG.bg2;
+      var excelRow=R+1;// 1-based for formula
+      var typeFg=t.type==='Buy'?FG.blue:t.type==='Sell'?FG.red:FG.green;
+      // Amount: Buy=Qty*Price+Fee, Sell=Qty*Price-Fee, Dividend=amount field directly
+      var amtCell;
+      if(t.type==='Dividend'){
+        amtCell=nv(t.amount!=null?+t.amount:0,'#,##0.00',FG.green,bg,true);
+      } else if(t.type==='Sell'){
+        amtCell=fv('F'+excelRow+'*G'+excelRow+'-H'+excelRow,FG.t1,bg,true,'#,##0.00');
+      } else {
+        amtCell=fv('F'+excelRow+'*G'+excelRow+'+H'+excelRow,FG.t1,bg,true,'#,##0.00');
+      }
+      setCell(ws,R,0,tv(t.date,FG.t2,bg,false,'left'));
+      setCell(ws,R,1,tv(t._pf,FG.t2,bg));
+      setCell(ws,R,2,Object.assign(tv(t.type,typeFg,bg,true,'center'),{t:'s',v:t.type}));
+      setCell(ws,R,3,tv(t.stock||'',FG.t1,bg,true,'left'));
+      setCell(ws,R,4,tv(t.ccy,FG.t2,bg,false,'center'));
+      setCell(ws,R,5,t.qty>0?nv(+t.qty,'#,##0',FG.t1,bg):blank(bg));
+      setCell(ws,R,6,t.price>0?nv(+t.price,'#,##0.0000',FG.t1,bg):blank(bg));
+      setCell(ws,R,7,t.fee>0?nv(+t.fee,'#,##0.00',FG.t2,bg):nv(0,'#,##0.00',FG.t2,bg));
+      setCell(ws,R,8,amtCell);
+      setCell(ws,R,9,tv(t.note||'',FG.t2,bg));
+      R++;
+    });
+    setRange(ws,R,10);
+    cw(ws,[12,20,10,20,6,9,13,10,14,22]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Transactions');
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 3: Holdings  — mirrors Overview tab exactly
+  //   Columns: Stock | Qty | Avg Cost | Cost Basis | Current Price | 
+  //            Holding Value | Unrealized P&L | Dividends | Total P&L | P&L%
+  //   Split by Portfolio > CCY (same as Overview: MYR→SGD→USD)
+  //   Footer row per CCY with totals (same as HTML tfoot)
+  //   Current Price = VLOOKUP from Prices sheet (interactive!)
+  //   Holding Value = Qty * Current Price
+  //   Unrealized = Holding Value - Cost Basis
+  //   Total P&L = Unrealized + Realized + Dividends
+  //   P&L % = Total P&L / Cost Basis
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    var HDRS=['Stock','Qty','Avg Cost','Cost Basis','Current Price','Holding Value',
+              'Unrealized P&L','Dividends','Realized P&L','Total P&L','P&L %'];
+    HDRS.forEach(function(h,ci){setCell(ws,R,ci,hdr(h));});
+    R++;
+
+    var CCY_ORDER=['MYR','SGD','USD'];
+
+    S.portfolios.forEach(function(pf){
+      // Portfolio section header
+      for(var ci2=0;ci2<11;ci2++)setCell(ws,R,ci2,blank(BG.bg4));
+      setCell(ws,R,0,subhdr('▶  '+pf.name));
+      R++;
+
+      var h=getHoldings(pf,true);
+      if(!h.length){
+        setCell(ws,R,0,tv('No active holdings',FG.t2,BG.bg0));
+        R++;return;
+      }
+
+      // Group by CCY in correct order
+      var rawCcys=[...new Set(h.map(function(x){return x.ccy;}))];
+      var orderedCcys=[...CCY_ORDER.filter(function(c){return rawCcys.includes(c);}),
+                       ...rawCcys.filter(function(c){return!CCY_ORDER.includes(c);})];
+
+      orderedCcys.forEach(function(ccy){
+        var rows=h.filter(function(x){return x.ccy===ccy;});
+        rows.sort(function(a,b){return b.mktVal-a.mktVal;});// highest alloc first
+
+        // CCY sub-header
+        for(var ci3=0;ci3<11;ci3++)setCell(ws,R,ci3,blank(BG.bg4));
+        setCell(ws,R,0,Object.assign(tv('  '+ccy,FG.blue,BG.bg4,true),{s:{font:{color:{rgb:FG.blue},bold:true,name:'Arial',sz:10},fill:{fgColor:{rgb:BG.bg4}},alignment:{horizontal:'left'},border:bd()}}));
+        R++;
+
+        var dataStart=R+1;// 1-based
+        rows.forEach(function(hh,i){
+          var bg=i%2===0?BG.bg0:BG.bg2;
+          var er=R+1;// excel row (1-based)
+          var tot2=hh.unreal+hh.divs+hh.realized;
+          var pct2=hh.cost>0?tot2/hh.cost:null;
+
+          // Column C = Qty (col index 1), D=AvgCost(2), E=CostBasis(3),
+          // F=CurrentPrice(4) via VLOOKUP, G=HoldingValue(5), H=Unrealized(6),
+          // I=Dividends(7), J=Realized(8), K=TotalPnL(9), L=PnL%(10)
+          setCell(ws,R,0,tv(hh.stock,FG.t1,bg,true,'left'));
+          setCell(ws,R,1,nv(+hh.qty,'#,##0',FG.t1,bg));
+          setCell(ws,R,2,nv(hh.avg>0?+hh.avg:null,'#,##0.0000',FG.t2,bg));
+          setCell(ws,R,3,nv(+hh.cost,'#,##0.00',FG.t1,bg));
+          // Current Price: VLOOKUP from Prices sheet (yellow to show it's live)
+          // We look up by stock name. The Prices sheet has Stock in col A, CCY in B, Price in C
+          // We need to find the right portfolio's price table.
+          // Since Prices sheet has multiple portfolio blocks, use exact match on col A
+          setCell(ws,R,4,fv('IFERROR(VLOOKUP(A'+er+',Prices!$A:$C,3,0),0)',FG.blue,bg,false,'#,##0.0000'));
+          // Holding Value = Qty * Current Price (formula referencing same row)
+          setCell(ws,R,5,fv('IF(B'+er+'>0,B'+er+'*F'+er+',0)',FG.t1,bg,true,'#,##0.00'));
+          // Unrealized = Holding Value - Cost Basis
+          setCell(ws,R,6,fv('IF(B'+er+'>0,G'+er+'-D'+er+',0)',(+hh.unreal>=0?FG.green:FG.red),bg,true,'#,##0.00'));
+          // Dividends
+          setCell(ws,R,7,hh.divs>0?nv(+hh.divs,'#,##0.00',FG.green,bg):blank(bg));
+          // Realized P&L (computed by app's rolling avg — hardcoded value, correct)
+          setCell(ws,R,8,pnl(+hh.realized,bg));
+          // Total P&L = Unrealized + Dividends + Realized
+          setCell(ws,R,9,fv('H'+er+'+I'+er+'+J'+er,(tot2>=0?FG.green:FG.red),bg,true,'#,##0.00'));
+          // P&L % = Total P&L / Cost Basis
+          setCell(ws,R,10,fv('IF(D'+er+'>0,K'+er+'/D'+er+',0)',(pct2>=0?FG.green:FG.red),bg,true,'0.00%'));
+          R++;
+        });
+        var dataEnd=R;// last data row (1-based)
+
+        // ── Footer total row (same as HTML tfoot) ─────────────────────────
+        var fr=R+1;
+        setCell(ws,R,0,Object.assign(tv('Total ('+ccy+')',FG.amber,BG.bg3,true),{s:{font:{color:{rgb:FG.amber},bold:true,name:'Arial',sz:10},fill:{fgColor:{rgb:BG.bg3}},alignment:{horizontal:'left'},border:bd()}}));
+        setCell(ws,R,1,blank(BG.bg3));
+        setCell(ws,R,2,blank(BG.bg3));
+        // Cost Basis total
+        setCell(ws,R,3,totf('SUM(D'+dataStart+':D'+dataEnd+')'));
+        setCell(ws,R,4,blank(BG.bg3));
+        // Holding Value total
+        setCell(ws,R,5,totf('SUM(G'+dataStart+':G'+dataEnd+')'));
+        // Unrealized total (uses getSummary value for accuracy incl. closed)
+        var sum=getSummary(pf);
+        setCell(ws,R,6,tot(sum.unreal[ccy]||0));
+        // Dividends total
+        setCell(ws,R,7,tot(sum.divs[ccy]||0,'#,##0.00'));
+        // Realized total
+        setCell(ws,R,8,tot(sum.realized[ccy]||0));
+        // Total P&L = sum unrealized + dividends + realized (from getSummary, matches mini-cards)
+        var totVal=(sum.unreal[ccy]||0)+(sum.divs[ccy]||0)+(sum.realized[ccy]||0);
+        setCell(ws,R,9,Object.assign(nv(totVal,'#,##0.00',FG.amber,BG.bg3,true),{t:'n',v:totVal}));
+        // P&L % = totVal / cost (totPct from overview)
+        var co=sum.cost?.[ccy]||0;
+        setCell(ws,R,10,co>0?Object.assign(nv(totVal/co,'0.00%',FG.amber,BG.bg3,true),{t:'n',v:totVal/co}):blank(BG.bg3));
+        R++;
+        R++;// spacer between CCYs
+      });
+      R++;// spacer between portfolios
+    });
+    setRange(ws,R,11);
+    cw(ws,[22,8,13,14,15,14,16,12,14,12,8]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Holdings');
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 4: Closed Trades  — stocks where qty=0 but realized≠0
+  //   Columns: Stock | CCY | Avg Cost | Cost Basis | Realized P&L | Dividends | Total P&L
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    ['Portfolio','Stock','CCY','Cost Basis','Realized P&L','Dividends','Total P&L'].forEach(function(h,ci){
+      setCell(ws,R,ci,hdr(h));
+    });
+    R++;
+    var any=false;
+    S.portfolios.forEach(function(pf){
+      var closed=getHoldings(pf,false).filter(function(h){return h.qty<=0&&(h.realized!==0||h.divs>0);});
+      if(!closed.length)return;
+      any=true;
+      closed.forEach(function(h,i){
+        var bg=i%2===0?BG.bg0:BG.bg2;
+        var totV=h.realized+h.divs;
+        setCell(ws,R,0,tv(pf.name,FG.t2,bg));
+        setCell(ws,R,1,tv(h.stock,FG.t1,bg,true,'left'));
+        setCell(ws,R,2,tv(h.ccy,FG.t2,bg,false,'center'));
+        setCell(ws,R,3,h.cost>0?nv(+h.cost,'#,##0.00',FG.t1,bg):blank(bg));
+        setCell(ws,R,4,pnl(+h.realized,bg));
+        setCell(ws,R,5,h.divs>0?nv(+h.divs,'#,##0.00',FG.green,bg):blank(bg));
+        setCell(ws,R,6,pnl(totV,bg));
+        R++;
+      });
+    });
+    if(!any){setCell(ws,R,0,tv('No closed trades',FG.t2,BG.bg0));R++;}
+    setRange(ws,R,7);
+    cw(ws,[20,20,6,14,14,12,12]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Closed Trades');
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 5: Journey  — mirrors Journey tab exactly
+  //   Year | Dividends | Realized P&L  per CCY per portfolio
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    ['Portfolio','CCY','Year','Dividends','Realized P&L'].forEach(function(h,ci){setCell(ws,R,ci,hdr(h));});
+    R++;
+    S.portfolios.forEach(function(pf){
+      var jd=journeyData(pf);
+      if(!Object.keys(jd).length)return;
+      var CCY_ORDER=['MYR','SGD','USD'];
+      var ccys=[...CCY_ORDER.filter(function(c){return jd[c];}),
+                ...Object.keys(jd).filter(function(c){return!CCY_ORDER.includes(c);})];
+      ccys.forEach(function(ccy){
+        if(!jd[ccy]||!jd[ccy].length)return;
+        jd[ccy].forEach(function(row,i){
+          var bg=i%2===0?BG.bg0:BG.bg2;
+          setCell(ws,R,0,tv(pf.name,FG.t2,bg));
+          setCell(ws,R,1,tv(ccy,FG.t1,bg,true,'center'));
+          setCell(ws,R,2,tv(String(row.yr),FG.t1,bg,true,'center'));
+          setCell(ws,R,3,row.divYr>0?nv(+row.divYr,'#,##0.00',FG.green,bg):blank(bg));
+          setCell(ws,R,4,row.realYr!==0?pnl(+row.realYr,bg):blank(bg));
+          R++;
+        });
+        // Totals row for this CCY
+        var totD=jd[ccy].reduce(function(s,x){return s+x.divYr;},0);
+        var totR=jd[ccy].reduce(function(s,x){return s+x.realYr;},0);
+        setCell(ws,R,0,tv(pf.name,FG.amber,BG.bg3,true));
+        setCell(ws,R,1,tv(ccy,FG.amber,BG.bg3,true,'center'));
+        setCell(ws,R,2,Object.assign(tv('Total',FG.amber,BG.bg3,true,'center'),{t:'s',v:'Total'}));
+        setCell(ws,R,3,tot(totD));
+        setCell(ws,R,4,tot(totR));
+        R++;
+      });
+      R++;
+    });
+    setRange(ws,R,5);
+    cw(ws,[20,8,8,14,14]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Journey');
+  })();
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SHEET 6: Options  — mirrors Options tab exactly per portfolio
+  //   Ticker | Open Date | Open Value | Open Fee | Close Date | 
+  //   Close Value | Close Fee | Mkt Value | P&L (USD) | Note
+  // ══════════════════════════════════════════════════════════════════════════
+  (function(){
+    var ws={};
+    var R=0;
+    ['Portfolio','Ticker','Open Date','Open Value','Open Fee',
+     'Close Date','Close Value','Close Fee','Mkt Value (Input)','P&L (USD)','Note']
+    .forEach(function(h,ci){setCell(ws,R,ci,hdr(h));});
+    R++;
+    S.portfolios.forEach(function(pf){
+      var trades=pf.optionTrades||[];
+      if(!trades.length)return;
+      setCell(ws,R,0,subhdr('▶  '+pf.name));
+      for(var ci4=1;ci4<11;ci4++)setCell(ws,R,ci4,blank(BG.bg4));
+      R++;
+      var openT=trades.filter(function(t){return t.closeValue===null||t.closeValue===undefined||t.closeValue==='';});
+      var closedT=trades.filter(function(t){return t.closeValue!==null&&t.closeValue!==undefined&&t.closeValue!=='';});
+
+      function writeTrades(arr,isOpen){
+        arr.forEach(function(t,i){
+          var bg=i%2===0?BG.bg0:BG.bg2;
+          var er=R+1;
+          var o=parseFloat(t.openValue)||0;
+          var c=t.closeValue!=null&&t.closeValue!==''?parseFloat(t.closeValue):null;
+          var of0=parseFloat(t.openFee)||0;
+          var cf0=parseFloat(t.closeFee)||0;
+          // P&L formula: same as mkRow in renderOptions
+          // closed: o+c-of0-cf0
+          // open with mkt: o+mkt-of0
+          var pnlCell2;
+          if(!isOpen){
+            pnlCell2=fv('D'+er+'+G'+er+'-E'+er+'-H'+er, null, bg, true, '#,##0.00');
+          } else if(t.mktValue!=null&&t.mktValue!==''){
+            pnlCell2=fv('D'+er+'+I'+er+'-E'+er, null, bg, true, '#,##0.00');
+          } else {
+            pnlCell2=blank(bg);
+          }
+          setCell(ws,R,0,tv(pf.name,FG.t2,bg));
+          setCell(ws,R,1,tv(t.ticker||'',FG.t1,bg,true,'left'));
+          setCell(ws,R,2,tv(t.openDate||'',FG.t2,bg,false,'center'));
+          setCell(ws,R,3,pnl(o,bg));
+          setCell(ws,R,4,of0>0?nv(of0,'#,##0.00',FG.t2,bg):blank(bg));
+          setCell(ws,R,5,t.closeDate?tv(t.closeDate,FG.t2,bg,false,'center'):blank(bg));
+          setCell(ws,R,6,c!==null?pnl(c,bg):blank(bg));
+          setCell(ws,R,7,cf0>0?nv(cf0,'#,##0.00',FG.t2,bg):blank(bg));
+          // Mkt value: yellow editable input
+          setCell(ws,R,8,t.mktValue!=null&&t.mktValue!==''?yel(+t.mktValue,'#,##0.00'):blank(bg));
+          setCell(ws,R,9,pnlCell2);
+          setCell(ws,R,10,tv(t.note||'',FG.t2,bg));
+          R++;
+        });
+      }
+
+      if(openT.length){
+        setCell(ws,R,0,Object.assign(tv('  Open Positions ('+openT.length+')',FG.blue,BG.bg4,true),{t:'s',v:'Open Positions ('+openT.length+')'}));
+        for(var ci5=1;ci5<11;ci5++)setCell(ws,R,ci5,blank(BG.bg4));
+        R++;
+        writeTrades(openT,true);
+      }
+      if(closedT.length){
+        setCell(ws,R,0,Object.assign(tv('  Closed Trades ('+closedT.length+')',FG.t2,BG.bg4,true),{t:'s',v:'Closed Trades ('+closedT.length+')'}));
+        for(var ci6=1;ci6<11;ci6++)setCell(ws,R,ci6,blank(BG.bg4));
+        R++;
+        writeTrades(closedT,false);
+      }
+      // Summary totals row
+      var realPnl=closedT.reduce(function(s,t){return s+(parseFloat(t.openValue)||0)+(parseFloat(t.closeValue)||0)-(parseFloat(t.openFee)||0)-(parseFloat(t.closeFee)||0);},0);
+      var unrPnl=openT.reduce(function(s,t){var o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0;return t.mktValue!=null&&t.mktValue!==''?s+o+(parseFloat(t.mktValue)||0)-of0:s;},0);
+      for(var ci7=0;ci7<11;ci7++)setCell(ws,R,ci7,blank(BG.bg3));
+      setCell(ws,R,0,tv(pf.name+' — Realized P&L:',FG.amber,BG.bg3,true));
+      setCell(ws,R,9,tot(realPnl));
+      R++;
+      for(var ci8=0;ci8<11;ci8++)setCell(ws,R,ci8,blank(BG.bg3));
+      setCell(ws,R,0,tv(pf.name+' — Unrealized P&L:',FG.amber,BG.bg3,true));
+      setCell(ws,R,9,tot(unrPnl));
+      R++;R++;
+    });
+    setRange(ws,R,11);
+    cw(ws,[18,28,12,12,10,12,12,10,14,14,22]);
+    freeze(ws,1);
+    XLSX.utils.book_append_sheet(wb,ws,'Options');
+  })();
+
+  XLSX.writeFile(wb,'PortfolioX_'+dt+'.xlsx');
+  var t=$('toast');t.textContent='Excel downloaded \u2713';t.classList.add('show');
+  clearTimeout(TT);TT=setTimeout(function(){t.classList.remove('show');t.textContent='Saved \u2713';},2500);
+}
+
+
+function showWelcomeIfFirstLoad(){
+  if(!S._isFirstLoad)return;
+  delete S._isFirstLoad;
+  const ov=document.getElementById('welcome-overlay');
+  if(ov)ov.style.display='flex';
+}
+function dismissWelcome(){
+  const ov=document.getElementById('welcome-overlay');
+  if(ov)ov.style.display='none';
+}
+function doWelcomeRestore(e){
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.portfolios||!Array.isArray(data.portfolios))throw new Error('Invalid');
+      S=data;
+      if(!S.pieImages)S.pieImages={};
+      // Migrate older backups — add any missing fields
+      S.portfolios.forEach(function(pf,idx){
+        pf.color=PFPAL[idx%PFPAL.length];
+        if(!pf.optionTrades)pf.optionTrades=[];
+        if(!pf.cashBalances)pf.cashBalances={};
+        if(!pf.deposits)pf.deposits=[];if(!pf.deposits)pf.deposits=[];
+      });
+      save();dismissWelcome();render();
+      const t=$('toast');t.textContent='Backup restored \u2713';t.classList.add('show');
+      clearTimeout(TT);TT=setTimeout(function(){t.classList.remove('show');t.textContent='Saved \u2713';},3000);
+    }catch(err){alert('Invalid backup file. Please select a valid PortfolioX .json backup.');}
+  };
+  rd.readAsText(f);
+}
+
+function ccyCardStyle(ccy){
+  const map={
+    'MYR':'border-left:4px solid #a855f7;border-top:1px solid #2a2040;border-right:1px solid #2a2040;border-bottom:1px solid #2a2040;background:#13101e;',
+    'SGD':'border-left:4px solid #f97316;border-top:1px solid #2a1e10;border-right:1px solid #2a1e10;border-bottom:1px solid #2a1e10;background:#141008;',
+    'USD':'border-left:4px solid #3b82f6;border-top:1px solid #10182a;border-right:1px solid #10182a;border-bottom:1px solid #10182a;background:#0c1018;',
+  };
+  const s=map[ccy]||'border-left:4px solid #4fc3f7;border:1px solid #1a2a3a;background:#0c1420;';
+  return s+'border-radius:var(--rl);padding:1.125rem 1.25rem;margin-bottom:1rem;';
+}
+
+// ── Per-CCY coloured tag ──────────────────────────────────────────
+function ccyTag(ccy,extra){
+  const cols={
+    'MYR':'background:#a855f7;color:#fff;border-color:#a855f7',
+    'SGD':'background:#f97316;color:#fff;border-color:#f97316',
+    'USD':'background:#3b82f6;color:#fff;border-color:#3b82f6',
+  };
+  const st=cols[ccy]||'background:var(--blue);color:#0a0a14;border-color:var(--blue)';
+  return '<span class="ctag" style="'+st+';'+(extra||'')+'">' + ccy + '</span>';
+}
+
+// ── Drag-and-drop: Portfolio chips ────────────────────────────────────────────
+var _pfDragSrc=null;
+function initPfDrag(){
+  const chips=[].slice.call(document.querySelectorAll('#pftabs .pf-chip[draggable]'));
+  chips.forEach(function(chip){
+    chip.addEventListener('dragstart',function(e){
+      _pfDragSrc=chip;
+      e.dataTransfer.effectAllowed='move';
+      chip.style.opacity='0.4';
+    });
+    chip.addEventListener('dragend',function(){
+      chip.style.opacity='';
+      document.querySelectorAll('#pftabs .pf-chip').forEach(function(c){
+        c.style.background=''; c.style.outline='';
+      });
+    });
+    chip.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      if(chip!==_pfDragSrc)chip.style.outline='2px solid var(--blue)';
+    });
+    chip.addEventListener('dragleave',function(){chip.style.outline='';});
+    chip.addEventListener('drop',function(e){
+      e.preventDefault();
+      chip.style.outline='';
+      if(!_pfDragSrc||_pfDragSrc===chip)return;
+      const fromId=_pfDragSrc.dataset.pfid;
+      const toId=chip.dataset.pfid;
+      const arr=[...S.portfolios];
+      const fi=arr.findIndex(function(p){return p.id===fromId;});
+      const ti=arr.findIndex(function(p){return p.id===toId;});
+      if(fi<0||ti<0)return;
+      arr.splice(ti,0,arr.splice(fi,1)[0]);
+      S.portfolios=arr;
+      save();renderPfTabs();
+    });
+  });
+}
+
+// ── Drag-and-drop: Stock price rows ──────────────────────────────────────────
+var _pxDragSrc=null;
+function initPxDrag(){
+  const rows=[].slice.call(document.querySelectorAll('#px-list .px-row[draggable]'));
+  rows.forEach(function(row){
+    row.addEventListener('dragstart',function(e){
+      _pxDragSrc=row;
+      e.dataTransfer.effectAllowed='move';
+      row.style.opacity='0.4';
+    });
+    row.addEventListener('dragend',function(){
+      row.style.opacity='';
+      document.querySelectorAll('#px-list .px-row').forEach(function(r){r.style.outline='';});
+    });
+    row.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      if(row!==_pxDragSrc&&row.dataset.ccy===_pxDragSrc.dataset.ccy)
+        row.style.outline='2px solid var(--blue)';
+    });
+    row.addEventListener('dragleave',function(){row.style.outline='';});
+    row.addEventListener('drop',function(e){
+      e.preventDefault();
+      row.style.outline='';
+      if(!_pxDragSrc||_pxDragSrc===row)return;
+      // Only allow drop within same CCY group
+      if(row.dataset.ccy!==_pxDragSrc.dataset.ccy)return;
+      row.parentNode.insertBefore(_pxDragSrc,row);
+    });
+  });
+}
+
+function renderDeposits(p){
+  if(!p.deposits)p.deposits=[];
+  const deps=[...p.deposits].sort((a,b)=>b.date.localeCompare(a.date));
+
+  // Get all CCYs used
+  const ccys=[...new Set(deps.map(d=>d.ccy||'MYR'))];
+  const CCY_ORDER=['MYR','SGD','USD','HKD','GBP','EUR'];
+  const allCcys=[...CCY_ORDER.filter(c=>ccys.includes(c)),...ccys.filter(c=>!CCY_ORDER.includes(c))];
+
+  if(!deps.length){
+    return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
+      +'<button class="pri sm" onclick="openDepositModal()">+ Deposit / Withdrawal</button></div>'
+      +'<div class="card m" style="text-align:center;padding:2rem">No deposits yet. Click + to add one.</div>';
+  }
+
+  // Build per-CCY sections
+  const sections=allCcys.map(function(ccy){
+    const cdeps=deps.filter(d=>(d.ccy||'MYR')===ccy);
+    const totDep=cdeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+    const totWit=cdeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+    const net=totDep-totWit;
+
+    // Summary mini-cards
+    const sumCards='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.875rem">'
+      +[['Total Deposited',totDep>0?'+'+fc(totDep,ccy):'—','g'],
+        ['Total Withdrawn',totWit>0?'-'+fc(totWit,ccy):'—',totWit>0?'rr':'m'],
+        ['Net Capital',fc(net,ccy),net>=0?'g':'rr']]
+      .map(function(a){return'<div class="kc"><div class="kl">'+a[0]+'</div><div class="kv '+a[2]+'" style="white-space:nowrap;font-size:13px">'+a[1]+'</div></div>';})
+      .join('')+'</div>';
+
+    // Year summary
+    const byYr={};
+    cdeps.forEach(function(d){
+      const yr=d.date.slice(0,4);
+      if(!byYr[yr])byYr[yr]={dep:0,wit:0};
+      if(d.type==='deposit')byYr[yr].dep+=+d.amount;
+      else byYr[yr].wit+=+d.amount;
+    });
+    const yrs=Object.keys(byYr).sort((a,b)=>b-a);
+    const yrRows=yrs.map(function(yr){
+      const y=byYr[yr];const net2=y.dep-y.wit;
+      return'<tr>'
+        +'<td style="font-weight:600">'+yr+'</td>'
+        +'<td class="r g">'+(y.dep>0?fc(y.dep,ccy):'—')+'</td>'
+        +'<td class="r '+(y.wit>0?'rr':'m')+'">'+(y.wit>0?'-'+fc(y.wit,ccy):'—')+'</td>'
+        +'<td class="r '+(net2>=0?'g':'rr')+'" style="font-weight:600">'+(net2>=0?'+':'')+fc(Math.abs(net2),ccy)+'</td>'
+        +'</tr>';
+    }).join('');
+    const yrTable='<div style="overflow-x:auto;margin-bottom:.875rem"><table class="tbl">'
+      +'<thead><tr><th>Year</th><th class="r">Deposited</th><th class="r">Withdrawn</th><th class="r">Net</th></tr></thead>'
+      +'<tbody>'+yrRows+'</tbody>'
+      +'<tfoot><tr><td style="font-weight:600">All time</td>'
+      +'<td class="r g">'+(totDep>0?fc(totDep,ccy):'—')+'</td>'
+      +'<td class="r '+(totWit>0?'rr':'m')+'">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</td>'
+      +'<td class="r '+(net>=0?'g':'rr')+'" style="font-weight:600">'+(net>=0?'+':'')+fc(Math.abs(net),ccy)+'</td>'
+      +'</tr></tfoot></table></div>';
+
+    // Transaction rows
+    const txRows=cdeps.map(function(d){
+      const i=p.deposits.indexOf(d);
+      const isDep=d.type==='deposit';
+      return'<tr>'
+        +'<td class="m">'+d.date+'</td>'
+        +'<td><span class="badge" style="color:'+(isDep?'var(--green)':'var(--red)')+';background:'+(isDep?'var(--gd)':'var(--rd)')+'">'+( isDep?'Deposit':'Withdrawal')+'</span></td>'
+        +'<td class="r" style="font-weight:600;color:'+(isDep?'var(--green)':'var(--red)')+'">'+(isDep?'+':'-')+fc(+d.amount,ccy)+'</td>'
+        +'<td class="m">'+(d.note||'—')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +'<button class="ib" onclick="editDeposit('+i+')">✎</button>'
+        +'<button class="ib" onclick="delDeposit('+i+')" style="color:var(--red)">✕</button>'
+        +'</td></tr>';
+    }).join('');
+    const txTable='<div style="overflow-x:auto"><table class="tbl">'
+      +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
+      +'<tbody>'+txRows+'</tbody></table></div>';
+
+    return'<div style="margin-bottom:1.5rem">'
+      +ccyTag(ccy,'margin-bottom:.65rem;display:inline-block')
+      +sumCards+yrTable+txTable
+      +'</div>';
+  }).join('');
+
+  return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
+    +'<button class="pri sm" onclick="openDepositModal()">+ Deposit / Withdrawal</button></div>'
+    +sections;
+}
+
+function openDepositModal(idx){
+  const p=pf();if(!p.deposits)p.deposits=[];
+  const isEdit=idx!==undefined;
+  const d=isEdit?p.deposits[idx]:{date:new Date().toISOString().split('T')[0],type:'deposit',ccy:'MYR',amount:'',note:''};
+  const ccyOpts=['MYR','SGD','USD'].map(c=>'<option '+((d.ccy||'MYR')===c?'selected':'')+'>'+c+'</option>').join('');
+  const h='<h3>'+(isEdit?'Edit':'Add')+' Deposit / Withdrawal</h3>'
+    +'<div class="fg">'
+    +'<div><label class="lbl">Type</label>'
+    +'<select id="dep-type"><option value="deposit" '+(d.type==='deposit'?'selected':'')+'>Deposit</option>'
+    +'<option value="withdrawal" '+(d.type==='withdrawal'?'selected':'')+'>Withdrawal</option></select></div>'
+    +'<div><label class="lbl">Date</label><input type="date" id="dep-date" value="'+d.date+'"></div>'
+    +'<div><label class="lbl">Currency</label><select id="dep-ccy">'+ccyOpts+'</select></div>'
+    +'<div><label class="lbl">Amount</label><input type="number" id="dep-amt" step="0.01" min="0" value="'+(d.amount||'')+'" placeholder="0.00"></div>'
+    +'<div class="full"><label class="lbl">Note</label><input id="dep-note" value="'+(d.note||'')+'" placeholder="e.g. Monthly top-up"></div>'
+    +'</div>'
+    +'<input type="hidden" id="dep-idx" value="'+(isEdit?idx:'')+'">'
+    +'<div style="display:flex;gap:8px;margin-top:1.25rem;justify-content:flex-end">'
+    +'<button onclick="cmm()">Cancel</button>'
+    +'<button class="pri" onclick="saveDeposit()">'+(isEdit?'Save':'Add')+'</button>'
+    +'</div>';
+  $('mi').innerHTML=h;$('ov').classList.add('open');MM='dep';
+}
+function saveDeposit(){
+  const p=pf();if(!p.deposits)p.deposits=[];
+  const type=$('dep-type').value;
+  const date=$('dep-date').value;
+  const ccy=$('dep-ccy').value||'MYR';
+  const amount=parseFloat($('dep-amt').value);
+  const note=$('dep-note').value.trim();
+  if(!date||isNaN(amount)||amount<=0){alert('Please fill in date and amount.');return;}
+  const idx=$('dep-idx').value;
+  const entry={id:uid(),date,type,ccy,amount,note};
+  if(idx!==''){p.deposits[+idx]=entry;}else{p.deposits.push(entry);}
+  save();cmm();renderContent();
+}
+function editDeposit(i){openDepositModal(i);}
+function delDeposit(i){
+  if(!confirm('Delete this entry?'))return;
+  pf().deposits.splice(i,1);save();renderContent();
+}
+
+function render(){renderPfTabs();renderContent();}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>swTab(b.dataset.tab)));
+$('bat').addEventListener('click',()=>omm('at'));
+$('bpx').addEventListener('click',()=>omm('px'));
+$('bep').addEventListener('click',()=>omm('ep'));
+$('bdp').addEventListener('click',()=>omm('dp'));
+$('bbk').addEventListener('click',doBackup);
+$('brs').addEventListener('click',()=>$('restore-input').click());
+$('bxl').addEventListener('click',doExcel);
+$('restore-input').addEventListener('change',doRestore);
+render();
+showWelcomeIfFirstLoad();
+</script>
+</body>
+</html>

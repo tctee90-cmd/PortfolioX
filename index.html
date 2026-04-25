@@ -696,7 +696,7 @@ function renderOverview(p){
     const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
     const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
     const mvWithCash=mv+cashBal;
-    const pct=co>0?(mvWithCash-co)/co*100:null;
+    const pct=co>0?(mv-co)/co*100:null;
     const totPct=co>0?tot/co*100:null;
     const totalMV=rows.reduce((s,h)=>s+h.mktVal,0)||1;
 
@@ -773,7 +773,7 @@ function renderOverview(p){
         +'<tfoot><tr><td style="font-weight:600">Total ('+ccy+')</td><td colspan="2"></td>'
         +'<td class="r" style="font-weight:600">'+fc(sumCost,ccy)+'</td>'
         +'<td></td>'
-        +'<td class="r">'+fc(sumMkt+cashBal,ccy)+'</td>'
+        +'<td class="r">'+fc(sumMkt,ccy)+'</td>'
         +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
         +'<td class="r g">'+(d>0?fc(d,ccy):'—')+'</td>'
         +'<td class="r '+sc(tot)+'" style="font-weight:600;white-space:nowrap">'+sgn(tot,ccy)

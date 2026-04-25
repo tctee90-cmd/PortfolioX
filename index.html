@@ -576,10 +576,9 @@ function renderDashboard(){
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
       +'<div>'
       +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
-      +'<div style="font-size:10px;color:var(--t2)">Total Value (Cash + Holdings only)</div>'
+      +'<div style="font-size:10px;color:var(--t2)">Total Market Value (Cash + Holdings only)</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:20px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
-      +(pct!==null?pnlPill(pct):'')
       +'</div>'
       +'</div>'
       +'</div>'
@@ -606,8 +605,8 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      // Row 2: Dividends | Cash  (amber accent)
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
+      // Row 2: Dividends | Cash
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
@@ -615,6 +614,13 @@ function renderDashboard(){
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 3: Total Holdings Value (full width)
+      +'<div style="margin-bottom:1rem">'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.mv,ccy)+'</div>'
       +'</div>'
       +'</div>'
       // Table with allocation bars
@@ -627,17 +633,8 @@ function renderDashboard(){
       +'<th style="width:24px"></th>'
       +'</tr></thead>'
       +'<tbody>'+pfRows+'</tbody>'
-      +'<tfoot><tr>'
-      +'<td style="font-weight:600">Total ('+ccy+')</td>'
-      +'<td class="r">'+fc(g.mv,ccy)+'</td>'
-      +'<td class="r">'+fc(g.co,ccy)+'</td>'
-      +'<td class="r '+sc(g.u)+'">'+sgn(g.u,ccy)+'</td>'
-      +'<td class="r '+sc(g.r)+'">'+sgn(g.r,ccy)+'</td>'
-      +'<td class="r '+(g.d>0?'g':'m')+'">'+(g.d>0?fc(g.d,ccy):'—')+'</td>'
-      +'<td class="r '+sc(tot)+'" style="font-weight:600;white-space:nowrap">'+sgn(tot,ccy)
-      +(totPct!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'">'+fp(totPct)+'</span>':'')
-      +'</td>'
-      +'<td></td>'
+      +'<tfoot style="display:none"><tr>'
+      +'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>'
       +'</tr></tfoot>'
       +'</table></div>'
       +'</div>';
@@ -720,7 +717,7 @@ function renderOverview(p){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
@@ -728,6 +725,12 @@ function renderOverview(p){
       +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="margin-bottom:.875rem">'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(sumMkt,ccy)+'</div>'
       +'</div>'
       +'</div>';
 
@@ -770,16 +773,7 @@ function renderOverview(p){
         +'<thead><tr><th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
         +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Dividends</th><th class="r">P&L / % (incl. div)</th><th></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
-        +'<tfoot><tr><td style="font-weight:600">Total ('+ccy+')</td><td colspan="2"></td>'
-        +'<td class="r" style="font-weight:600">'+fc(sumCost,ccy)+'</td>'
-        +'<td></td>'
-        +'<td class="r" style="font-weight:600">'+fc(sumMkt,ccy)+'</td>'
-        +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
-        +'<td class="r g">'+(d>0?fc(d,ccy):'—')+'</td>'
-        +'<td class="r '+sc(tot)+'" style="font-weight:600;white-space:nowrap">'+sgn(tot,ccy)
-        +(totPct!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'">'+fp(totPct)+'</span>':'')
-        +'</td>'
-        +'<td></td></tr></tfoot>'
+        +''
         +'</table></div>'
       :'<p class="m" style="font-size:12px;padding:.5rem 0">No active holdings in '+ccy+'.</p>';
 
@@ -790,11 +784,10 @@ function renderOverview(p){
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
       +'<div>'
       +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
-      +'<div style="font-size:10px;color:var(--t2)">Total Value (Cash + Holdings only)</div>'
-      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
+      +'<div style="font-size:10px;color:var(--t2)">Total Market Value (Cash + Holdings only)</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
-      +pctBadge
-      +(rows.length?'<input id="hld-s-'+ccy+'" placeholder="Search holdings\u2026" oninput="filterOvHoldings(\''+ccy+'\')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:130px">':'')
+      +(rows.length?'':'')
       +'</div>'
       +'</div>'
       +'</div>'

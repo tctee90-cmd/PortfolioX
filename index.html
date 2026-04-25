@@ -520,7 +520,7 @@ function renderDashboard(){
   const summaryCcyCards=allCcys.map(function(ccy){
     const g=grandTotals[ccy];
     const cashTotal=g.cash||0;
-    const tot=Math.round((g.u+g.d+g.r)*100)/100;
+    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100)*100)/100;
     const totPct=g.co>0?tot/g.co*100:null;
     const pct=g.co>0?(g.mv+cashTotal-g.co)/g.co*100:null;
 
@@ -557,7 +557,7 @@ function renderDashboard(){
         +'<span style="font-size:10px;color:var(--t2);white-space:nowrap;min-width:30px">'+allocPctStr+'%</span>'
         +'</div>'
         +'</td>'
-        +'<td class="r" style="font-weight:600">'+fc(mvPlusCash,ccy)+'</td>'
+        +'<td class="r" style="font-weight:600">'+fc(mv,ccy)+'</td>'
         +'<td class="r">'+fc(co,ccy)+'</td>'
         +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
         +'<td class="r '+sc(r)+'">'+sgn(r,ccy)+'</td>'
@@ -621,7 +621,7 @@ function renderDashboard(){
       +'<div style="overflow-x:auto"><table class="tbl">'
       +'<thead><tr>'
       +'<th style="text-align:center">Portfolio</th>'
-      +'<th class="r">Holding Value</th><th class="r">Invested</th>'
+      +'<th class="r">Holdings</th><th class="r">Invested</th>'
       +'<th class="r">Unrealized</th><th class="r">Realized</th>'
       +'<th class="r">Dividends</th><th class="r">Total P&L / % (incl. div)</th>'
       +'<th style="width:24px"></th>'
@@ -629,7 +629,7 @@ function renderDashboard(){
       +'<tbody>'+pfRows+'</tbody>'
       +'<tfoot><tr>'
       +'<td style="font-weight:600">Total ('+ccy+')</td>'
-      +'<td class="r">'+fc(mvWithCash,ccy)+'</td>'
+      +'<td class="r">'+fc(g.mv,ccy)+'</td>'
       +'<td class="r">'+fc(g.co,ccy)+'</td>'
       +'<td class="r '+sc(g.u)+'">'+sgn(g.u,ccy)+'</td>'
       +'<td class="r '+sc(g.r)+'">'+sgn(g.r,ccy)+'</td>'
@@ -693,7 +693,7 @@ function renderOverview(p){
   return dateBar+allCcys.map((ccy,ci)=>{
     const rows=holdings.filter(h=>h.ccy===ccy);
     const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
-    const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((u+d+r)*100)/100;
+    const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
     const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
     const mvWithCash=mv+cashBal;
     const pct=co>0?(mvWithCash-co)/co*100:null;
@@ -839,7 +839,7 @@ function renderHoldings(p){
   for(const [ccy,rows] of Object.entries(byCcy)){
     let tbody='';
     for(const hh of rows){
-      const tot=Math.round((hh.unreal+hh.divs+hh.realized)*100)/100;
+      const tot=Math.round((Math.round(hh.unreal*100)/100+Math.round(hh.divs*100)/100+Math.round(hh.realized*100)/100)*100)/100;
       const pct=hh.cost>0?tot/hh.cost*100:null;
       tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
         +`<td style="font-weight:600">${hh.stock}</td>`

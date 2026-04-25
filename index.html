@@ -544,26 +544,21 @@ function renderDashboard(){
       const mvPlusCash=mv+pfCash;
 
       return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')">'
-        +'<td style="min-width:170px">'
-        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap">'
-        +'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+pf0.color+';flex-shrink:0"></span>'
-        +'<span style="font-size:12px;font-weight:600">'+pf0.name+'</span>'
-
+        +'<td style="max-width:130px">'
+        +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">'
+        +'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+pf0.color+';flex-shrink:0"></span>'
+        +'<span style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pf0.name+'</span>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px">'
-        +'<div style="flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden">'
-        +'<div style="width:'+allocPct.toFixed(2)+'%;height:100%;background:'+pf0.color+';border-radius:3px;transition:width .4s ease"></div>'
+        +'<div style="display:flex;align-items:center;gap:4px">'
+        +'<div style="width:50px;height:3px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0">'
+        +'<div style="width:'+allocPct.toFixed(2)+'%;height:100%;background:'+pf0.color+';border-radius:3px"></div>'
         +'</div>'
-        +'<span style="font-size:10px;color:var(--t2);white-space:nowrap;min-width:30px">'+allocPctStr+'%</span>'
+        +'<span style="font-size:10px;color:var(--t2)">'+allocPctStr+'%</span>'
         +'</div>'
         +'</td>'
-        +'<td class="r" style="font-weight:600">'+fc(mv,ccy)+'</td>'
-        +'<td class="r">'+fc(co,ccy)+'</td>'
-        +'<td class="r '+sc(u)+'">'+sgn(u,ccy)+'</td>'
-        +'<td class="r '+sc(r)+'">'+sgn(r,ccy)+'</td>'
-        +'<td class="r '+(d>0?'g':'m')+'">'+(d>0?fc(d,ccy):'—')+'</td>'
+        +'<td class="r" style="font-weight:600;white-space:nowrap">'+fc(mv,ccy)+'</td>'
         +'<td class="r '+sc(t)+'" style="font-weight:600;white-space:nowrap">'+sgn(t,ccy)
-        +(tp!==null?' <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:'+(t>=0?'var(--gd)':'var(--rd)')+'">'+fp(tp)+'</span>':'')
+        +(tp!==null?' <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;background:'+(t>=0?'var(--gd)':'var(--rd)')+';color:'+(t>=0?'var(--green)':'var(--red)')+'">'+fp(tp)+'</span>':'')
         +'</td>'
         +'<td style="color:var(--t3);font-size:11px">›</td>'
         +'</tr>';
@@ -586,16 +581,23 @@ function renderDashboard(){
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
       +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap;color:#fff">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';" class="'+sc(tot)+'">'+fp(totPct)+'</span>':'')
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
       +'</div>'
       +'</div>'
-      // Row 1: Invested | Unrealized | Realized  (each with unique accent colour)
-      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
+      // Row 1: Total Invested | Total Holdings Value
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.co,ccy)+'</div>'
       +'</div>'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.mv,ccy)+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 2: Unrealized P&L | Realized P&L
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.u)+'">'+sgn(g.u,ccy)+'</div>'
@@ -605,8 +607,8 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      // Row 2: Dividends | Cash
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+      // Row 3: Dividends | Cash Balance
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
@@ -616,26 +618,15 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
       +'</div>'
       +'</div>'
-      // Row 3: Total Holdings Value (full width)
-      +'<div style="margin-bottom:1rem">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.mv,ccy)+'</div>'
-      +'</div>'
-      +'</div>'
-      // Table with allocation bars
+      // Portfolio allocation table
       +'<div style="overflow-x:auto"><table class="tbl">'
       +'<thead><tr>'
-      +'<th style="text-align:center">Portfolio</th>'
-      +'<th class="r">Holdings</th><th class="r">Invested</th>'
-      +'<th class="r">Unrealized</th><th class="r">Realized</th>'
-      +'<th class="r">Dividends</th><th class="r">Total P&L / % (incl. div)</th>'
+      +'<th>Portfolio</th>'
+      +'<th class="r">Holdings</th>'
+      +'<th class="r">Total P&L / % (incl. div)</th>'
       +'<th style="width:24px"></th>'
       +'</tr></thead>'
       +'<tbody>'+pfRows+'</tbody>'
-      +'<tfoot style="display:none"><tr>'
-      +'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>'
-      +'</tr></tfoot>'
       +'</table></div>'
       +'</div>';
   }).join('');
@@ -703,11 +694,19 @@ function renderOverview(p){
 
     // Mini-cards — row 1: Invested / Unrealized / Realized, row 2: Dividends / Cash
     const miniCards=
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
+      // Row 1: Total Invested | Total Holdings Value
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(co,ccy)+'</div>'
       +'</div>'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(sumMkt,ccy)+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 2: Unrealized P&L | Realized P&L
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(u)+'">'+sgn(u,ccy)+'</div>'
@@ -717,7 +716,8 @@ function renderOverview(p){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+      // Row 3: Dividends | Cash Balance
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.875rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
@@ -725,12 +725,6 @@ function renderOverview(p){
       +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
-      +'</div>'
-      +'</div>'
-      +'<div style="margin-bottom:.875rem">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(sumMkt,ccy)+'</div>'
       +'</div>'
       +'</div>';
 
@@ -756,7 +750,7 @@ function renderOverview(p){
         +`<td class="r" style="font-weight:600">${hh.mktVal>0?fc(hh.mktVal,hh.mktCcy):'—'}</td>`
         +`<td class="r ${sc(hh.unreal)}">${sgn(hh.unreal,ccy)}</td>`
         +`<td class="r ${hh.divs>0?'g':''}">${hh.divs>0?fc(hh.divs,ccy):'—'}</td>`
-        +`<td class="r ${sc(tot2)}" style="font-weight:600;white-space:nowrap">${sgn(tot2,ccy)}${pct2!==null?'<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;background:'+(pct2>=0?'var(--gd)':' var(--rd)')+'">'+fp(pct2)+'</span>':''}</td>`
+        +`<td class="r ${sc(tot2)}" style="font-weight:600;white-space:nowrap">${sgn(tot2,ccy)}${pct2!==null?'<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;background:'+(pct2>=0?'var(--gd)':' var(--rd)')+';color:'+(pct2>=0?'var(--green)':'var(--red)')+'">'+fp(pct2)+'</span>':''}</td>`
         +'<td style="color:var(--t3);font-size:11px">›</td>'
         +'</tr>';
     });
@@ -795,8 +789,8 @@ function renderOverview(p){
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
       +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap;color:#fff">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+'" class="'+sc(tot)+'">'+fp(totPct)+'</span>':'')
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
       +'</div>'
       +'</div>'
       +'</div>';

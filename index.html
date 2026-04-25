@@ -520,9 +520,14 @@ function renderDashboard(){
   const summaryCcyCards=allCcys.map(function(ccy){
     const g=grandTotals[ccy];
     const cashTotal=g.cash||0;
+    const mvWithCash=g.mv+cashTotal;
     const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100)*100)/100;
-    const totPct=g.co>0?tot/g.co*100:null;
-    const pct=g.co>0?(g.mv+cashTotal-g.co)/g.co*100:null;
+    const _dAllDeps=S.portfolios.flatMap(p0=>(p0.deposits||[]).filter(d=>(d.ccy||'MYR')===ccy));
+    const _dDep=_dAllDeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+    const _dWit=_dAllDeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+    const _dPrincipal=_dDep>0?(_dDep-_dWit):g.co;
+    const totPct=_dPrincipal>0?tot/_dPrincipal*100:null;
+    const pct=_dPrincipal>0?(mvWithCash-_dPrincipal)/_dPrincipal*100:null;
 
     // Build portfolio rows with inline allocation bar
     const activePfs=S.portfolios.filter(function(pf0){
@@ -570,7 +575,6 @@ function renderDashboard(){
     }).join('');
 
 
-    const mvWithCash=g.mv+cashTotal;
     return '<div style="'+ccyCardStyle(ccy)+'">'
       // Header — just CCY tag + total value
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
@@ -591,12 +595,27 @@ function renderDashboard(){
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';" class="'+sc(tot)+'">'+fp(totPct)+'</span>':'')
       +'</div>'
       +'</div>'
-      // Row 1: Invested | Unrealized | Realized  (each with unique accent colour)
-      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.co,ccy)+'</div>'
-      +'</div>'
+      // Row 1: Principal | Return on Principal
+      +(function(){
+        const _deps=S.portfolios.flatMap(p0=>(p0.deposits||[]).filter(d=>(d.ccy||'MYR')===ccy));
+        const _dep=_deps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+        const _wit=_deps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+        const _principal=_dep>0?(_dep-_wit):null;
+        const _ret=_principal!==null?mvWithCash-_principal:null;
+        const _retPct=_principal>0?(_ret/_principal*100):null;
+        return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Principal (Deposit)</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(_principal!==null?fc(_principal,ccy):'<span style="font-size:10px;color:var(--t3)">Add in Capital Flows</span>')+'</div>'
+          +'</div>'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Return on Principal</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+(_ret!==null?sc(_ret):'m')+'">'+(_ret!==null?sgn(_ret,ccy)+(_retPct!==null?' ('+(_retPct>=0?'+':'')+_retPct.toFixed(1)+'%)':''):'—')+'</div>'
+          +'</div>'
+          +'</div>';
+      })()
+      // Row 2: Unrealized | Realized
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.u)+'">'+sgn(g.u,ccy)+'</div>'
@@ -606,7 +625,7 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      // Row 2: Dividends | Cash  (amber accent)
+      // Row 3: Dividends | Cash Balance
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
@@ -695,8 +714,13 @@ function renderOverview(p){
     const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
     const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
     const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
-    const pct=co>0?(mv-co)/co*100:null;
-    const totPct=co>0?tot/co*100:null;
+    // Principal: use net deposits if available, else cost basis
+    const _ovDeps=(p.deposits||[]).filter(d=>(d.ccy||'MYR')===ccy);
+    const _ovDep=_ovDeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+    const _ovWit=_ovDeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+    const _ovPrincipal=_ovDep>0?(_ovDep-_ovWit):co;
+    const pct=_ovPrincipal>0?(mvWithCash-_ovPrincipal)/_ovPrincipal*100:null;
+    const totPct=_ovPrincipal>0?tot/_ovPrincipal*100:null;
     const totalMV=rows.reduce((s,h)=>s+h.mktVal,0)||1;
 
     // Fix 4: Sort rows by mkt value descending (highest allocation first)
@@ -704,33 +728,48 @@ function renderOverview(p){
     const sumMkt=sortedRows.reduce((s,h)=>s+h.mktVal,0);
     const mvWithCash=sumMkt+cashBal;
 
-    // Mini-cards — row 1: Invested / Unrealized / Realized, row 2: Dividends / Cash
+    // Mini-cards row 1: Principal | Return on Principal
     const miniCards=
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(co,ccy)+'</div>'
-      +'</div>'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(u)+'">'+sgn(u,ccy)+'</div>'
-      +'</div>'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
-      +'</div>'
-      +'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
-      +'</div>'
-      +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
-      +'</div>'
-      +'</div>';
-
+      (function(){
+        const _deps2=(p.deposits||[]).filter(d=>(d.ccy||'MYR')===ccy);
+        const _dep2=_deps2.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+        const _wit2=_deps2.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+        const _principal2=_dep2>0?(_dep2-_wit2):null;
+        const _ret2=_principal2!==null?mvWithCash-_principal2:null;
+        const _retPct2=_principal2>0?(_ret2/_principal2*100):null;
+        return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Principal (Deposit)</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(_principal2!==null?fc(_principal2,ccy):'<span style="font-size:10px;color:var(--t3)">Add in Capital Flows</span>')+'</div>'
+          +'</div>'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Return on Principal</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+(_ret2!==null?sc(_ret2):'m')+'">'+(_ret2!==null?sgn(_ret2,ccy)+(_retPct2!==null?' ('+(_retPct2>=0?'+':'')+_retPct2.toFixed(1)+'%)':''):'—')+'</div>'
+          +'</div>'
+          +'</div>'
+          // Row 2: Unrealized | Realized
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(u)+'">'+sgn(u,ccy)+'</div>'
+          +'</div>'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
+          +'</div>'
+          +'</div>'
+          // Row 3: Dividends | Cash Balance
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+          +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
+          +'</div>'
+          +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
+          +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
+          +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
+          +'</div>'
+          +'</div>';
+      })();
     // Colour bar (sorted)
     const barSegs=sortedRows.map((h,i)=>{
       const w=(h.mktVal/totalMV*100).toFixed(2);

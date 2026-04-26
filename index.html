@@ -220,7 +220,7 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="tab on" data-tab="dashboard">Dashboard</button>
     <button class="tab" data-tab="overview">Overview</button>
     <button class="tab" data-tab="transactions">Transactions</button>
-    <button class="tab" data-tab="closed">Closed Trades</button>
+    
     <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="options">Options</button>
     <button class="tab" data-tab="deposits">Capital Flows</button>
@@ -417,7 +417,7 @@ function journeyData(p0){
         const hs=hh[t.stock]||{qty:0,cost:0};
         const avg=hs.qty>0?hs.cost/hs.qty:0;
         const pnl=(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
-        realByYr[yr]=(realByYr[yr]||0)+pnl;
+        realByYr[yr]=Math.round(((realByYr[yr]||0)+pnl)*100)/100;
         // Reduce holding after sell
         if(hh[t.stock]){hh[t.stock].cost-=avg*(+t.qty);hh[t.stock].qty-=+t.qty;}
       }
@@ -545,14 +545,11 @@ function renderDashboard(){
 
       return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')">'
         +'<td style="max-width:130px">'
-        +'<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px">'
-        +'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+pf0.color+';flex-shrink:0"></span>'
-        +'<span style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+pf0.name+'</span>'
-        +'</div>'
-        +'<div style="display:flex;align-items:center;gap:4px">'
-        +'<div style="width:50px;height:3px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0">'
-        +'<div style="width:'+allocPct.toFixed(2)+'%;height:100%;background:'+pf0.color+';border-radius:3px"></div>'
-        +'</div>'
+        +'<div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">'
+        +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+pf0.color+';margin-right:4px;vertical-align:middle"></span>'
+        +pf0.name+'</div>'
+        +'<div style="display:flex;align-items:center;gap:5px">'
+        +'<div style="width:'+(allocPct*0.4).toFixed(1)+'px;height:3px;background:'+pf0.color+';border-radius:3px;flex-shrink:0"></div>'
         +'<span style="font-size:10px;color:var(--t2)">'+allocPctStr+'%</span>'
         +'</div>'
         +'</td>'
@@ -659,7 +656,6 @@ function renderContent(){
   else if(TAB==='overview'){$('ct').innerHTML=renderOverview(p);}
   else if(TAB==='holdings')$('ct').innerHTML=renderHoldings(p);
   else if(TAB==='transactions')$('ct').innerHTML=renderTx(p);
-  else if(TAB==='closed')$('ct').innerHTML=renderClosed(p);
   else if(TAB==='journey')$('ct').innerHTML=renderJourney(p);
   else if(TAB==='options')$('ct').innerHTML=renderOptions();
   else if(TAB==='deposits')$('ct').innerHTML=renderDeposits(p);
@@ -1022,14 +1018,53 @@ function renderTx(p,filterYrCcy){
       });
       html+='</div>';
     }
-    const typeFilterOpts=['','Buy','Sell','Dividend','Platform Fee'].map(t=>'<option value="'+t+'">'+(t||'All types')+'</option>').join('');
+    const typeFilterOpts=['','Buy','Sell','Dividend','Platform Fee','Closed Trades'].map(t=>'<option value="'+t+'">'+(t||'All types')+'</option>').join('');
     html+='<div class="search-bar">'
       +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="max-width:240px">'
       +'<select id="tx-type-filter" onchange="filterTxTable()" style="width:120px">'+typeFilterOpts+'</select>'
       +'<span class="m" style="font-size:12px" id="tx-count">'+txs.length+' transactions</span>'
       +'</div>';
   }
-  html+='<div style="overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
+  // Build closed trades view (hidden by default)
+  const _closedAll=getHoldings(p,false).filter(h=>(h.realized!==0||h.divs!==0));
+  // Deduct platform fees from closed summary
+  const _pfByCcy={};
+  p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{_pfByCcy[t.ccy]=(_pfByCcy[t.ccy]||0)+(+t.amount||0);});
+  const _closedByCcy={};
+  _closedAll.forEach(h=>{if(!_closedByCcy[h.ccy])_closedByCcy[h.ccy]={r:0,d:0};_closedByCcy[h.ccy].r+=h.realized;_closedByCcy[h.ccy].d+=h.divs;});
+  Object.keys(_closedByCcy).forEach(ccy=>{_closedByCcy[ccy].r=Math.round((_closedByCcy[ccy].r-(_pfByCcy[ccy]||0))*100)/100;});
+  const _closedSummary=Object.entries(_closedByCcy).map(([ccy,v])=>
+    '<div style="display:inline-flex;gap:14px;padding:6px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);margin-right:6px;margin-bottom:6px">'
+    +'<div><div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">'+ccy+' Realized</div>'
+    +'<div style="font-size:13px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,ccy)+'</div></div>'
+    +(v.d>0?'<div><div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Dividends</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--green)">'+fc(v.d,ccy)+'</div></div>':'')
+    +'</div>'
+  ).join('');
+  const _closedRows=_closedAll.map(h=>{
+    const tot=h.realized+h.divs;
+    const pct=h.cost>0?tot/h.cost*100:null;
+    const statusLabel=h.qty>0
+      ?'<span style="font-size:9px;padding:1px 6px;border-radius:10px;background:var(--gd);color:var(--green)">Partial</span>'
+      :'<span style="font-size:9px;padding:1px 6px;border-radius:10px;background:var(--bg4);color:var(--t2)">Closed</span>';
+    return '<tr class="ck" onclick="drillStock(\''+h.stock.replace(/'/g,"\\'")+'\',\''+h.ccy+'\')">'
+      +'<td style="font-weight:600">'+h.stock+' '+statusLabel+'</td>'
+      +'<td><span class="ctag">'+h.ccy+'</span></td>'
+      +'<td class="r '+sc(h.realized)+'" style="font-weight:600">'+(h.realized!==0?sgn(h.realized,h.ccy):'—')+'</td>'
+      +'<td class="r g">'+(h.divs>0?fc(h.divs,h.ccy):'—')+'</td>'
+      +'<td class="r '+sc(tot)+'" style="font-weight:600">'+sgn(tot,h.ccy)+'</td>'
+      +'<td class="r">'+(pct!==null?'<span style="color:'+(pct>=0?'var(--green)':'var(--red)')+';font-weight:600">'+fp(pct)+'</span>':'—')+'</td>'
+      +'<td class="m" style="font-size:11px">'+(h.firstDate||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  html+='<div id="tx-closed-view" style="display:none">'
+    +'<div style="margin-bottom:.75rem;flex-wrap:wrap">'+_closedSummary+'</div>'
+    +'<div style="overflow-x:auto"><table class="tbl" id="tx-closed-table"><thead><tr>'
+    +'<th>Stock</th><th>CCY</th><th class="r">Realized P&L</th><th class="r">Dividends</th><th class="r">Total P&L</th><th class="r">P&L %</th><th>First Buy</th>'
+    +'</tr></thead><tbody>'+_closedRows+'</tbody></table></div>'
+    +(_closedAll.length===0?'<div class="m" style="text-align:center;padding:2rem;font-size:12px">No realized P&L yet.</div>':'')
+    +'</div>';
+  html+='<div id="tx-table-wrap"><div style="overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
     +'<th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th>'
     +'<th class="r">Fee</th><th class="r">Amount</th><th>Note</th>'
     +(isFiltered?'':'<th style="width:52px"></th>')
@@ -1054,7 +1089,7 @@ function renderTx(p,filterYrCcy){
     }
     html+='</tr>';
   });
-  html+='</tbody></table></div>';
+  html+='</tbody></table></div></div>';
   if(txs.length===0)html+='<div class="m" style="text-align:center;padding:2rem;font-size:12px">No transactions found.</div>';
   return html;
 }
@@ -1075,8 +1110,23 @@ function filterSdTx(){
 }
 
 function filterTxTable(){
-  const q=(document.getElementById('tx-search')||{value:''}).value.toLowerCase();
   const type=(document.getElementById('tx-type-filter')||{value:''}).value;
+  // Special case: Closed Trades view
+  if(type==='Closed Trades'){
+    const ct=document.getElementById('tx-closed-view');
+    const tt=document.getElementById('tx-table-wrap');
+    if(ct)ct.style.display='';
+    if(tt)tt.style.display='none';
+    const cnt=document.getElementById('tx-count');
+    if(cnt){const rows=document.querySelectorAll('#tx-closed-table tbody tr');cnt.textContent=rows.length+' positions';}
+    return;
+  }
+  // Hide closed view, show normal table
+  const ct=document.getElementById('tx-closed-view');
+  const tt=document.getElementById('tx-table-wrap');
+  if(ct)ct.style.display='none';
+  if(tt)tt.style.display='';
+  const q=(document.getElementById('tx-search')||{value:''}).value.toLowerCase();
   const rows=document.querySelectorAll('#tx-table tbody tr');
   let visible=0;
   rows.forEach(r=>{
@@ -1086,15 +1136,17 @@ function filterTxTable(){
     r.style.display=show?'':'none';
     if(show)visible++;
   });
-  const c=document.getElementById('tx-count');if(c)c.textContent=visible+' transactions';
+  const cnt=document.getElementById('tx-count');if(cnt)cnt.textContent=visible+' transactions';
 }
 
 // ── Closed trades tab ────────────────────────────────────────────────────────────
 function renderClosed(p){
-  const all=getHoldings(p,false).filter(h=>h.qty<=0&&(h.realized!==0||h.divs!==0));
+  const all=getHoldings(p,false).filter(h=>(h.realized!==0||h.divs!==0));
   // Overall closed P&L by CCY
   const _clByCcy={};
   all.forEach(h=>{if(!_clByCcy[h.ccy])_clByCcy[h.ccy]={r:0,d:0};_clByCcy[h.ccy].r+=h.realized;_clByCcy[h.ccy].d+=h.divs;});
+  // Deduct platform fees from closed trades summary
+  p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{if(_clByCcy[t.ccy])_clByCcy[t.ccy].r=Math.round((_clByCcy[t.ccy].r-(+t.amount||0))*100)/100;});
   const _clCards=Object.entries(_clByCcy).map(([c,v])=>{
     return '<div style="display:flex;gap:12px;padding:6px 12px;background:#1a2744;border-radius:var(--r);border:1px solid rgba(255,255,255,.15)">'
       +'<div><div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">'+c+' Realized</div>'
@@ -1105,7 +1157,7 @@ function renderClosed(p){
   }).join('');
   const _clSummary=_clCards?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:.75rem">${_clCards}</div>`:'';
   return _clSummary+`<div class="search-bar"><input id="cl-search" placeholder="Search stock…" oninput="filterClosedTable()" style="max-width:320px"><span class="m" style="font-size:12px" id="cl-count">${all.length} closed position${all.length!==1?'s':''}</span></div>
-  ${!all.length?`<div class="card m" style="text-align:center;padding:2rem">No closed positions yet.</div>`:
+  ${!all.length?`<div class="card m" style="text-align:center;padding:2rem">No realized P&L yet.</div>`:
   `<div style="overflow-x:auto"><table class="tbl" id="cl-table"><thead><tr>
     <th>Stock</th><th>CCY</th><th class="r">Realized P&L</th><th class="r">Dividends</th><th class="r">Total P&L</th><th class="r">P&L %</th><th>First buy</th>
   </tr></thead><tbody>
@@ -1167,7 +1219,11 @@ function renderJourney(p){
       </div>`;
     } else {
       // PnL tab
-      const totalReal=rows.reduce((s,r)=>s+r.realYr,0);
+      const totalReal=(function(){
+        const gross=rows.reduce((s,r)=>s+r.realYr,0);
+        const pfFee=p.transactions.filter(t=>t.type==='Platform Fee'&&t.ccy===ccy).reduce((s,t)=>s+(+t.amount||0),0);
+        return Math.round((gross-pfFee)*100)/100;
+      })();
       const totalUnreal=sum.unreal[ccy]||0;
       const hasReal=rows.some(r=>r.realYr!==0);
       const rowsHtml=rows.filter(r=>r.realYr!==0).map(r=>{
@@ -2394,31 +2450,16 @@ function renderDeposits(p){
     const sum=getSummary(p);
     const mktVal=sum.mktVal[ccy]||0;
     const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
-    const totalVal=mktVal+cashBal;
-    const returnAmt=net>0?totalVal-net:null;
-    const returnPct=net>0&&net!==0?returnAmt/net*100:null;
 
-    // Return on Principal card (only shown if there are deposits)
-    const ropCard=net>0
-      ?'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:.875rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between">'
-        +'<div>'
-        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Return on Principal ('+ccy+')</div>'
-        +'<div style="font-size:10px;color:var(--t3)">Net deposited '+fc(net,ccy)+' → Current value '+fc(totalVal,ccy)+'</div>'
-        +'</div>'
-        +'<div style="text-align:right">'
-        +'<div style="font-size:15px;font-weight:700;white-space:nowrap" class="'+sc(returnAmt)+'">'+sgn(returnAmt,ccy)+'</div>'
-        +(returnPct!==null?'<div style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:2px;background:'+(returnAmt>=0?'var(--gd)':'var(--rd)')+';" class="'+sc(returnAmt)+'">'+(returnPct>=0?'+':'')+returnPct.toFixed(2)+'%</div>':'')
-        +'</div>'
-        +'</div>'
-      :'';
-
-    // Summary mini-cards
-    const sumCards='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.875rem">'
-      +[['Total Deposited',totDep>0?'+'+fc(totDep,ccy):'—','g'],
-        ['Total Withdrawn',totWit>0?'-'+fc(totWit,ccy):'—',totWit>0?'rr':'m'],
-        ['Net Capital',fc(net,ccy),net>=0?'g':'rr']]
-      .map(function(a){return'<div class="kc"><div class="kl">'+a[0]+'</div><div class="kv '+a[2]+'" style="white-space:nowrap;font-size:13px">'+a[1]+'</div></div>';})
-      .join('')+'</div>';
+    // Summary mini-cards — row1: Deposited | Withdrawn, row2: Net Capital
+    const sumCards=
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
+      +'<div class="kc"><div class="kl">Total Deposited</div><div class="kv g" style="white-space:nowrap;font-size:13px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div></div>'
+      +'<div class="kc"><div class="kl">Total Withdrawn</div><div class="kv '+(totWit>0?'rr':'m')+'" style="white-space:nowrap;font-size:13px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div></div>'
+      +'</div>'
+      +'<div style="margin-bottom:.875rem">'
+      +'<div class="kc"><div class="kl">Net Capital</div><div class="kv '+(net>=0?'g':'rr')+'" style="white-space:nowrap;font-size:13px">'+fc(net,ccy)+'</div></div>'
+      +'</div>';
 
     // Year summary
     const byYr={};
@@ -2467,7 +2508,7 @@ function renderDeposits(p){
 
     return'<div style="margin-bottom:1.5rem">'
       +ccyTag(ccy,'margin-bottom:.65rem;display:inline-block')
-      +ropCard+sumCards+yrTable+txTable
+      +sumCards+yrTable+txTable
       +'</div>';
   }).join('');
 

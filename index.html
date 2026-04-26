@@ -2578,6 +2578,26 @@ $('restore-input').addEventListener('change',doRestore);
 render();
 showWelcomeIfFirstLoad();
 
+// ── Swipe left/right to switch tabs ──────────────────────────────
+(function(){
+  const TAB_ORDER=['dashboard','overview','transactions','journey','options','deposits'];
+  let _tx=0,_ty=0;
+  document.addEventListener('touchstart',function(e){
+    _tx=e.touches[0].clientX;
+    _ty=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    const dx=e.changedTouches[0].clientX-_tx;
+    const dy=e.changedTouches[0].clientY-_ty;
+    // Only trigger on mostly horizontal swipe of >50px
+    if(Math.abs(dx)<50||Math.abs(dy)>Math.abs(dx)*0.8)return;
+    const idx=TAB_ORDER.indexOf(TAB);
+    if(idx===-1)return;
+    if(dx<0&&idx<TAB_ORDER.length-1)swTab(TAB_ORDER[idx+1]); // swipe left → next tab
+    if(dx>0&&idx>0)swTab(TAB_ORDER[idx-1]);                   // swipe right → prev tab
+  },{passive:true});
+})();
+
 // Position tab bar below header dynamically
 function fixLayout(){
   const hd=document.getElementById('hd');

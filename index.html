@@ -554,8 +554,8 @@ function renderDashboard(){
         +'</div>'
         +'</td>'
         +'<td class="r" style="font-weight:600;white-space:nowrap">'+fc(mv,ccy)+'</td>'
-        +'<td class="r '+sc(t)+'" style="font-weight:600;white-space:nowrap">'+sgn(t,ccy)
-        +(tp!==null?' <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;background:'+(t>=0?'var(--gd)':'var(--rd)')+';color:'+(t>=0?'var(--green)':'var(--red)')+'">'+fp(tp)+'</span>':'')
+        +'<td class="r '+sc(t)+'" style="font-weight:600">'+sgn(t,ccy)
+        +(tp!==null?'<br><span style="font-size:10px;font-weight:600;color:'+(t>=0?'var(--green)':'var(--red)')+'">'+fp(tp)+'</span>':'')
         +'</td>'
         +'<td style="color:var(--t3);font-size:11px">›</td>'
         +'</tr>';

@@ -129,15 +129,16 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   background:var(--bg2);
   border-bottom:1px solid var(--b2);
   padding:0 16px;display:flex;align-items:center;gap:8px;min-height:50px;
-  position:sticky;top:0;z-index:100;flex-wrap:wrap;
+  position:fixed;top:0;left:0;right:0;z-index:100;flex-wrap:wrap;
 }
 #hd .logo{font-size:15px;font-weight:700;letter-spacing:-.5px;white-space:nowrap}
 #hd .logo span{color:var(--blue)}
 
-/* Tab bar — subtle bg to distinguish from content below */
-#tb-wrap{background:var(--bg2);border-bottom:1px solid var(--b1);}
+/* Tab bar — fixed below header */
+#tb-wrap{background:var(--bg2);border-bottom:1px solid var(--b1);position:fixed;left:0;right:0;z-index:99;}
 
 #mn{max-width:1300px;margin:0 auto;padding:16px 16px 60px}
+#date-bar{font-size:12px;}
 
 /* Back button */
 .bb{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--blue);cursor:pointer;margin-bottom:1rem;padding:4px 0}
@@ -215,12 +216,11 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="sm ghost" id="bxl" style="border-color:var(--blue);color:var(--blue)">&#8595; Excel</button>
   </div>
 </div>
-<div id="mn">
-  <div style="display:flex;gap:0;border-bottom:1px solid var(--b1);margin-bottom:1rem;align-items:center;overflow-x:auto">
+<div id="tb-wrap">
+  <div style="display:flex;gap:0;align-items:center;overflow-x:auto;padding:0 16px">
     <button class="tab on" data-tab="dashboard">Dashboard</button>
     <button class="tab" data-tab="overview">Overview</button>
     <button class="tab" data-tab="transactions">Transactions</button>
-    
     <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="options">Options</button>
     <button class="tab" data-tab="deposits">Capital Flows</button>
@@ -228,6 +228,9 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="sm ghost" id="bpx" style="margin-bottom:3px;white-space:nowrap">Update Prices</button>
     <button class="pri sm" id="bat" style="margin-left:5px;margin-bottom:3px;white-space:nowrap">+ Transaction</button>
   </div>
+</div>
+<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem 1rem;font-size:12px;"></div>
+<div id="mn">
   <div id="ct"></div>
 </div>
 <div id="ov"><div class="modal" id="mi"></div></div>
@@ -628,13 +631,8 @@ function renderDashboard(){
       +'</div>';
   }).join('');
 
-  const dateBar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding:.5rem .75rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--amber)">'
-    +'<span style="font-size:11px;color:var(--t2)">All Portfolios — Dashboard</span>'
-    +'<span style="font-size:13px;font-weight:600">'+todayStr()+'</span>'
-    +'</div>';
-
-  if(!allCcys.length)return dateBar+'<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
-  return dateBar+summaryCcyCards;
+  if(!allCcys.length)return '<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
+  return summaryCcyCards;
 }
 
 
@@ -648,17 +646,30 @@ function goPortfolio(id){
   render();
 }
 
+function setDateBar(label){
+  const db=document.getElementById('date-bar');
+  if(!db)return;
+  db.style.display='flex';
+  db.style.alignItems='center';
+  db.style.gap='8px';
+  db.innerHTML='<span style="color:var(--t2)">'+label+'</span>'
+    +'<span style="font-weight:600">'+todayStr()+'</span>';
+  fixLayout();
+}
 function renderContent(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
   const p=pf();
-  if(VIEW&&VIEW.type==='stock'){$('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);return;}
-  if(TAB==='dashboard'){$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
-  else if(TAB==='overview'){$('ct').innerHTML=renderOverview(p);}
-  else if(TAB==='holdings')$('ct').innerHTML=renderHoldings(p);
-  else if(TAB==='transactions')$('ct').innerHTML=renderTx(p);
-  else if(TAB==='journey')$('ct').innerHTML=renderJourney(p);
-  else if(TAB==='options')$('ct').innerHTML=renderOptions();
-  else if(TAB==='deposits')$('ct').innerHTML=renderDeposits(p);
+  if(VIEW&&VIEW.type==='stock'){
+    const db=document.getElementById('date-bar');if(db)db.style.display='none';
+    $('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);fixLayout();return;
+  }
+  if(TAB==='dashboard'){setDateBar('All Portfolios — Dashboard');$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
+  else if(TAB==='overview'){setDateBar(pf().name+' — Overview');$('ct').innerHTML=renderOverview(p);}
+  else if(TAB==='holdings'){setDateBar(pf().name+' — Holdings');$('ct').innerHTML=renderHoldings(p);}
+  else if(TAB==='transactions'){setDateBar(pf().name+' — Transactions');$('ct').innerHTML=renderTx(p);}
+  else if(TAB==='journey'){setDateBar(pf().name+' — Journey');$('ct').innerHTML=renderJourney(p);}
+  else if(TAB==='options'){setDateBar(pf().name+' — Options');$('ct').innerHTML=renderOptions();}
+  else if(TAB==='deposits'){setDateBar(pf().name+' — Capital Flows');$('ct').innerHTML=renderDeposits(p);}
 }
 
 // ── Overview ────────────────────────────────────────────────────────────────────
@@ -668,13 +679,9 @@ function renderOverview(p){
   const rawCcys=[...new Set([...Object.keys(sum.mktVal),...Object.keys(sum.divs)])].filter(Boolean);
   const allCcys=[...CCY_ORDER.filter(c=>rawCcys.includes(c)),...rawCcys.filter(c=>!CCY_ORDER.includes(c))];
 
-  const dateBar='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding:.5rem .75rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--blue)">'
-    +'<span style="font-size:11px;color:var(--t2)">Today</span>'
-    +'<span style="font-size:13px;font-weight:600">'+todayStr()+'</span>'
-    +'</div>';
-  if(!allCcys.length)return dateBar+'<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
+  if(!allCcys.length)return '<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
 
-  return dateBar+allCcys.map((ccy,ci)=>{
+  return allCcys.map((ccy,ci)=>{
     const rows=holdings.filter(h=>h.ccy===ccy);
     const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
     const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
@@ -2570,6 +2577,25 @@ $('bxl').addEventListener('click',doExcel);
 $('restore-input').addEventListener('change',doRestore);
 render();
 showWelcomeIfFirstLoad();
+
+// Position tab bar below header dynamically
+function fixLayout(){
+  const hd=document.getElementById('hd');
+  const tb=document.getElementById('tb-wrap');
+  const db=document.getElementById('date-bar');
+  const mn=document.getElementById('mn');
+  if(!hd||!tb||!mn)return;
+  const hdH=hd.getBoundingClientRect().height;
+  const tbH=tb.getBoundingClientRect().height;
+  const dbH=db&&db.style.display!=='none'?db.getBoundingClientRect().height:0;
+  tb.style.top=hdH+'px';
+  if(db&&db.style.display!=='none')db.style.top=(hdH+tbH)+'px';
+  mn.style.paddingTop=(hdH+tbH+dbH+16)+'px';
+}
+fixLayout();
+window.addEventListener('resize',fixLayout);
+// Re-run after fonts load
+setTimeout(fixLayout,200);
 </script>
 </body>
 </html>

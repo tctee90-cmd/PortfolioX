@@ -1716,30 +1716,35 @@ function renderOptions(){
   const closedT=trades.filter(t=>!isOpen(t));
   const fmtN=(v,dp=2)=>{const a=Math.abs(v).toLocaleString('en',{minimumFractionDigits:dp,maximumFractionDigits:dp});return(v>=0?'+':'-')+'US$ '+a;};
   const fmtAbs=v=>{const a=Math.abs(v).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});return(v<0?'-':'')+'US$ '+a;};
-  const pctBadge=(pnl,base)=>{if(!base)return'';const p=(pnl/Math.abs(base))*100;return` <span style="font-size:10px;color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${p.toFixed(1)}%</span>`;};
+  const pctBadge=(pnl,base)=>{if(!base)return'';const p=(pnl/Math.abs(base))*100;return` <span style="font-size:10px;color:${p>=0?'#4ade80':'#f87171'}">${p>=0?'+':''}${p.toFixed(1)}%</span>`;};
   const realPnl=closedT.reduce((s,t)=>s+(parseFloat(t.openValue)||0)+(parseFloat(t.closeValue)||0)-(parseFloat(t.openFee)||0)-(parseFloat(t.closeFee)||0),0);
   const unrPnl=openT.reduce((s,t)=>{const o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0;return t.mktValue!=null&&t.mktValue!==''?s+o+(parseFloat(t.mktValue)||0)-of0:s;},0);
-  const openExp=openT.reduce((s,t)=>s+(parseFloat(t.openValue)||0),0);
   const hasMktCount=openT.filter(t=>t.mktValue!=null&&t.mktValue!=='').length;
-  const summary=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1.25rem">
-    <div class="kc"><div class="kl">Open trades</div><div class="kv">${openT.length}</div></div>
-    <div class="kc"><div class="kl">Closed trades</div><div class="kv">${closedT.length}</div></div>
-    <div class="kc"><div class="kl">Realized P&L</div><div class="kv ${realPnl>=0?'g':'rr'}">${fmtN(realPnl)}</div></div>
-    <div class="kc"><div class="kl">Unrealized P&L</div><div class="kv ${unrPnl>0?'g':unrPnl<0?'rr':'m'}">${hasMktCount?fmtN(unrPnl):'<span style="font-size:11px">Add mkt value</span>'}</div></div>
-    <div class="kc"><div class="kl">Open exposure</div><div class="kv m" style="font-size:13px">${fmtAbs(openExp)}</div></div>
+  const totalPnl=realPnl+(hasMktCount?unrPnl:0);
+
+  // ── Total P&L summary — row 1: Total, row 2: Realized | Unrealized ──
+  const summary=`<div style="margin-bottom:1.25rem">
+    <div style="margin-bottom:6px">
+      <div class="kc"><div class="kl">Total P&L (Realized + Unrealized)</div><div class="kv ${totalPnl>=0?'g':'rr'}" style="white-space:nowrap">${fmtN(totalPnl)}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="kc"><div class="kl">Realized P&L</div><div class="kv ${realPnl>=0?'g':'rr'}" style="white-space:nowrap">${fmtN(realPnl)}</div></div>
+      <div class="kc"><div class="kl">Unrealized P&L</div><div class="kv ${unrPnl>0?'g':unrPnl<0?'rr':'m'}" style="white-space:nowrap">${hasMktCount?fmtN(unrPnl):'—'}</div></div>
+    </div>
   </div>`;
+
   const thead=`<thead><tr>
     <th>Ticker</th><th>Open date</th><th class="r">Open value</th><th class="r">Open fee</th>
     <th>Close date</th><th class="r">Close / Mkt value</th><th class="r">Close fee</th>
     <th class="r">P&L (USD)</th><th>Note</th><th style="width:52px"></th>
   </tr></thead>`;
+
   function mkRow(t,i){
     const open=isOpen(t);
     const o=parseFloat(t.openValue)||0;
     const c=!open?parseFloat(t.closeValue)||0:null;
     const hasMkt=open&&t.mktValue!=null&&t.mktValue!=='';
     const m=hasMkt?parseFloat(t.mktValue)||0:null;
-    // P&L = openValue + closeValue (both signed). e.g. -500 open + 800 close = +300
     const of0=parseFloat(t.openFee)||0, cf0=parseFloat(t.closeFee)||0;
     const pnl=!open?(o+c-of0-cf0):null;
     const uPnl=hasMkt?(o+m-of0):null;
@@ -1748,15 +1753,15 @@ function renderOptions(){
     else if(uPnl!==null){pnlCls=uPnl>=0?'g':'rr';pnlHtml=fmtN(uPnl)+pctBadge(uPnl,o)+'<span style="font-size:10px;color:var(--t2);margin-left:2px">(unreal)</span>';}
     else{pnlCls='m';pnlHtml='<span style="font-size:11px;color:var(--t2)">No mkt value</span>';}
     const closeMktHtml=!open?fmtAbs(c):hasMkt?('<span class="m" style="font-size:11px">Mkt: </span>'+fmtAbs(m)):'<span class="badge" style="color:var(--blue);background:var(--bd)">Open</span>';
-    return`<tr>
+    return`<tr data-opt-search="${(t.ticker||'').toLowerCase()} ${(t.note||'').toLowerCase()}">
       <td style="font-weight:600">${t.ticker||'—'}</td>
       <td class="m">${t.openDate||'—'}</td>
-      <td class="r" style="color:${o>=0?'var(--green)':'var(--red)'};font-weight:600">${fmtN(o)}</td>
+      <td class="r" style="color:${o>=0?'#4ade80':'#f87171'};font-weight:600">${fmtN(o)}</td>
       <td class="r m">${of0>0?fmtAbs(of0):'—'}</td>
       <td class="m">${!open?(t.closeDate||'—'):'—'}</td>
       <td class="r">${closeMktHtml}</td>
       <td class="r m">${cf0>0?fmtAbs(cf0):'—'}</td>
-      <td class="r ${pnlCls}" style="font-weight:600">${pnlHtml}</td>
+      <td class="r" style="font-weight:600;color:${pnlCls==='g'?'#4ade80':pnlCls==='rr'?'#f87171':'var(--t2)'}">${pnlHtml}</td>
       <td class="m" style="font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.note||''}">${t.note||'—'}</td>
       <td style="white-space:nowrap">
         <button class="ib" onclick="editOpt(${i})">✎</button>
@@ -1764,22 +1769,43 @@ function renderOptions(){
       </td>
     </tr>`;
   }
+
   const openRows=trades.map((t,i)=>({t,i})).filter(x=>isOpen(x.t));
   const closedRows=trades.map((t,i)=>({t,i})).filter(x=>!isOpen(x.t));
+
+  // Open positions totals
+  const openTotalUnr=openRows.reduce((s,x)=>{const t=x.t,o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0,hasMkt=t.mktValue!=null&&t.mktValue!=='',m=hasMkt?parseFloat(t.mktValue)||0:null;return m!==null?s+(o+m-of0):s;},0);
+  const openTotalRow=openRows.length?`<tfoot><tr style="background:var(--bg3)">
+    <td colspan="2" style="font-weight:600;color:var(--t2)">Total (${openRows.length} position${openRows.length!==1?'s':''})</td>
+    <td colspan="5"></td>
+    <td class="r" style="font-weight:700;color:${openTotalUnr>=0?'#4ade80':'#f87171'}">${hasMktCount?fmtN(openTotalUnr):'—'} <span style="font-size:10px;color:var(--t2)">(unreal)</span></td>
+    <td colspan="2"></td>
+  </tr></tfoot>`:'';
+
   const closedSumPnl=closedRows.reduce((s,x)=>s+(parseFloat(x.t.openValue)||0)+(parseFloat(x.t.closeValue)||0)-(parseFloat(x.t.openFee)||0)-(parseFloat(x.t.closeFee)||0),0);
+  const closedTotalRow=closedRows.length?`<tfoot><tr style="background:var(--bg3)">
+    <td colspan="2" style="font-weight:600;color:var(--t2)">Total (${closedRows.length} trade${closedRows.length!==1?'s':''})</td>
+    <td colspan="5"></td>
+    <td class="r" style="font-weight:700;color:${closedSumPnl>=0?'#4ade80':'#f87171'}">${fmtN(closedSumPnl)}</td>
+    <td colspan="2"></td>
+  </tr></tfoot>`:'';
+
   const openSec=openRows.length?`<div style="margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem">
-      <span style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px">Open positions (${openRows.length})</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:6px">
+      <span style="font-size:11px;font-weight:700;background:#000;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:4px">Open positions (${openRows.length}) &nbsp;·&nbsp; Unrealized: <span style="color:${hasMktCount?(openTotalUnr>=0?'var(--green)':'var(--red)'):'#888'}">${hasMktCount?fmtN(openTotalUnr):'—'}</span></span>
+      <input id="opt-open-search" placeholder="Search open…" oninput="filterOpts('open')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:150px">
     </div>
-    <div style="overflow-x:auto"><table class="tbl">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>
+    <div style="overflow-x:auto"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>
   </div>`:'';
+
   const closedSec=closedRows.length?`<div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px">Closed trades (${closedRows.length})</span>
-      <span style="font-size:12px;font-weight:600;color:${closedSumPnl>=0?'var(--green)':'var(--red)'}">Realized: ${fmtN(closedSumPnl)}</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:6px">
+      <span style="font-size:11px;font-weight:700;background:#000;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:4px">Closed trades (${closedRows.length}) &nbsp;·&nbsp; Realized: <span style="color:${closedSumPnl>=0?'var(--green)':'var(--red)'}">${fmtN(closedSumPnl)}</span></span>
+      <input id="opt-closed-search" placeholder="Search closed…" oninput="filterOpts('closed')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:150px">
     </div>
-    <div style="overflow-x:auto"><table class="tbl">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>
+    <div style="overflow-x:auto"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${closedTotalRow}</table></div>
   </div>`:'';
+
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Option Trade</strong> to add one.</div>`:'';
   return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
     <div>
@@ -1788,6 +1814,15 @@ function renderOptions(){
     </div>
     <button class="pri" onclick="addOpt()">+ Option Trade</button>
   </div>${summary}${openSec}${closedSec}${empty}`;
+}
+function filterOpts(section){
+  const input=document.getElementById('opt-'+section+'-search');
+  const table=document.getElementById('opt-'+section+'-table');
+  if(!input||!table)return;
+  const q=input.value.toLowerCase();
+  table.querySelectorAll('tbody tr').forEach(r=>{
+    r.style.display=!q||(r.dataset.optSearch||'').includes(q)?'':'none';
+  });
 }
 function addOpt(){showOptModal({id:uid(),ticker:'',openDate:new Date().toISOString().split('T')[0],openValue:'',closeDate:'',closeValue:null,mktValue:null,note:''},-1);}
 function editOpt(i){showOptModal(Object.assign({},pf().optionTrades[i]),i);}

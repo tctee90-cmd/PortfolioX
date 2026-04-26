@@ -2581,20 +2581,37 @@ showWelcomeIfFirstLoad();
 // ── Swipe left/right to switch tabs ──────────────────────────────
 (function(){
   const TAB_ORDER=['dashboard','overview','transactions','journey','options','deposits'];
-  let _tx=0,_ty=0;
+  let _tx=0,_ty=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _tx=e.touches[0].clientX;
     _ty=e.touches[0].clientY;
+    _target=e.target;
   },{passive:true});
   document.addEventListener('touchend',function(e){
     const dx=e.changedTouches[0].clientX-_tx;
     const dy=e.changedTouches[0].clientY-_ty;
-    // Only trigger on mostly horizontal swipe of >50px
-    if(Math.abs(dx)<50||Math.abs(dy)>Math.abs(dx)*0.8)return;
+    if(Math.abs(dx)<60||Math.abs(dy)>Math.abs(dx)*0.5)return;
+    // Check if touch started inside a horizontally scrollable container
+    // and that container still has scroll room in the swipe direction
+    let el=_target;
+    while(el&&el!==document.body){
+      const style=window.getComputedStyle(el);
+      const overflowX=style.overflowX;
+      if(overflowX==='auto'||overflowX==='scroll'){
+        const canScrollLeft=el.scrollLeft>0;
+        const canScrollRight=el.scrollLeft+el.clientWidth<el.scrollWidth-1;
+        // If swiping left and container can still scroll right — let it scroll
+        if(dx<0&&canScrollRight)return;
+        // If swiping right and container can still scroll left — let it scroll
+        if(dx>0&&canScrollLeft)return;
+        break;
+      }
+      el=el.parentElement;
+    }
     const idx=TAB_ORDER.indexOf(TAB);
     if(idx===-1)return;
-    if(dx<0&&idx<TAB_ORDER.length-1)swTab(TAB_ORDER[idx+1]); // swipe left → next tab
-    if(dx>0&&idx>0)swTab(TAB_ORDER[idx-1]);                   // swipe right → prev tab
+    if(dx<0&&idx<TAB_ORDER.length-1)swTab(TAB_ORDER[idx+1]);
+    if(dx>0&&idx>0)swTab(TAB_ORDER[idx-1]);
   },{passive:true});
 })();
 

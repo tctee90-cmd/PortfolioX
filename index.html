@@ -222,8 +222,8 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="tab on" data-tab="dashboard">Dashboard</button>
     <button class="tab" data-tab="overview">Overview</button>
     <button class="tab" data-tab="transactions">Transactions</button>
-    <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="options">Options</button>
+    <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="deposits">Capital Flows</button>
     <div style="flex:1;min-width:8px"></div>
     <button class="sm ghost" id="bpx" style="margin-bottom:3px;white-space:nowrap">Update Prices</button>
@@ -646,7 +646,7 @@ function renderDashboard(){
       +'</div>'
       // Total P&L full-width card (distinct background)
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unrealized + realized + div)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -713,8 +713,11 @@ function renderDashboard(){
   const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
   const fxNote=Object.entries(_fx).filter(([c])=>allCcys.includes(c)&&c!=='MYR').map(([c,r])=>c+': RM '+r.toFixed(4)).join(' · ');
   const grandCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">All Portfolio Value <span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(MYR equiv.)</span></div>'
+    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">All Portfolio Value<br><span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(Cash + Holdings only)</span></div>'
+    +'<div style="text-align:right">'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'</div>'
     +'</div>';
   return grandCard+summaryCcyCards;
 }
@@ -751,8 +754,8 @@ function renderContent(){
   else if(TAB==='overview'){setDateBar(pf().name+' — Overview');$('ct').innerHTML=renderOverview(p);}
   else if(TAB==='holdings'){setDateBar(pf().name+' — Holdings');$('ct').innerHTML=renderHoldings(p);}
   else if(TAB==='transactions'){setDateBar(pf().name+' — Transactions');$('ct').innerHTML=renderTx(p);}
-  else if(TAB==='journey'){setDateBar(pf().name+' — Journey');$('ct').innerHTML=renderJourney(p);}
   else if(TAB==='options'){setDateBar(pf().name+' — Options');$('ct').innerHTML=renderOptions();}
+  else if(TAB==='journey'){setDateBar(pf().name+' — Journey');$('ct').innerHTML=renderJourney(p);}
   else if(TAB==='deposits'){setDateBar(pf().name+' — Capital Flows');$('ct').innerHTML=renderDeposits(p);}
 }
 
@@ -775,8 +778,11 @@ function renderOverview(p){
   const usedFxCcys=allCcys.filter(function(c){return c!=='MYR';});
   const fxNoteOv=usedFxCcys.map(function(c){return c+': RM '+(_fx[c]||1).toFixed(2);}).join(' · ');
   const personCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">'+p.name+' Portfolio Value <span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(MYR equiv.)</span></div>'
+    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">'+p.name+' Portfolio Value<br><span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(Cash + Holdings only)</span></div>'
+    +'<div style="text-align:right">'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'</div>'
     +'</div>';
 
   const summaryCcyCards=allCcys.map((ccy,ci)=>{
@@ -888,7 +894,7 @@ function renderOverview(p){
       +'</div>'
       // Total P&L full-width card
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / % (incl. div)</div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unrealized + realized + div)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -1091,39 +1097,6 @@ function renderTx(p,filterYrCcy){
     html+='<div class="bb" onclick="TAB=\'journey\';journeyFilter=null;renderContent()">← Back to Journey</div>';
     html+='<div style="margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bd);border-radius:var(--r);font-size:12px;color:var(--blue)">Dividends for '+filterYrCcy.ccy+' in '+filterYrCcy.yr+'</div>';
   } else {
-    // P&L summary — 2 rows per currency: row1: CCY | Realized | Unrealized, row2: Dividends
-    const _sum=getSummary(p);
-    const _allTxCcys=[...new Set(p.transactions.map(t=>t.ccy).filter(Boolean))];
-    const CCY_ORDER=['MYR','SGD','USD'];
-    const _ccys=[...CCY_ORDER.filter(c=>_allTxCcys.includes(c)),..._allTxCcys.filter(c=>!CCY_ORDER.includes(c))];
-    if(_ccys.length){
-      html+='<div style="margin-bottom:.875rem;display:flex;flex-direction:column;gap:8px">';
-      _ccys.forEach(function(c){
-        const _r=_sum.realized[c]||0,_u=_sum.unreal[c]||0,_d=_sum.divs[c]||0;
-        html+='<div style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden">'
-          // Row 1: Currency | Realized | Unrealized
-          +'<div style="display:flex;align-items:center;gap:0;padding:8px 12px">'
-          +ccyTag(c)
-          +'<div style="width:1px;background:var(--b1);height:28px;margin:0 14px;flex-shrink:0"></div>'
-          +'<div style="flex:1">'
-          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Realized P&L</div>'
-          +'<div style="font-size:13px;font-weight:700" class="'+sc(_r)+'">'+sgn(_r,c)+'</div>'
-          +'</div>'
-          +'<div style="width:1px;background:var(--b1);height:28px;margin:0 14px;flex-shrink:0"></div>'
-          +'<div style="flex:1">'
-          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Unrealized P&L</div>'
-          +'<div style="font-size:13px;font-weight:700" class="'+sc(_u)+'">'+sgn(_u,c)+'</div>'
-          +'</div>'
-          +'</div>'
-          // Row 2: Dividends
-          +'<div style="border-top:1px solid var(--b1);padding:7px 12px;display:flex;align-items:center;gap:14px">'
-          +'<div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;min-width:60px">Dividends</div>'
-          +'<div style="font-size:13px;font-weight:700;color:'+(_d>0?'var(--green)':'var(--t3)')+'">'+(_d>0?'+'+fc(_d,c):'—')+'</div>'
-          +'</div>'
-          +'</div>';
-      });
-      html+='</div>';
-    }
     const typeFilterOpts=['','Buy','Sell','Dividend','Platform Fee','Closed Trades'].map(t=>'<option value="'+t+'">'+(t||'All types')+'</option>').join('');
     html+='<div class="search-bar">'
       +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="max-width:240px">'
@@ -1361,7 +1334,8 @@ function renderJourney(p){
   }).join('');
 
   return`<div class="card"><div class="stl">${window.jSubTab==='dividend'?'Dividend history':'PnL history'}</div>
-  ${subTabs}${sections}</div>`;
+  ${subTabs}${sections}
+  </div>`;
 }
 
 function jDrill(mode,ccy,yr){
@@ -1800,7 +1774,13 @@ function renderOptions(){
   // ── Total P&L summary — row 1: Total, row 2: Realized | Unrealized ──
   const summary=`<div style="margin-bottom:1.25rem">
     <div style="margin-bottom:6px">
-      <div class="kc"><div class="kl">Total P&L (Realized + Unrealized)</div><div class="kv ${totalPnl>=0?'g':'rr'}" style="white-space:nowrap">${fmtN(totalPnl)}</div></div>
+      <div class="kc" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="kl" style="margin-bottom:1px">Total P&L</div>
+          <div style="font-size:9px;color:var(--t3)">(realized + unrealized)</div>
+        </div>
+        <div class="kv ${totalPnl>=0?'g':'rr'}" style="white-space:nowrap;font-size:15px;font-weight:700">${fmtN(totalPnl)}</div>
+      </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="kc"><div class="kl">Realized P&L</div><div class="kv ${realPnl>=0?'g':'rr'}" style="white-space:nowrap">${fmtN(realPnl)}</div></div>
@@ -2544,10 +2524,8 @@ function initPxDrag(){
 function renderDeposits(p){
   if(!p.deposits)p.deposits=[];
   const deps=[...p.deposits].sort((a,b)=>b.date.localeCompare(a.date));
-
-  // Get all CCYs used
-  const ccys=[...new Set(deps.map(d=>d.ccy||'MYR'))];
   const CCY_ORDER=['MYR','SGD','USD','HKD','GBP','EUR'];
+  const ccys=[...new Set(deps.map(d=>d.ccy||'MYR'))];
   const allCcys=[...CCY_ORDER.filter(c=>ccys.includes(c)),...ccys.filter(c=>!CCY_ORDER.includes(c))];
 
   if(!deps.length){
@@ -2556,60 +2534,76 @@ function renderDeposits(p){
       +'<div class="card m" style="text-align:center;padding:2rem">No deposits yet. Click + to add one.</div>';
   }
 
-  // Build per-CCY sections
+  // Get all years across all currencies for year filter
+  const allYears=[...new Set(deps.map(d=>d.date.slice(0,4)))].sort((a,b)=>b-a);
+  const yearFilterHtml='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">'
+    +'<span style="font-size:11px;color:var(--t2)">Year:</span>'
+    +'<select id="dep-yr-sel" onchange="filterDepYear(this.value)" style="font-size:12px;padding:4px 8px;width:auto">'
+    +'<option value="all">All years</option>'
+    +allYears.map(yr=>'<option value="'+yr+'">'+yr+'</option>').join('')
+    +'</select>'
+    +'</div>';
+
+  // ── Year summary cards (shown when a specific year is selected) ──
+  const yearSummaryCards=allYears.map(function(yr){
+    const yrDeps=deps.filter(d=>d.date.slice(0,4)===yr);
+    const cards=allCcys.map(function(ccy){
+      const cd=yrDeps.filter(d=>(d.ccy||'MYR')===ccy);
+      if(!cd.length)return'';
+      const dep=cd.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+      const wit=cd.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+      const net=dep-wit;
+      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+      const accent=CCY_ACCENT[ccy]||'#4fc3f7';
+      return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:8px 10px">'
+        +'<div style="font-size:10px;font-weight:700;color:'+accent+';margin-bottom:6px">'+ccy+'</div>'
+        +'<div style="font-size:9px;color:var(--t2)">Deposited</div><div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">'+(dep>0?'+'+fc(dep,ccy):'—')+'</div>'
+        +'<div style="font-size:9px;color:var(--t2)">Withdrawn</div><div style="font-size:12px;font-weight:600;color:'+(wit>0?'var(--red)':'var(--t3)')+';margin-bottom:4px">'+(wit>0?'-'+fc(wit,ccy):'—')+'</div>'
+        +'<div style="border-top:1px solid var(--b1);padding-top:4px;margin-top:2px">'
+        +'<div style="font-size:9px;color:var(--t2)">Net</div>'
+        +'<div style="font-size:13px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
+        +'</div></div>';
+    }).filter(Boolean).join('');
+    if(!cards)return'';
+    return'<div id="dep-yr-summary-'+yr+'" style="display:none;margin-bottom:1rem">'
+      +'<div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:.5rem">'+yr+' Summary</div>'
+      +'<div style="display:grid;grid-template-columns:repeat('+Math.min(allCcys.length,3)+',1fr);gap:8px">'+cards+'</div>'
+      +'</div>';
+  }).join('');
+
+  const ccyCards='<div id="dep-ccy-cards" style="margin-bottom:1rem">'
+    +'<div style="display:grid;grid-template-columns:repeat('+Math.min(allCcys.length,3)+',1fr);gap:6px">'
+    +allCcys.map(function(ccy){
+      const cdeps=deps.filter(d=>(d.ccy||'MYR')===ccy);
+      const totDep=cdeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
+      const totWit=cdeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
+      const net=totDep-totWit;
+      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+      const accent=CCY_ACCENT[ccy]||'#4fc3f7';
+      return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:10px 12px">'
+        +'<div style="font-size:12px;font-weight:700;color:'+accent+';margin-bottom:10px">'+ccy+'</div>'
+        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Deposit</div>'
+        +'<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
+        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Withdrawal</div>'
+        +'<div style="font-size:13px;font-weight:600;color:'+(totWit>0?'var(--red)':'var(--t3)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
+        +'<div style="border-top:1px solid var(--b1);padding-top:8px">'
+        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Net Capital</div>'
+        +'<div style="font-size:14px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
+        +'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'</div>';
+
+  // ── Per-CCY transaction sections ──────────────────────────────
   const sections=allCcys.map(function(ccy){
     const cdeps=deps.filter(d=>(d.ccy||'MYR')===ccy);
-    const totDep=cdeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
-    const totWit=cdeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
-    const net=totDep-totWit;
 
-    // Return on Principal — use getSummary + cash balance
-    const sum=getSummary(p);
-    const mktVal=sum.mktVal[ccy]||0;
-    const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
-
-    // Summary mini-cards — row1: Deposited | Withdrawn, row2: Net Capital
-    const sumCards=
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
-      +'<div class="kc"><div class="kl">Total Deposited</div><div class="kv g" style="white-space:nowrap;font-size:13px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div></div>'
-      +'<div class="kc"><div class="kl">Total Withdrawn</div><div class="kv '+(totWit>0?'rr':'m')+'" style="white-space:nowrap;font-size:13px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div></div>'
-      +'</div>'
-      +'<div style="margin-bottom:.875rem">'
-      +'<div class="kc"><div class="kl">Net Capital</div><div class="kv '+(net>=0?'g':'rr')+'" style="white-space:nowrap;font-size:13px">'+fc(net,ccy)+'</div></div>'
-      +'</div>';
-
-    // Year summary
-    const byYr={};
-    cdeps.forEach(function(d){
-      const yr=d.date.slice(0,4);
-      if(!byYr[yr])byYr[yr]={dep:0,wit:0};
-      if(d.type==='deposit')byYr[yr].dep+=+d.amount;
-      else byYr[yr].wit+=+d.amount;
-    });
-    const yrs=Object.keys(byYr).sort((a,b)=>b-a);
-    const yrRows=yrs.map(function(yr){
-      const y=byYr[yr];const net2=y.dep-y.wit;
-      return'<tr>'
-        +'<td style="font-weight:600">'+yr+'</td>'
-        +'<td class="r g">'+(y.dep>0?fc(y.dep,ccy):'—')+'</td>'
-        +'<td class="r '+(y.wit>0?'rr':'m')+'">'+(y.wit>0?'-'+fc(y.wit,ccy):'—')+'</td>'
-        +'<td class="r '+(net2>=0?'g':'rr')+'" style="font-weight:600">'+(net2>=0?'+':'')+fc(Math.abs(net2),ccy)+'</td>'
-        +'</tr>';
-    }).join('');
-    const yrTable='<div style="overflow-x:auto;margin-bottom:.875rem"><table class="tbl">'
-      +'<thead><tr><th>Year</th><th class="r">Deposited</th><th class="r">Withdrawn</th><th class="r">Net</th></tr></thead>'
-      +'<tbody>'+yrRows+'</tbody>'
-      +'<tfoot><tr><td style="font-weight:600">All time</td>'
-      +'<td class="r g">'+(totDep>0?fc(totDep,ccy):'—')+'</td>'
-      +'<td class="r '+(totWit>0?'rr':'m')+'">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</td>'
-      +'<td class="r '+(net>=0?'g':'rr')+'" style="font-weight:600">'+(net>=0?'+':'')+fc(Math.abs(net),ccy)+'</td>'
-      +'</tr></tfoot></table></div>';
-
-    // Transaction rows
     const txRows=cdeps.map(function(d){
       const i=p.deposits.indexOf(d);
       const isDep=d.type==='deposit';
-      return'<tr>'
+      const yr=d.date.slice(0,4);
+      return'<tr class="dep-tx-row" data-yr="'+yr+'" data-ccy="'+ccy+'">'
         +'<td class="m">'+d.date+'</td>'
         +'<td><span class="badge" style="color:'+(isDep?'var(--green)':'var(--red)')+';background:'+(isDep?'var(--gd)':'var(--rd)')+'">'+( isDep?'Deposit':'Withdrawal')+'</span></td>'
         +'<td class="r" style="font-weight:600;color:'+(isDep?'var(--green)':'var(--red)')+'">'+(isDep?'+':'-')+fc(+d.amount,ccy)+'</td>'
@@ -2619,21 +2613,36 @@ function renderDeposits(p){
         +'<button class="ib" onclick="delDeposit('+i+')" style="color:var(--red)">✕</button>'
         +'</td></tr>';
     }).join('');
-    const txTable='<div style="overflow-x:auto"><table class="tbl">'
-      +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
-      +'<tbody>'+txRows+'</tbody></table></div>';
 
-    return'<div style="margin-bottom:1.5rem">'
-      +ccyTag(ccy,'margin-bottom:.65rem;display:inline-block')
-      +sumCards+yrTable+txTable
+    return'<div style="margin-bottom:1.25rem">'
+      +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.5rem">'+ccy+' Transactions</div>'
+      +'<div style="overflow-x:auto"><table class="tbl">'
+      +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
+      +'<tbody>'+txRows+'</tbody></table></div>'
       +'</div>';
   }).join('');
 
   return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
     +'<button class="pri sm" onclick="openDepositModal()">+ Deposit / Withdrawal</button></div>'
+    +yearFilterHtml
+    +yearSummaryCards
+    +ccyCards
     +sections;
 }
 
+function filterDepYear(yr){
+  // Show/hide all-time summary cards
+  const ccyCardsEl=document.getElementById('dep-ccy-cards');
+  if(ccyCardsEl)ccyCardsEl.style.display=yr==='all'?'':'none';
+  // Show/hide year summary cards
+  document.querySelectorAll('[id^="dep-yr-summary-"]').forEach(function(el){
+    el.style.display=(yr!=='all'&&el.id==='dep-yr-summary-'+yr)?'block':'none';
+  });
+  // Show/hide transaction rows
+  document.querySelectorAll('.dep-tx-row').forEach(function(r){
+    r.style.display=(yr==='all'||r.dataset.yr===yr)?'':'none';
+  });
+}
 function openDepositModal(idx){
   const p=pf();if(!p.deposits)p.deposits=[];
   const isEdit=idx!==undefined;
@@ -2690,7 +2699,7 @@ showWelcomeIfFirstLoad();
 
 // ── Swipe left/right to switch tabs ──────────────────────────────
 (function(){
-  const TAB_ORDER=['dashboard','overview','transactions','journey','options','deposits'];
+  const TAB_ORDER=['dashboard','overview','transactions','options','journey','deposits'];
   let _tx=0,_ty=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _tx=e.touches[0].clientX;

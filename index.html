@@ -366,7 +366,8 @@ function toMYR(amount,ccy){
 let S=load(),TAB='dashboard',MM=null,ETX=null,DTX=null,VIEW=null,TT=null;
 let journeyFilter=null; // {ccy, yr} for drill from journey
 
-function load(){try{const d=localStorage.getItem(SK);const p=d?JSON.parse(d):defData();if(p.portfolios)p.portfolios.forEach(function(pf,idx){pf.color=PFPAL[idx%PFPAL.length];if(!pf.cashBalances)pf.cashBalances={};if(!pf.deposits)pf.deposits=[];});if(!p.pieImages)p.pieImages={};p.portfolios.forEach(pf=>{if(!pf.optionTrades)pf.optionTrades=[];});if(p.optionTrades&&p.optionTrades.length&&p.portfolios.length){p.portfolios[0].optionTrades=p.optionTrades;delete p.optionTrades;}return p;}catch{return defData();}}
+function load(){try{const d=localStorage.getItem(SK);const p=d?JSON.parse(d):defData();if(p.portfolios)p.portfolios.forEach(function(pf,idx){pf.color=PFPAL[idx%PFPAL.length];if(!pf.cashBalances)pf.cashBalances={};if(!pf.deposits)pf.deposits=[];// Ensure all transactions have an id
+if(pf.transactions)pf.transactions.forEach(function(t){if(!t.id)t.id=uid();});});if(!p.pieImages)p.pieImages={};p.portfolios.forEach(pf=>{if(!pf.optionTrades)pf.optionTrades=[];});if(p.optionTrades&&p.optionTrades.length&&p.portfolios.length){p.portfolios[0].optionTrades=p.optionTrades;delete p.optionTrades;}return p;}catch{return defData();}}
 function save(){try{localStorage.setItem(SK,JSON.stringify(S));const t=$('toast');t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>t.classList.remove('show'),1800);}catch(e){alert('Save failed — localStorage may be full. Try clearing old data.');}}
 function pf(){return S.portfolios.find(p=>p.id===S.activeId)||S.portfolios[0];}
 function stockDict(){const d={};pf().transactions.filter(t=>t.stock&&t.type==='Buy').forEach(t=>{d[t.stock]=t.ccy;});return d;}
@@ -1463,7 +1464,7 @@ function omm(mode,data){
     MM='_cash';
     return;
   }
-  MM=mode;ETX=data||null;renderModal();$('ov').classList.add('open');
+  MM=mode;if(data!==undefined)ETX=data||null;renderModal();$('ov').classList.add('open');
 }
 function cmm(){$('ov').classList.remove('open');MM=null;ETX=null;DTX=null;}
 $('ov').addEventListener('click',e=>{if(e.target===$('ov'))cmm();});
@@ -1479,40 +1480,7 @@ function renderModal(){
     const tx=ETX||{id:uid(),date:new Date().toISOString().split('T')[0],type:'Buy',stock:'',qty:'',price:'',fee:'',ccy:'USD',amount:'',note:''};
     const isF=tx.type==='Dividend'||tx.type==='Platform Fee';
 
-    // ── Original values panel (edit mode only) ───────────────────────────────
     let origHtml='';
-    if(isEdit){
-      const origAmt=tx.amount!=null&&tx.amount!==''?+tx.amount
-        :tx.type==='Sell'?(+tx.qty)*(+tx.price)-(+tx.fee||0)
-        :(+tx.qty)*(+tx.price)+(+tx.fee||0);
-      origHtml='<div style="background:var(--bg4);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:1.25rem;border-left:3px solid var(--amber)">'
-        +'<div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">Original values</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">';
-      // Always show these fields
-      const origFields=[
-        ['Date',     tx.date||'—'],
-        ['Type',     tx.type],
-        ['Stock',    tx.stock||'—'],
-        ['Currency', tx.ccy],
-        ...(isF?[
-          ['Amount', tx.amount!=null?fc(+tx.amount,tx.ccy):'—'],
-        ]:[
-          ['Quantity', tx.qty?((+tx.qty).toLocaleString()):'—'],
-          ['Price',    tx.price?fc(+tx.price,tx.ccy,4):'—'],
-          ['Fee',      tx.fee?fc(+tx.fee,tx.ccy):'—'],
-          ['Amount',   origAmt>0?fc(origAmt,tx.ccy):'—'],
-        ]),
-        ['Note',     tx.note||'—'],
-      ];
-      origFields.forEach(([lbl,val])=>{
-        origHtml+='<div style="padding:3px 0;font-size:12px">'
-          +'<div style="color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">'+lbl+'</div>'
-          +'<div style="font-weight:600;color:var(--t1)">'+val+'</div>'
-          +'</div>';
-      });
-      origHtml+='</div></div>'
-        +'<div style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem">Edit below</div>';
-    }
 
     // ── Form fields ──────────────────────────────────────────────────────────
     const ccyOpts=CCYS.map(c=>'<option '+(tx.ccy===c?'selected':'')+'>'+c+'</option>').join('');
@@ -1687,7 +1655,20 @@ function ttc(){const t=($('tt')||{}).value,isF=t==='Dividend'||t==='Platform Fee
 function gTx(){const type=($('tt')||{}).value,isF=type==='Dividend'||type==='Platform Fee',isPF=type==='Platform Fee';return{date:($('td')||{}).value||'',type,stock:isPF?'':($('ts')?$('ts').value.trim():''),ccy:($('tc')||{}).value||'USD',qty:isF?0:+(($('tq')||{}).value||0),price:isF?0:+(($('tp')||{}).value||0),fee:isF?0:+(($('tf')||{}).value||0),amount:isF?+(($('ta')||{}).value||0):null,note:($('tn')||{}).value||''};}
 function aat(){const d=gTx();if(['Buy','Sell'].includes(d.type)&&!d.stock){alert('Please enter a stock name.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.qty>0)){alert('Please enter a valid quantity.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.price>0)){alert('Please enter a valid price.');return;}const tx={id:uid(),...d};S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,transactions:[...p.transactions,tx]});cmm();save();render();}
 function eet(){const d=gTx();S.portfolios=S.portfolios.map(p=>{if(p.id!==S.activeId)return p;return{...p,transactions:p.transactions.map(t=>t.id===ETX.id?{...t,...d}:t)};});cmm();save();render();}
-function oet(id){const tx=pf().transactions.find(t=>t.id===id);if(!tx)return;ETX={...tx};omm('et');}
+function oet(id){
+  const p=pf();
+  let tx=p.transactions.find(t=>t.id===id);
+  if(!tx){
+    // Fallback: id might actually be an index for older transactions
+    const idx=parseInt(id);
+    if(!isNaN(idx))tx=p.transactions[idx];
+  }
+  if(!tx)return;
+  // Ensure tx has an id for saving
+  if(!tx.id){tx.id=uid();save();}
+  ETX={...tx};
+  omm('et');
+}
 function odt(id){DTX=id;omm('dxt');}
 function ddt(){S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,transactions:p.transactions.filter(t=>t.id!==DTX)});cmm();save();render();}
 function ans(){const n=($('nsn')||{}).value?.trim(),c=($('nsc')||{}).value,pr=+(($('nsp')||{}).value||0);if(!n)return;S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,prices:{...p.prices,[n]:{price:pr,ccy:c}}});save();omm('px');}

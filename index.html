@@ -770,7 +770,26 @@ function renderOverview(p){
 
   if(!allCcys.length)return '<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
 
-  return allCcys.map((ccy,ci)=>{
+  // ── Person's total portfolio value in MYR ─────────────────────
+  let personMYR=0;
+  allCcys.forEach(function(ccy){
+    const mv=sum.mktVal[ccy]||0;
+    const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
+    personMYR+=toMYR(mv+cashBal,ccy);
+  });
+  const usedFxCcys=allCcys.filter(function(c){return c!=='MYR';});
+  const fxNoteOv=usedFxCcys.map(function(c){return c+': RM '+(_fx[c]||1).toFixed(2);}).join(' · ');
+  const personCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    +'<div>'
+    +'<div style="font-size:10px;color:rgba(255,236,153,.7);font-weight:600;margin-bottom:2px">'+p.name+' Portfolio Value <span style="font-weight:400;font-size:9px">(MYR equiv.)</span></div>'
+    +(fxNoteOv?'<div style="font-size:9px;color:rgba(255,236,153,.5)">'+fxNoteOv+'</div>':'')
+    +'</div>'
+    +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'</div>'
+    +'</div>';
+
+  const summaryCcyCards=allCcys.map((ccy,ci)=>{
     const rows=holdings.filter(h=>h.ccy===ccy);
     const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
     const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
@@ -898,6 +917,7 @@ function renderOverview(p){
       +holdingsTable
       +'</div>';
   }).join('');
+  return personCard+summaryCcyCards;
 }
 function drawOverviewCharts(p){
   const h=getHoldings(p,true);

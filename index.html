@@ -712,14 +712,9 @@ function renderDashboard(){
   });
   const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
   const fxNote=Object.entries(_fx).filter(([c])=>allCcys.includes(c)&&c!=='MYR').map(([c,r])=>c+': RM '+r.toFixed(4)).join(' · ');
-  const grandCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +'<div>'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.7);font-weight:600;margin-bottom:2px">All Portfolio Value <span style="font-weight:400;font-size:9px">(MYR equiv.)</span></div>'
-    +(fxNote?'<div style="font-size:9px;color:rgba(255,236,153,.5)">'+fxNote+'</div>':'')
-    +'</div>'
+  const grandCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">All Portfolio Value <span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(MYR equiv.)</span></div>'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'</div>'
     +'</div>';
   return grandCard+summaryCcyCards;
 }
@@ -779,14 +774,9 @@ function renderOverview(p){
   });
   const usedFxCcys=allCcys.filter(function(c){return c!=='MYR';});
   const fxNoteOv=usedFxCcys.map(function(c){return c+': RM '+(_fx[c]||1).toFixed(2);}).join(' · ');
-  const personCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +'<div>'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.7);font-weight:600;margin-bottom:2px">'+p.name+' Portfolio Value <span style="font-weight:400;font-size:9px">(MYR equiv.)</span></div>'
-    +(fxNoteOv?'<div style="font-size:9px;color:rgba(255,236,153,.5)">'+fxNoteOv+'</div>':'')
-    +'</div>'
+  const personCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">'+p.name+' Portfolio Value <span style="font-size:9px;font-weight:400;color:rgba(255,236,153,.4)">(MYR equiv.)</span></div>'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'</div>'
     +'</div>';
 
   const summaryCcyCards=allCcys.map((ccy,ci)=>{

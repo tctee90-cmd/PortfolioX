@@ -36,6 +36,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── Inputs & selects ────────────────────────────────────────────── */
 input,select{font-family:inherit;font-size:13px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:7px 10px;outline:none;width:100%;transition:border .15s}
+input[type="date"]{-webkit-appearance:none;appearance:none;min-height:36px;color:var(--t1)}
 input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,195,247,.1)}
 select option{background:var(--bg4)}
 
@@ -296,6 +297,72 @@ function defData(){return{activeId:'p1',pieImages:{},portfolios:[
   {id:'p3',name:'Personal MYR',color:'#81c784',transactions:[],prices:{},optionTrades:[],cashBalances:{}}
 ]};}
 
+let _fx={SGD:3.45,USD:4.45,HKD:0.57,GBP:5.90}; // FX rates to MYR, updated live
+async function fetchFXAndFill(){
+  const btn=document.getElementById('fx-fetch-btn');
+  const status=document.getElementById('fx-fetch-status');
+  if(btn)btn.disabled=true;
+  if(status)status.textContent='Fetching…';
+  // Get which currencies have visible inputs in the modal
+  const toFetch=[];
+  ['SGD','USD','GBP','HKD','AUD','EUR'].forEach(function(c){
+    if(document.getElementById('fx-'+c))toFetch.push(c);
+  });
+  if(!toFetch.length){if(btn)btn.disabled=false;return;}
+  let success=false;
+  // Try Google Finance via allorigins (USDMYR, SGDMYR etc)
+  try{
+    await Promise.all(toFetch.map(async function(ccy){
+      const pair=ccy+'MYR';
+      const url='https://www.google.com/finance/quote/'+pair;
+      const proxy='https://api.allorigins.win/get?url='+encodeURIComponent(url);
+      const r=await fetch(proxy);
+      const d=await r.json();
+      const match=(d.contents||'').match(/data-last-price="([\d.]+)"/);
+      if(match&&+match[1]>0){
+        _fx[ccy]=+match[1];
+        const el=document.getElementById('fx-'+ccy);
+        if(el)el.value=(+match[1]).toFixed(4);
+        success=true;
+      }
+    }));
+  }catch(e){}
+  // Fallback to frankfurter if Google didn't work
+  if(!success){
+    try{
+      const r=await fetch('https://api.frankfurter.app/latest?from=MYR&to='+toFetch.join(','));
+      if(r.ok){
+        const d=await r.json();
+        Object.entries(d.rates||{}).forEach(function([ccy,rate]){
+          if(rate>0){
+            _fx[ccy]=Math.round((1/rate)*10000)/10000;
+            const el=document.getElementById('fx-'+ccy);
+            if(el)el.value=_fx[ccy].toFixed(4);
+            success=true;
+          }
+        });
+      }
+    }catch(e){}
+  }
+  if(status)status.textContent=success?'✓ Updated':'⚠ Failed — enter manually';
+  if(btn)btn.disabled=false;
+}
+
+async function fetchFX(){
+  try{
+    const ccys=Object.keys(_fx).filter(c=>c!=='MYR');
+    const r=await fetch('https://api.frankfurter.app/latest?from=MYR&to='+ccys.join(','));
+    if(!r.ok)return;
+    const d=await r.json();
+    Object.entries(d.rates||{}).forEach(([ccy,rate])=>{if(rate>0)_fx[ccy]=Math.round((1/rate)*10000)/10000;});
+  }catch(e){}
+}
+fetchFX();setInterval(fetchFX,10*60*1000); // refresh every 10 mins
+
+function toMYR(amount,ccy){
+  if(ccy==='MYR')return amount;
+  return amount*(_fx[ccy]||1);
+}
 let S=load(),TAB='dashboard',MM=null,ETX=null,DTX=null,VIEW=null,TT=null;
 let journeyFilter=null; // {ccy, yr} for drill from journey
 
@@ -632,7 +699,25 @@ function renderDashboard(){
   }).join('');
 
   if(!allCcys.length)return '<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
-  return summaryCcyCards;
+  // Grand Total MYR card
+  let grandMYR=0,grandMYRInvested=0,grandMYRPnl=0;
+  allCcys.forEach(function(ccy){
+    const g=grandTotals[ccy];
+    const cashTotal=g.cash||0;
+    const mvWithCash=g.mv+cashTotal;
+    grandMYR+=toMYR(mvWithCash,ccy);
+    grandMYRInvested+=toMYR(g.co,ccy);
+    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100)*100)/100;
+    grandMYRPnl+=toMYR(tot,ccy);
+  });
+  const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
+  const fxNote=Object.entries(_fx).filter(([c])=>allCcys.includes(c)&&c!=='MYR').map(([c,r])=>c+': RM '+r.toFixed(4)).join(' · ');
+  const grandCard='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:var(--rl);padding:1rem 1.25rem;margin-bottom:1rem">'
+    +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px">Total Portfolio Value (MYR equivalent)</div>'
+    +'<div style="font-size:22px;font-weight:700;color:#fff">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +(fxNote?'<div style="font-size:10px;color:var(--t3);margin-top:3px">FX: '+fxNote+'</div>':'')
+    +'</div>';
+  return grandCard+summaryCcyCards;
 }
 
 
@@ -1452,7 +1537,7 @@ function renderModal(){
       +origHtml
       +'<div class="fg">'
       +'<div><label class="lbl">Type</label><select id="tt" onchange="ttc()">'+typeOpts+'</select></div>'
-      +'<div><label class="lbl">Date</label><input type="date" id="td" value="'+tx.date+'"></div>'
+      +'<div><label class="lbl">Date</label><input type="date" id="td" value="'+tx.date+'" style="width:100%;box-sizing:border-box"></div>'
       +'<div id="tsw" class="full"><label class="lbl">Stock / Asset</label><div class="ac-wrap"><input id="ts" value="'+(tx.stock||'')+'" placeholder="e.g. TSLA" autocomplete="off"><div id="ac-list" class="ac-list"></div></div></div>'
       +'<div><label class="lbl">Currency</label><select id="tc">'+ccyOpts+'</select></div>'
       +'<div id="tqw" '+qShow+'><label class="lbl">Quantity</label><input type="number" id="tq" value="'+(tx.qty||'')+'"></div>'
@@ -1468,100 +1553,97 @@ function renderModal(){
   }
     else if(MM==='dxt'){h=`<h3>Delete transaction?</h3><p style="color:var(--t2);line-height:1.7;margin-bottom:1.25rem">Remove this transaction? All P&L recalculates immediately.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="dng" onclick="ddt()">Delete</button></div>`;}
   else if(MM==='px'){
-    // Build unified stock list from ALL portfolios
-    // Preserve stored order from prices{}, group by CCY
+    // Only show stocks that are currently held (qty > 0) across all portfolios
     const seen={};
-    const allStocks=[]; // [{stock, price, ccy, pfIds}] in order
+    const allStocks=[];
 
-    // Step 1: collect ALL stocks from all portfolios' prices (in stored order)
-    S.portfolios.forEach(function(pf0){
-      Object.keys(pf0.prices).forEach(function(stock){
-        if(!seen[stock]){
-          seen[stock]=true;
-          const mp=pf0.prices[stock];
-          allStocks.push({stock:stock,price:mp.price,ccy:mp.ccy,pfIds:[pf0.id]});
-        } else {
-          var existing=allStocks.find(function(x){return x.stock===stock;});
-          if(existing&&existing.pfIds.indexOf(pf0.id)<0)existing.pfIds.push(pf0.id);
-        }
-      });
-    });
-
-    // Step 2: add active holdings not yet in prices (appended at end)
+    // Collect active holdings only
     S.portfolios.forEach(function(pf0){
       getHoldings(pf0,true).forEach(function(h){
-        if(!seen[h.stock]){
+        if(h.qty>0&&!seen[h.stock]){
           seen[h.stock]=true;
-          allStocks.push({stock:h.stock,price:0,ccy:h.ccy,pfIds:[pf0.id]});
+          const mp=pf0.prices[h.stock]||{};
+          allStocks.push({stock:h.stock,price:mp.price||0,ccy:h.ccy,mktVal:h.mktVal||0,pfIds:[pf0.id]});
+        } else if(h.qty>0&&seen[h.stock]){
+          var ex=allStocks.find(function(x){return x.stock===h.stock;});
+          if(ex&&ex.pfIds.indexOf(pf0.id)<0)ex.pfIds.push(pf0.id);
         }
       });
     });
 
-    // Step 3: group by CCY (MYR → SGD → USD → others), preserve order within each group
+    // Group by CCY, sort by market value descending within each group
     const CCY_ORDER=['MYR','SGD','USD'];
     const byCcy={};
     allStocks.forEach(function(s){
       if(!byCcy[s.ccy])byCcy[s.ccy]=[];
       byCcy[s.ccy].push(s);
     });
+    Object.keys(byCcy).forEach(function(c){
+      byCcy[c].sort(function(a,b){return b.mktVal-a.mktVal;});
+    });
     const ccyOrder=[...CCY_ORDER.filter(function(c){return byCcy[c];}),
                     ...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
 
     let rowsHtml='';
-    if(allStocks.length){
-      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+    const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
 
+    if(allStocks.length){
       ccyOrder.forEach(function(ccy){
         const group=byCcy[ccy];
-        const accent=CCY_ACCENT[ccy]||'rgba(79,195,247,.4)';
-        // CCY group header
-        rowsHtml+='<div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;padding:4px 6px;border-left:3px solid '+accent+';background:var(--bg3);border-radius:0 4px 4px 0">'
+        const accent=CCY_ACCENT[ccy]||'#4fc3f7';
+        rowsHtml+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 5px;padding:3px 8px;border-left:3px solid '+accent+';background:var(--bg3);border-radius:0 4px 4px 0">'
           +'<span style="font-size:11px;font-weight:700;color:'+accent+'">'+ccy+'</span>'
           +'<span style="font-size:10px;color:var(--t3)">'+group.length+' stock'+(group.length!==1?'s':'')+'</span>'
           +'</div>';
-        // Column headers (once per group)
-        rowsHtml+='<div style="display:grid;grid-template-columns:20px 1fr 75px 115px 32px;gap:6px;margin-bottom:4px;padding:0 2px">'
-          +'<span></span>'
+        // Column headers
+        rowsHtml+='<div style="display:grid;grid-template-columns:1fr 70px 100px;gap:6px;padding:0 2px;margin-bottom:3px">'
           +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">Stock</span>'
-          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">CCY</span>'
-          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">Price</span>'
-          +'<span></span></div>';
-
-        group.forEach(function(item,idx){
-          const stock=item.stock;
-          const k=stock.replace(/[^a-z0-9]/gi,'_');
+          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;text-align:right">CCY</span>'
+          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;text-align:right">Price</span>'
+          +'</div>';
+        group.forEach(function(item){
+          const k=item.stock.replace(/[^a-z0-9]/gi,'_');
           const opts=CCYS.map(function(c){return '<option '+(item.ccy===c?'selected':'')+'>'+c+'</option>';}).join('');
           const pfBadges=item.pfIds.map(function(pid){
             const pf0=S.portfolios.find(function(x){return x.id===pid;})||{};
-            return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(pf0.color||'#888')+';margin-left:2px" title="'+pf0.name+'"></span>';
+            return '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(pf0.color||'#888')+'" title="'+pf0.name+'"></span>';
           }).join('');
-          rowsHtml+='<div class="px-row" data-k="'+k+'" data-ccy="'+ccy+'" draggable="true"'
-            +' style="display:grid;grid-template-columns:20px 1fr 75px 115px 32px;gap:6px;margin-bottom:6px;align-items:center">'
-            +'<div class="drag-handle" title="Drag to reorder" style="cursor:grab;color:var(--t3);font-size:14px;text-align:center;padding-top:2px">⠿</div>'
-            +'<div style="display:flex;align-items:center;gap:4px">'
-            +'<input id="pn-'+k+'" data-orig="'+stock.replace(/"/g,'&quot;')+'" value="'+stock.replace(/"/g,'&quot;')+'" style="font-weight:600;flex:1">'
+          rowsHtml+='<div style="display:grid;grid-template-columns:1fr 70px 100px;gap:6px;margin-bottom:5px;align-items:center">'
+            +'<div style="display:flex;align-items:center;gap:4px;min-width:0">'
+            +'<span style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+item.stock+'</span>'
             +pfBadges
             +'</div>'
-            +'<select id="pc-'+k+'" style="padding:5px 4px">'+opts+'</select>'
-            +'<input type="number" id="pp-'+k+'" step="0.0001" value="'+item.price+'">'
-            +'<button class="ib" onclick="delPrice(\''+k+'\')" style="font-size:13px;padding:2px 5px;border:1px solid var(--red);border-radius:6px;color:var(--red)" title="Remove">&#10005;</button>'
+            +'<select id="pc-'+k+'" style="padding:4px;font-size:12px">'+opts+'</select>'
+            +'<input type="number" id="pp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:right;font-size:13px">'
             +'</div>';
         });
       });
     } else {
-      rowsHtml='<p class="m" style="font-size:12px;margin-bottom:1rem">No holdings yet.</p>';
+      rowsHtml='<p class="m" style="font-size:12px;margin-bottom:1rem">No active holdings found.</p>';
     }
-    h='<h3>Update market prices — All portfolios</h3>'
-      +'<p style="font-size:11px;color:var(--t2);margin-bottom:1rem">&#9650;&#9660; to reorder within currency group &middot; Edit name to rename &middot; &#10005; removes entry</p>'
+    // Detect which non-MYR currencies are actually used in active holdings
+    const usedFxCcys=[...new Set(allStocks.map(function(s){return s.ccy;}))].filter(function(c){return c&&c!=='MYR';});
+
+    h='<h3>Update Market Prices</h3>'
+      +'<p style="font-size:11px;color:var(--t2);margin-bottom:1rem">Sorted by holding value. Only active holdings shown.</p>'
       +'<div id="px-list" style="margin-bottom:1rem">'+rowsHtml+'</div>'
-      +'<div style="border-top:1px solid var(--b1);padding-top:1rem">'
-      +'<label class="lbl">Add new stock price</label>'
-      +'<div style="display:flex;gap:8px">'
-      +'<input id="nsn" placeholder="Stock name" style="flex:1">'
-      +'<select id="nsc" style="width:80px">'+CCYS.map(function(c){return '<option>'+c+'</option>';}).join('')+'</select>'
-      +'<input type="number" id="nsp" placeholder="0.00" step="0.0001" style="width:95px">'
-      +'<button onclick="ans()">Add</button>'
-      +'</div></div>'
+      +(usedFxCcys.length?
+        '<div style="border-top:1px solid var(--b1);padding-top:.875rem;margin-bottom:1rem">'
+        +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.5rem">FX Rates to MYR (for grand total)</div>'
+        +'<div style="display:grid;grid-template-columns:repeat('+Math.min(usedFxCcys.length,3)+',1fr);gap:8px">'
+        +usedFxCcys.map(function(ccy){
+          return '<div>'
+            +'<label style="font-size:11px;color:var(--t2);display:block;margin-bottom:3px">1 '+ccy+' =</label>'
+            +'<div style="display:flex;align-items:center;gap:4px">'
+            +'<input type="number" id="fx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:right;font-size:13px">'
+            +'<span style="font-size:11px;color:var(--t2);white-space:nowrap">MYR</span>'
+            +'</div>'
+            +'</div>';
+        }).join('')
+        +'</div>'
+
+        +'</div>'
+      :'')
       +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">'
       +'<button onclick="cmm()">Cancel</button>'
       +'<button class="pri" onclick="spx()">Save all</button>'
@@ -1651,43 +1733,22 @@ function delPrice(k){
   if(el){const row=el.closest('.px-row');if(row)row.remove();}
 }
 function spx(){
-  // Read rows IN DOM ORDER — this preserves the user's drag arrangement
-  const orderedUpdates=[]; // [{orig, newName, price, ccy}] in DOM order
-  const updatesByOrig={};  // for quick lookup by original name
-  const pxRows=document.querySelectorAll('#px-list .px-row');
-  [].forEach.call(pxRows,function(row){
-    const k=row.dataset.k;if(!k)return;
-    const ni=document.getElementById('pn-'+k);
-    const pi=document.getElementById('pp-'+k);
-    const ci=document.getElementById('pc-'+k);
-    if(!pi||!ci)return;
-    const orig=((row.querySelector('[data-orig]')||{}).dataset||{}).orig||k;
-    const newName=(ni?ni.value.trim():orig)||orig;
-    const entry={orig:orig,newName:newName,price:+pi.value,ccy:ci.value};
-    orderedUpdates.push(entry);
-    updatesByOrig[orig]=entry;
+  // Save FX rates from modal inputs (only currencies shown)
+  ['SGD','USD','GBP','HKD','AUD','EUR'].forEach(function(ccy){
+    const el=document.getElementById('fx-'+ccy);
+    if(el&&+el.value>0)_fx[ccy]=Math.round(+el.value*100)/100;
   });
-
-  // Apply to ALL portfolios — build np IN THE SAME DOM ORDER
+  // Save prices for all active holdings
   S.portfolios=S.portfolios.map(function(pf0){
-    const np={};
-    const activeStocks=getHoldings(pf0,true).map(function(h){return h.stock;});
-    // Insert prices in DOM order (only stocks relevant to this portfolio)
-    orderedUpdates.forEach(function(u){
-      const inPrices=pf0.prices.hasOwnProperty(u.orig);
-      const inActive=activeStocks.indexOf(u.orig)>=0||activeStocks.indexOf(u.newName)>=0;
-      if(inPrices||inActive){
-        np[u.newName]={price:u.price,ccy:u.ccy};
-      }
+    const np=Object.assign({},pf0.prices);
+    getHoldings(pf0,true).forEach(function(h){
+      if(h.qty<=0)return;
+      const k=h.stock.replace(/[^a-z0-9]/gi,'_');
+      const pi=document.getElementById('pp-'+k);
+      const ci=document.getElementById('pc-'+k);
+      if(pi&&ci)np[h.stock]={price:+pi.value,ccy:ci.value};
     });
-    // Apply renames to transactions
-    let txs=pf0.transactions;
-    orderedUpdates.forEach(function(u){
-      if(u.newName!==u.orig){
-        txs=txs.map(function(t){return t.stock===u.orig?Object.assign({},t,{stock:u.newName}):t;});
-      }
-    });
-    return Object.assign({},pf0,{transactions:txs,prices:np});
+    return Object.assign({},pf0,{prices:np});
   });
   cmm();save();render();
 }

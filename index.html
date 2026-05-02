@@ -297,7 +297,7 @@ function defData(){return{activeId:'p1',pieImages:{},portfolios:[
   {id:'p3',name:'Personal MYR',color:'#81c784',transactions:[],prices:{},optionTrades:[],cashBalances:{}}
 ]};}
 
-let _fx={SGD:3.45,USD:4.45,HKD:0.57,GBP:5.90}; // FX rates to MYR, updated live
+let _fx={SGD:3.45,USD:4.45,HKD:0.57,GBP:5.90}; // loaded from S.fx after load()
 async function fetchFXAndFill(){
   const btn=document.getElementById('fx-fetch-btn');
   const status=document.getElementById('fx-fetch-status');
@@ -364,6 +364,7 @@ function toMYR(amount,ccy){
   return amount*(_fx[ccy]||1);
 }
 let S=load(),TAB='dashboard',MM=null,ETX=null,DTX=null,VIEW=null,TT=null;
+if(S.fx)Object.assign(_fx,S.fx); // restore saved FX rates
 let journeyFilter=null; // {ccy, yr} for drill from journey
 
 function load(){try{const d=localStorage.getItem(SK);const p=d?JSON.parse(d):defData();if(p.portfolios)p.portfolios.forEach(function(pf,idx){pf.color=PFPAL[idx%PFPAL.length];if(!pf.cashBalances)pf.cashBalances={};if(!pf.deposits)pf.deposits=[];// Ensure all transactions have an id
@@ -1707,6 +1708,7 @@ function spx(){
     const el=document.getElementById('fx-'+ccy);
     if(el&&+el.value>0)_fx[ccy]=Math.round(+el.value*100)/100;
   });
+  S.fx=Object.assign({},_fx); // persist FX inside main data
   // Save prices for all active holdings
   S.portfolios=S.portfolios.map(function(pf0){
     const np=Object.assign({},pf0.prices);

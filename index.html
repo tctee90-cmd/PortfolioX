@@ -1123,7 +1123,7 @@ function renderTx(p,filterYrCcy){
   p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{_pfByCcy[t.ccy]=(_pfByCcy[t.ccy]||0)+(+t.amount||0);});
   const _closedByCcy={};
   _closedAll.forEach(h=>{if(!_closedByCcy[h.ccy])_closedByCcy[h.ccy]={r:0,d:0};_closedByCcy[h.ccy].r+=h.realized;_closedByCcy[h.ccy].d+=h.divs;});
-  Object.keys(_closedByCcy).forEach(ccy=>{_closedByCcy[ccy].r=Math.round((_closedByCcy[ccy].r-(_pfByCcy[ccy]||0))*100)/100;});
+  Object.keys(_closedByCcy).forEach(ccy=>{_closedByCcy[ccy].r=Math.round(_closedByCcy[ccy].r*100)/100;});
   const _closedSummary=Object.entries(_closedByCcy).map(([ccy,v])=>
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem">'
     +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'

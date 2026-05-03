@@ -215,6 +215,7 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="sm amb" id="bbk">Backup</button>
     <button class="sm ghost" id="brs" style="border-color:var(--green);color:var(--green)">Restore</button>
     <button class="sm ghost" id="bxl" style="border-color:var(--blue);color:var(--blue)">&#8595; Excel</button>
+    <button class="sm ghost" id="bpx" style="white-space:nowrap">Update Prices</button>
   </div>
 </div>
 <div id="tb-wrap">
@@ -226,8 +227,6 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="deposits">Capital Flows</button>
     <div style="flex:1;min-width:8px"></div>
-    <button class="sm ghost" id="bpx" style="margin-bottom:3px;white-space:nowrap">Update Prices</button>
-    <button class="pri sm" id="bat" style="margin-left:5px;margin-bottom:3px;white-space:nowrap">+ Transaction</button>
   </div>
 </div>
 <div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem 1rem;font-size:12px;"></div>
@@ -1113,6 +1112,7 @@ function renderTx(p,filterYrCcy){
     html+='<div style="display:flex;gap:8px;margin-bottom:.75rem">'
       +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="flex:1">'
       +'<select id="tx-type-filter" onchange="filterTxTable()" style="flex:1">'+typeFilterOpts+'</select>'
+      +'<button class="pri sm" id="bat" onclick="omm(\'at\')" style="white-space:nowrap">+ Transaction</button>'
       +'</div>'
       +'<div style="font-size:11px;color:var(--t2);margin-bottom:.5rem" id="tx-count">'+txs.length+' transactions</div>';
   }
@@ -2676,7 +2676,7 @@ function delDeposit(i){
 
 function render(){renderPfTabs();renderContent();}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>swTab(b.dataset.tab)));
-$('bat').addEventListener('click',()=>omm('at'));
+// + Transaction button now rendered inline in renderTx
 $('bpx').addEventListener('click',()=>omm('px'));
 $('bep').addEventListener('click',()=>omm('ep'));
 $('bdp').addEventListener('click',()=>omm('dp'));

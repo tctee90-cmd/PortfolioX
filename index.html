@@ -1843,6 +1843,7 @@ function renderOptions(){
       <input id="opt-open-search" placeholder="Search open…" oninput="filterOpts('open')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:120px">
       <button class="pri sm" onclick="addOpt()">+ Option Trade</button>
     </div>
+    <div style="overflow-x:auto"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>
   </div>`:'';
 
   const closedSec=closedRows.length?`<div>

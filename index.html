@@ -1852,12 +1852,12 @@ function renderOptions(){
   </div>`:'';
 
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
-  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px">
+  return`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:8px">
     <div>
       <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
       <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
     </div>
-    <button class="pri sm" onclick="addOpt()" style="white-space:nowrap;flex-shrink:0">+ Transaction</button>
+    <button class="pri sm" onclick="addOpt()">+ Transaction</button>
   </div>${summary}
   <div style="display:flex;gap:8px;margin-bottom:.75rem">
     <input id="opt-open-search" placeholder="Search open positions…" oninput="filterOpts('open')" style="flex:1">

@@ -383,15 +383,15 @@ function getHoldings(p0,ao){
   return Object.entries(h).map(([stock,v])=>{const mp=p0.prices[stock];const mktP=mp?+mp.price:0,mktCcy=mp?mp.ccy:v.ccy,mktVal=v.qty*mktP,avg=v.qty>0?v.cost/v.qty:0,unreal=v.qty>0?mktVal-v.cost:0;return{stock,...v,avg,mktP,mktCcy,mktVal,unreal};}).filter(h=>ao?h.qty>0:(h.qty>0||h.divs!==0||h.realized!==0));
 }
 function getSummary(p0){
-  const divs={},unreal={},mktVal={},cost={},realized={},firstDate={};
+  const divs={},unreal={},mktVal={},cost={},realized={},firstDate={},platformFees={};
   p0.transactions.forEach(tx=>{
     if(tx.type==='Dividend')divs[tx.ccy]=(divs[tx.ccy]||0)+(+tx.amount||0);
-    if(tx.type==='Platform Fee')realized[tx.ccy]=(realized[tx.ccy]||0)-(+tx.amount||0);
+    if(tx.type==='Platform Fee')platformFees[tx.ccy]=Math.round(((platformFees[tx.ccy]||0)+(+tx.amount||0))*100)/100;
     if(tx.type==='Buy'&&(!firstDate[tx.ccy]||tx.date<firstDate[tx.ccy]))firstDate[tx.ccy]=tx.date;
   });
-  getHoldings(p0,true).forEach(h=>{const c=h.ccy;unreal[c]=Math.round(((unreal[c]||0)+h.unreal)*100)/100;mktVal[c]=Math.round(((mktVal[c]||0)+h.mktVal)*100)/100;cost[c]=Math.round(((cost[c]||0)+h.cost)*100)/100;realized[c]=Math.round(((realized[c]||0)+h.realized)*100)/100;});
-  getHoldings(p0,false).filter(h=>h.qty<=0&&h.realized!==0).forEach(h=>{realized[h.ccy]=(realized[h.ccy]||0)+h.realized;});
-  return{divs,unreal,mktVal,cost,realized,firstDate};
+  getHoldings(p0,true).forEach(h=>{const c=h.ccy;unreal[c]=Math.round(((unreal[c]||0)+Math.round(h.unreal*100)/100)*100)/100;mktVal[c]=Math.round(((mktVal[c]||0)+Math.round(h.mktVal*100)/100)*100)/100;cost[c]=Math.round(((cost[c]||0)+Math.round(h.cost*100)/100)*100)/100;realized[c]=Math.round(((realized[c]||0)+Math.round(h.realized*100)/100)*100)/100;});
+  getHoldings(p0,false).filter(h=>h.qty<=0&&h.realized!==0).forEach(h=>{realized[h.ccy]=Math.round(((realized[h.ccy]||0)+Math.round(h.realized*100)/100)*100)/100;});
+  return{divs,unreal,mktVal,cost,realized,firstDate,platformFees};
 }
 // ── Cash Balance helpers ───────────────────────────────────────────
 // Returns total cash for a portfolio per-ccy  e.g. {SGD:500, USD:200}
@@ -567,12 +567,13 @@ function renderDashboard(){
     const sum=getSummary(pf0);
     const rawCcys=[...new Set([...Object.keys(sum.mktVal),...Object.keys(sum.divs)])].filter(Boolean);
     rawCcys.forEach(function(ccy){
-      if(!grandTotals[ccy])grandTotals[ccy]={mv:0,co:0,u:0,d:0,r:0};
+      if(!grandTotals[ccy])grandTotals[ccy]={mv:0,co:0,u:0,d:0,r:0,pf:0};
       grandTotals[ccy].mv+=(sum.mktVal[ccy]||0);
       grandTotals[ccy].co+=(sum.cost[ccy]||0);
       grandTotals[ccy].u+=(sum.unreal[ccy]||0);
       grandTotals[ccy].d+=(sum.divs[ccy]||0);
       grandTotals[ccy].r+=(sum.realized[ccy]||0);
+      grandTotals[ccy].pf+=(sum.platformFees[ccy]||0);
     });
   });
 
@@ -591,7 +592,7 @@ function renderDashboard(){
   const summaryCcyCards=allCcys.map(function(ccy){
     const g=grandTotals[ccy];
     const cashTotal=g.cash||0;
-    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100)*100)/100;
+    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100-Math.round((g.pf||0)*100)/100)*100)/100;
     const totPct=g.co>0?tot/g.co*100:null;
     const pct=g.co>0?(g.mv+cashTotal-g.co)/g.co*100:null;
 
@@ -605,8 +606,8 @@ function renderDashboard(){
     const pfRows=activePfs.map(function(pf0){
       const sum=getSummary(pf0);
       const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0;
-      const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
-      const t=u+d+r;
+      const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pfee=sum.platformFees[ccy]||0;
+      const t=Math.round((u+d+r-pfee)*100)/100;
       const tp=co>0?t/co*100:null;
       // Allocation % of this portfolio in the total for this CCY
       const allocPct=g.mv>0?(mv/g.mv*100):0;
@@ -639,15 +640,16 @@ function renderDashboard(){
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
       +'<div>'
       +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
-      +'<div style="font-size:9px;color:var(--t2)">Total Market Value (Cash + Holdings only)</div>'
+      +'<div style="font-size:9px;color:var(--t2)">Total Market Value</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
       +'</div>'
+      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
       +'</div>'
       // Total P&L full-width card (distinct background)
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unrealized + realized + div)</span></div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -675,12 +677,19 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      // Row 3: Dividends | Cash Balance
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
+      // Row 3: Dividends | Platform Fees
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
       +'</div>'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Platform Fees</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+((g.pf||0)>0?'var(--red)':'var(--t2)')+'">'+((g.pf||0)>0?'-'+fc(g.pf,ccy):'—')+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 4: Cash Balance (full width)
+      +'<div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:1rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
@@ -691,7 +700,7 @@ function renderDashboard(){
       +'<thead><tr>'
       +'<th>Portfolio</th>'
       +'<th class="r">Holdings</th>'
-      +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(incl. div)</span></th>'
+      +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - fee)</span></th>'
       +'<th style="width:24px"></th>'
       +'</tr></thead>'
       +'<tbody>'+pfRows+'</tbody>'
@@ -708,7 +717,7 @@ function renderDashboard(){
     const mvWithCash=g.mv+cashTotal;
     grandMYR+=toMYR(mvWithCash,ccy);
     grandMYRInvested+=toMYR(g.co,ccy);
-    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100)*100)/100;
+    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100-Math.round((g.pf||0)*100)/100)*100)/100;
     grandMYRPnl+=toMYR(tot,ccy);
   });
   const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
@@ -717,11 +726,10 @@ function renderDashboard(){
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-right:1rem">'
     +'<div>'
     +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">All Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only)</div>'
     +'</div>'
     +'<div style="text-align:right">'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only) · MYR equivalent</div>'
     +'</div>'
     +'</div>'
     +'</div>';
@@ -787,19 +795,18 @@ function renderOverview(p){
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-right:1rem">'
     +'<div>'
     +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">'+p.name+' Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only)</div>'
     +'</div>'
     +'<div style="text-align:right">'
     +'<div style="font-size:22px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only) · MYR equivalent</div>'
     +'</div>'
     +'</div>'
     +'</div>';
 
   const summaryCcyCards=allCcys.map((ccy,ci)=>{
     const rows=holdings.filter(h=>h.ccy===ccy);
-    const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
-    const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100)*100)/100;
+    const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pf=sum.platformFees[ccy]||0;
+    const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,tot=Math.round((Math.round(u*100)/100+Math.round(d*100)/100+Math.round(r*100)/100-Math.round(pf*100)/100)*100)/100;
     const cashBal=(p.cashBalances&&p.cashBalances[ccy])||0;
     const pct=co>0?(mv-co)/co*100:null;
     const totPct=co>0?tot/co*100:null;
@@ -834,12 +841,19 @@ function renderOverview(p){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
       +'</div>'
       +'</div>'
-      // Row 3: Dividends | Cash Balance
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.875rem">'
+      // Row 3: Dividends | Platform Fees
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
       +'</div>'
+      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Platform Fees</div>'
+      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+(pf>0?'var(--red)':'var(--t2)')+'">'+(pf>0?'-'+fc(pf,ccy):'—')+'</div>'
+      +'</div>'
+      +'</div>'
+      // Row 4: Cash Balance (full width)
+      +'<div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:.875rem">'
       +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
@@ -853,10 +867,9 @@ function renderOverview(p){
     }).join('');
     const colourBar=rows.length?'<div style="display:flex;height:6px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:.75rem;background:var(--bg4)">'+barSegs+'</div>':'';
 
-    // Holdings table (sorted by allocation)
     let tbody='';
     sortedRows.forEach((hh,i)=>{
-      const tot2=hh.unreal+hh.divs+hh.realized;
+      const tot2=Math.round((hh.unreal+hh.divs+hh.realized)*100)/100;
       const pct2=hh.cost>0?tot2/hh.cost*100:null;
       const barW=(hh.mktVal/totalMV*100).toFixed(1);
       tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
@@ -867,6 +880,7 @@ function renderOverview(p){
         +`<td class="r m" style="font-size:11px">${hh.mktP>0?hh.mktCcy+' '+hh.mktP.toFixed(3):'—'}</td>`
         +`<td class="r" style="font-weight:600">${hh.mktVal>0?fc(hh.mktVal,hh.mktCcy):'—'}</td>`
         +`<td class="r ${sc(hh.unreal)}">${sgn(hh.unreal,ccy)}</td>`
+        +`<td class="r ${sc(hh.realized)}">${hh.realized!==0?sgn(hh.realized,ccy):'—'}</td>`
         +`<td class="r ${hh.divs>0?'g':''}">${hh.divs>0?fc(hh.divs,ccy):'—'}</td>`
         +`<td class="r ${sc(tot2)}" style="font-weight:600;white-space:nowrap">${sgn(tot2,ccy)}${pct2!==null?'<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;background:'+(pct2>=0?'var(--gd)':' var(--rd)')+';color:'+(pct2>=0?'var(--green)':'var(--red)')+'">'+fp(pct2)+'</span>':''}</td>`
         +'<td style="color:var(--t3);font-size:11px">›</td>'
@@ -883,7 +897,7 @@ function renderOverview(p){
     const holdingsTable=rows.length
       ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'">'
         +'<thead><tr><th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
-        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Dividends</th><th class="r">P&L / % (incl. div)</th><th></th>'
+        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - platform fee)</span></th><th></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
         +''
         +'</table></div>'
@@ -896,16 +910,16 @@ function renderOverview(p){
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
       +'<div>'
       +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
-      +'<div style="font-size:10px;color:var(--t2)">Total Market Value (Cash + Holdings only)</div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
+      +'<div style="display:flex;align-items:baseline;gap:6px">'
       +'<span style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
-      +(rows.length?'':'')
       +'</div>'
+      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
       +'</div>'
       // Total P&L full-width card
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unrealized + realized + div)</span></div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -1122,8 +1136,15 @@ function renderTx(p,filterYrCcy){
   const _pfByCcy={};
   p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{_pfByCcy[t.ccy]=(_pfByCcy[t.ccy]||0)+(+t.amount||0);});
   const _closedByCcy={};
-  _closedAll.forEach(h=>{if(!_closedByCcy[h.ccy])_closedByCcy[h.ccy]={r:0,d:0};_closedByCcy[h.ccy].r+=h.realized;_closedByCcy[h.ccy].d+=h.divs;});
-  Object.keys(_closedByCcy).forEach(ccy=>{_closedByCcy[ccy].r=Math.round(_closedByCcy[ccy].r*100)/100;});
+  _closedAll.forEach(h=>{
+    if(!_closedByCcy[h.ccy])_closedByCcy[h.ccy]={r:0,d:0};
+    _closedByCcy[h.ccy].r+=Math.round(h.realized*100)/100;
+    _closedByCcy[h.ccy].d+=Math.round(h.divs*100)/100;
+  });
+  Object.keys(_closedByCcy).forEach(ccy=>{
+    _closedByCcy[ccy].r=Math.round(_closedByCcy[ccy].r*100)/100;
+    _closedByCcy[ccy].d=Math.round(_closedByCcy[ccy].d*100)/100;
+  });
   const _closedSummary=Object.entries(_closedByCcy).map(([ccy,v])=>
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem">'
     +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'
@@ -1154,7 +1175,7 @@ function renderTx(p,filterYrCcy){
     +_closedSummary
     +'<div style="font-size:11px;color:var(--t2);margin-bottom:.5rem" id="tx-closed-count">'+_closedAll.length+' position'+(_closedAll.length!==1?'s':'')+'</div>'
     +'<div style="overflow-x:auto"><table class="tbl" id="tx-closed-table"><thead><tr>'
-    +'<th>Stock</th><th>CCY</th><th class="r">Realized P&L</th><th class="r">Dividends</th><th class="r">Total P&L</th><th class="r">P&L %</th><th>First Buy</th>'
+    +'<th>Stock</th><th>CCY</th><th class="r">Realized P&L</th><th class="r">Dividends</th><th class="r">Net P&L</th><th class="r">P&L %</th><th>First Buy</th>'
     +'</tr></thead><tbody>'+_closedRows+'</tbody></table></div>'
     +(_closedAll.length===0?'<div class="m" style="text-align:center;padding:2rem;font-size:12px">No realized P&L yet.</div>':'')
     +'</div>';

@@ -1838,27 +1838,32 @@ function renderOptions(){
   </tr></tfoot>`:'';
 
   const openSec=openRows.length?`<div style="margin-bottom:1.5rem">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:6px">
+    <div style="margin-bottom:.5rem">
       <span style="font-size:11px;font-weight:700;background:#000;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:4px">Open positions (${openRows.length}) &nbsp;·&nbsp; Unrealized: <span style="color:${hasMktCount?(openTotalUnr>=0?'var(--green)':'var(--red)'):'#888'}">${hasMktCount?fmtN(openTotalUnr):'—'}</span></span>
-      <input id="opt-open-search" placeholder="Search open…" oninput="filterOpts('open')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:120px">
     </div>
     <div style="overflow-x:auto"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>
   </div>`:'';
 
   const closedSec=closedRows.length?`<div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:6px">
+    <div style="margin-bottom:.5rem">
       <span style="font-size:11px;font-weight:700;background:#000;color:#888;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:4px">Closed trades (${closedRows.length}) &nbsp;·&nbsp; Realized: <span style="color:${closedSumPnl>=0?'var(--green)':'var(--red)'}">${fmtN(closedSumPnl)}</span></span>
-      <input id="opt-closed-search" placeholder="Search closed…" oninput="filterOpts('closed')" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--b2);background:var(--bg4);color:var(--t1);width:150px">
     </div>
     <div style="overflow-x:auto"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${closedTotalRow}</table></div>
   </div>`:'';
 
-  const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Option Trade</strong> to add one.</div>`:'';
-  return`<div style="position:relative;margin-bottom:1rem;min-height:2.5rem">
-    <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
-    <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
-    <button class="pri sm" onclick="addOpt()" style="position:absolute;top:0;right:0">+ Option Trade</button>
-  </div>${summary}${openSec}${closedSec}${empty}`;
+  const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
+  return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px">
+    <div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
+      <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
+    </div>
+    <button class="pri sm" onclick="addOpt()" style="white-space:nowrap;flex-shrink:0">+ Transaction</button>
+  </div>${summary}
+  <div style="display:flex;gap:8px;margin-bottom:.75rem">
+    <input id="opt-open-search" placeholder="Search open positions…" oninput="filterOpts('open')" style="flex:1">
+    <input id="opt-closed-search" placeholder="Search closed trades…" oninput="filterOpts('closed')" style="flex:1">
+  </div>
+  ${openSec}${closedSec}${empty}`;
 }
 function filterOpts(section){
   const input=document.getElementById('opt-'+section+'-search');

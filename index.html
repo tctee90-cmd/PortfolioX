@@ -114,6 +114,20 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 }
 
 .pill{border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;transition:all .15s}
+.hd-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  width:130px;height:34px;
+  padding:0 10px;
+  background:linear-gradient(160deg,#1e2a3a 0%,#131c28 100%);
+  border:1px solid rgba(0,212,255,0.35);
+  border-top:1px solid rgba(0,212,255,0.65);
+  border-bottom:2px solid rgba(0,90,160,0.9);
+  border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--t1);
+  cursor:pointer;white-space:nowrap;overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 8px rgba(0,180,255,0.12),inset 0 1px 0 rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
 
 /* Toast */
 .toast{position:fixed;bottom:20px;right:20px;background:var(--gd);border:1px solid var(--green);color:var(--green);padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
@@ -129,11 +143,59 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 #hd{
   background:var(--bg2);
   border-bottom:1px solid var(--b2);
-  padding:0 16px;display:flex;align-items:center;gap:8px;min-height:50px;
-  position:fixed;top:0;left:0;right:0;z-index:100;flex-wrap:wrap;
+  padding:0 16px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:fixed;top:0;left:0;right:0;z-index:100;
 }
-#hd .logo{font-size:15px;font-weight:700;letter-spacing:-.5px;white-space:nowrap}
-#hd .logo span{color:var(--blue)}
+#hd .logo{
+  font-family:'Orbitron','Segoe UI',sans-serif;
+  font-size:13px;font-weight:900;letter-spacing:.5px;white-space:nowrap;
+  flex-shrink:0;display:flex;align-items:center;gap:3px;
+}
+
+.pv-hide{display:none}
+body.privacy-on .pv-val{display:none!important}
+body.privacy-on .pv-hide{display:inline!important}
+/* Blur everything financial in the main content */
+body.privacy-on .pv-num,
+body.privacy-on .kv,
+body.privacy-on .tbl tbody td,
+body.privacy-on .tbl tfoot td,
+body.privacy-on .g:not(th):not(.kl):not(label),
+body.privacy-on .rr:not(th):not(.kl):not(label){
+  color:transparent!important;
+  text-shadow:0 0 7px rgba(180,180,180,0.6);
+  filter:blur(5px);
+  user-select:none;
+}
+/* Blur all child spans/divs inside financial cards */
+body.privacy-on .kv *,
+body.privacy-on .tbl tbody td *,
+body.privacy-on .tbl tfoot td *,
+body.privacy-on .kc > div:last-child *,
+body.privacy-on [style*="font-weight:700"] span,
+body.privacy-on [style*="font-weight:800"] span,
+body.privacy-on [style*="font-weight:900"] span{
+  color:transparent!important;
+  text-shadow:0 0 7px rgba(180,180,180,0.6);
+  filter:blur(5px);
+  user-select:none;
+}
+/* Blur inline styled financial values — pnl pills, badges, value spans */
+body.privacy-on #mn span[style*="border-radius"],
+body.privacy-on #mn span[style*="color:#4ade80"],
+body.privacy-on #mn span[style*="color:#f87171"],
+body.privacy-on #mn span[style*="color:var(--green)"],
+body.privacy-on #mn span[style*="color:var(--red)"],
+body.privacy-on #mn span[style*="color:#c49a0e"],
+body.privacy-on #mn div[style*="color:#c49a0e"],
+body.privacy-on #mn div[style*="color:#4ade80"],
+body.privacy-on #mn div[style*="color:#f87171"]{
+  color:transparent!important;
+  text-shadow:0 0 7px rgba(180,180,180,0.6);
+  filter:blur(5px);
+  user-select:none;
+}
 
 /* Tab bar — fixed below header */
 #tb-wrap{background:var(--bg2);border-bottom:1px solid var(--b1);position:fixed;left:0;right:0;z-index:99;}
@@ -201,29 +263,60 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 </div>
 <input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
 <div id="hd">
-  <div class="logo"><span>◈</span> PortfolioX</div>
-  <div id="pftabs" style="display:flex;gap:5px;align-items:center;flex:1;flex-wrap:wrap;margin-left:6px"></div>
-  <div style="display:flex;gap:5px;align-items:center;flex-shrink:0;padding:6px 0">
-    <button class="sm ghost" id="bep">Edit</button>
-    <button class="sm gdng" id="bdp">Delete</button>
-    <button class="sm amb" id="bbk">Backup</button>
-    <button class="sm ghost" id="brs" style="border-color:var(--green);color:var(--green)">Restore</button>
-    <button class="sm ghost" id="bxl" style="border-color:var(--blue);color:var(--blue)">&#8595; Excel</button>
-    <button class="sm ghost" id="bpx" style="white-space:nowrap">Update Prices</button>
+  <!-- Row 1: Logo centred -->
+  <div style="display:flex;align-items:center;justify-content:center;width:100%;min-height:44px">
+    <div class="logo">
+      <span style="font-size:15px;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 4px #0088ff) drop-shadow(0 0 8px rgba(0,100,255,0.4))">◈</span><span style="background:linear-gradient(180deg,#ffffff 0%,#e8e8e8 20%,#a0a0a0 45%,#d8d8d8 55%,#ffffff 70%,#888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 6px rgba(200,200,255,0.3))"> PORTFOLIO</span><span style="background:linear-gradient(180deg,#ffe566 0%,#ffaa00 30%,#ff6600 60%,#cc3300 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 8px rgba(255,140,0,0.6))">X</span>
+    </div>
+  </div>
+  <!-- Row 2: Portfolio ▾ | [spacer] Tab ▾ [spacer] | ↻ Refresh -->
+  <div style="display:flex;align-items:center;gap:8px;padding:0 0 8px">
+    <!-- Portfolio dropdown -->
+    <div style="position:relative;flex-shrink:0" id="pf-menu-wrap">
+      <button onclick="togglePfMenu()" id="pf-menu-btn" class="hd-btn">
+        <span id="pf-menu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e57373;flex-shrink:0"></span>
+        <span id="pf-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Portfolio</span>
+        <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
+      </button>
+      <div id="pf-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Portfolios</div>
+            <div id="pf-menu-chips"></div>
+            <button onclick="closePfMenu();omm('ap')" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">➕</span> Add Portfolio</button>
+            <button onclick="closePfMenu();omm('ep')" id="bep" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">✏️</span> Edit Portfolio</button>
+            <button onclick="closePfMenu();omm('dp')" id="bdp" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--red);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">🗑️</span> Delete Portfolio</button>
+          </div>
+          <div style="border-left:1px solid var(--b1);padding-left:8px">
+            <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Data</div>
+            <button onclick="closePfMenu();document.getElementById('bbk').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:#f59e0b;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">💾</span> Backup</button>
+            <button onclick="closePfMenu();document.getElementById('brs').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--green);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📂</span> Restore</button>
+            <button onclick="closePfMenu();document.getElementById('bxl').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📊</span> Download Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Hidden real buttons -->
+    <button id="bbk" style="display:none"></button>
+    <button id="brs" style="display:none"></button>
+    <button id="bxl" style="display:none"></button>
+    <!-- Tab dropdown — centred -->
+    <div style="flex:1;display:flex;justify-content:center">
+      <div style="position:relative" id="tab-menu-wrap">
+        <button onclick="toggleTabMenu()" id="tab-menu-btn" class="hd-btn">
+          <span id="tab-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Dashboard</span>
+          <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
+        </button>
+        <div id="tab-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:6px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+        </div>
+      </div>
+    </div>
+    <!-- Refresh — right -->
+    <button class="hd-btn" id="bpx">↻ Refresh</button>
   </div>
 </div>
-<div id="tb-wrap">
-  <div style="display:flex;gap:0;align-items:center;overflow-x:auto;padding:0 16px">
-    <button class="tab on" data-tab="dashboard">Dashboard</button>
-    <button class="tab" data-tab="overview">Overview</button>
-    <button class="tab" data-tab="transactions">Transactions</button>
-    <button class="tab" data-tab="options">Options</button>
-    <button class="tab" data-tab="deposits">Capital Flows</button>
-    <button class="tab" data-tab="journey">Journey</button>
-    <div style="flex:1;min-width:8px"></div>
-  </div>
-</div>
-<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem 1rem;font-size:12px;"></div>
+<div id="tb-wrap" style="display:none"></div>
+<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem 1rem .4rem 2rem;font-size:12px;"></div>
 <div id="mn">
   <div id="ct"></div>
 </div>
@@ -488,21 +581,95 @@ function triggerPieImg(pfId,ccy){const inp=document.createElement('input');inp.t
 function removePieImg(pfId,ccy){delete S.pieImages[pfId+'_'+ccy];save();renderContent();}
 
 // ── Portfolio tabs with drag-to-reorder ────────────────────────────────────────
+const TAB_LABELS={dashboard:'Dashboard',overview:'Overview',transactions:'Transactions',options:'Options',deposits:'Capital Flows',journey:'Journey'};
+const TAB_ICONS={dashboard:'',overview:'',transactions:'',options:'',deposits:'',journey:''};
+function renderTabMenu(){
+  const dd=document.getElementById('tab-menu-dropdown');
+  const lbl=document.getElementById('tab-menu-label');
+  if(lbl)lbl.textContent=TAB_LABELS[TAB]||TAB;
+  if(!dd)return;
+  const tabs=['dashboard','overview','transactions','options','deposits','journey'];
+  dd.innerHTML=tabs.map(t=>{
+    const isActive=TAB===t;
+    return'<button onclick="closeTabMenu();swTab(\''+t+'\')"'
+      +' style="width:100%;text-align:left;padding:7px 10px;background:'+(isActive?'rgba(0,212,255,0.1)':'transparent')+';border:none;border-radius:6px;font-size:12px;font-weight:'+(isActive?700:400)+';color:'+(isActive?'var(--blue)':'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px"'
+      +' onmouseover="this.style.background=\''+(isActive?'rgba(0,212,255,0.15)':'var(--bg3)')+'\'" onmouseout="this.style.background=\''+(isActive?'rgba(0,212,255,0.1)':'transparent')+'\'">'
+      +'<span>'+TAB_LABELS[t]+'</span>'
+      +(isActive?'<span style="margin-left:auto;font-size:10px;color:var(--blue)">✓</span>':'')
+      +'</button>';
+  }).join('');
+}
+function toggleTabMenu(){
+  const dd=document.getElementById('tab-menu-dropdown');
+  if(!dd)return;
+  const open=dd.style.display==='none';
+  renderTabMenu();
+  dd.style.display=open?'':'none';
+  if(open)setTimeout(()=>document.addEventListener('click',closeTabMenuOutside),0);
+}
+function closeTabMenu(){
+  const dd=document.getElementById('tab-menu-dropdown');
+  if(dd)dd.style.display='none';
+  document.removeEventListener('click',closeTabMenuOutside);
+}
+function closeTabMenuOutside(e){
+  const wrap=document.getElementById('tab-menu-wrap');
+  if(wrap&&!wrap.contains(e.target))closeTabMenu();
+}
+function togglePfMenu(){
+  const dd=document.getElementById('pf-menu-dropdown');
+  if(!dd)return;
+  const open=dd.style.display==='none';
+  dd.style.display=open?'':'none';
+  if(open){
+    renderPfTabs(); // refresh chips to show current active state
+    setTimeout(()=>document.addEventListener('click',closePfMenuOutside),0);
+  }
+}
+function closePfMenu(){
+  const dd=document.getElementById('pf-menu-dropdown');
+  if(dd)dd.style.display='none';
+  document.removeEventListener('click',closePfMenuOutside);
+}
+function closePfMenuOutside(e){
+  const wrap=document.getElementById('pf-menu-wrap');
+  if(wrap&&!wrap.contains(e.target))closePfMenu();
+}
 function renderPfTabs(){
-  const tabs=$('pftabs');
-  tabs.innerHTML=S.portfolios.map((p,i)=>{
-    const isActive=S.activeId===p.id;
-    return '<div class="pf-chip" draggable="true" data-pfid="'+p.id+'" data-pfi="'+i+'"'
-      +' onclick="swPf(\''+p.id+'\')"'
-      +' style="border:1.5px solid '+(isActive?p.color:'var(--b1)')+';color:'+(isActive?p.color:'var(--t2)')+';background:'+(isActive?p.color+'18':'transparent')+';font-weight:'+(isActive?600:400)+';cursor:grab;user-select:none">'
-      +'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+p.color+';flex-shrink:0"></span>'
-      +'<span>'+p.name+'</span>'
-      +'</div>';
-  }).join('')
-  +'<button class="pill" onclick="omm(\'ap\')" style="border:1px dashed var(--b2);color:var(--t2);cursor:pointer">+ Portfolio</button>';
-  $('bdp').style.display=S.portfolios.length>1?'':'none';
-  // Wire up drag-and-drop on pf chips
-  initPfDrag();
+  const activePf=S.portfolios.find(p=>p.id===S.activeId)||S.portfolios[0];
+  const isDashboard=TAB==='dashboard';
+  // Update dropdown button label
+  const dot=document.getElementById('pf-menu-dot');
+  const lbl=document.getElementById('pf-menu-label');
+  if(dot){dot.style.background=isDashboard?'var(--blue)':activePf?activePf.color:'#888';}
+  if(lbl){lbl.textContent=isDashboard?'All Portfolios':activePf?activePf.name:'Portfolio';}
+  // Populate chips in dropdown
+  const chips=document.getElementById('pf-menu-chips');
+  if(chips){
+    // All Portfolios row
+    const allActive=isDashboard;
+    const allRow='<button onclick="closePfMenu();TAB=\'dashboard\';VIEW=null;journeyFilter=null;render()" '
+      +' style="width:100%;text-align:left;padding:7px 10px;background:'+(allActive?'rgba(59,130,246,0.15)':'transparent')+';border:none;border-radius:6px;font-size:12px;font-weight:'+(allActive?600:400)+';color:'+(allActive?'var(--blue)':'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px"'
+      +' onmouseover="this.style.background=\''+(allActive?'rgba(59,130,246,0.2)':'var(--bg3)')+'\'" onmouseout="this.style.background=\''+(allActive?'rgba(59,130,246,0.15)':'transparent')+'\'">'
+      +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></span>'
+      +'<span>All Portfolios</span>'
+      +(allActive?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
+      +'</button>';
+    chips.innerHTML=allRow+S.portfolios.map((p,i)=>{
+      const isActive=!isDashboard&&S.activeId===p.id;
+      return '<button onclick="closePfMenu();swPf(\''+p.id+'\')" draggable="true" data-pfid="'+p.id+'" data-pfi="'+i+'" class="pf-chip"'
+        +' style="width:100%;text-align:left;padding:7px 10px;background:'+(isActive?p.color+'22':'transparent')+';border:none;border-radius:6px;font-size:12px;font-weight:'+(isActive?600:400)+';color:'+(isActive?p.color:'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px"'
+        +' onmouseover="this.style.background=\''+(isActive?p.color+'33':'var(--bg3)')+'\'" onmouseout="this.style.background=\''+(isActive?p.color+'22':'transparent')+'\'">'
+        +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+';flex-shrink:0"></span>'
+        +'<span>'+p.name+'</span>'
+        +(isActive?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
+        +'</button>';
+    }).join('');
+    initPfDrag();
+  }
+  // Show/hide delete button based on portfolio count
+  const bdp=document.getElementById('bdp');
+  if(bdp)bdp.style.display=S.portfolios.length>1?'':'none';
 }
 function movePf(idx,dir){
   const arr=[...S.portfolios];
@@ -589,26 +756,8 @@ function renderDashboard(){
 
 
     const mvWithCash=g.mv+cashTotal;
-    return '<div style="'+ccyCardStyle(ccy)+'">'
-      // Header — just CCY tag + total value
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
-      +'<div>'
-      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
-      +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
-      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
-      +'</div>'
-      +'<div style="text-align:right">'
-      +'<span style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
-      +'</div>'
-      +'</div>'
-      // Total P&L full-width card (distinct background)
-      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:.875rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
-      +'</div>'
-      +'</div>'
+    const dashMiniId='dash-mini-'+ccy;
+    const dashMiniCards=''
       // Row 1: Total Invested | Total Holdings Value
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
@@ -642,20 +791,42 @@ function renderDashboard(){
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+((g.pf||0)>0?'var(--red)':'var(--t2)')+'">'+((g.pf||0)>0?'-'+fc(g.pf,ccy):'—')+'</div>'
       +'</div>'
       +'</div>'
-      // Row 4: Cash Balance left side only
+      // Row 4: Cash Balance
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
       +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
       +'</div>'
       +'<div></div>'
+      +'</div>';
+
+    return '<div style="'+ccyCardStyle(ccy)+'">'
+      // Header — just CCY tag + total value
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
+      +'<div>'
+      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
+      +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
+      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
-      // Colour allocation bar
-      +(activePfs.length?'<div style="display:flex;height:6px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:.75rem;background:var(--bg4)">'
-      +activePfs.map(function(pf0){const mv=getSummary(pf0).mktVal[ccy]||0;const w=g.mv>0?(mv/g.mv*100).toFixed(2):0;return '<div title="'+pf0.name+' '+w+'%" style="height:100%;width:'+w+'%;background:'+pf0.color+';flex-shrink:0"></div>';}).join('')
-      +'</div>':'')
+      +'<div style="text-align:right">'
+      +'<span class="pv-val" style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-hide" style="font-size:18px;font-weight:700;color:var(--t1)">••••</span>'
+      +'</div>'
+      +'</div>'
+      // Total P&L card — clickable toggle
+      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:.875rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+dashMiniId+'\')" title="Tap to show/hide breakdown">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
+      +'</div>'
+      // Mini cards — hidden by default
+      +'<div id="'+dashMiniId+'" style="display:none">'
+      +dashMiniCards
+      +'</div>'
       // Portfolio allocation table
-      +'<div style="overflow-x:auto"><table class="tbl">'
+      +'<div style="overflow-x:auto"><table class="tbl" style="border-top:2px solid '+ccyAccent(ccy)+'">'
       +'<thead><tr>'
       +'<th>Portfolio</th>'
       +'<th class="r">Holdings</th>'
@@ -681,15 +852,16 @@ function renderDashboard(){
   });
   const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
   const fxNote=Object.entries(_fx).filter(([c])=>allCcys.includes(c)&&c!=='MYR').map(([c,r])=>c+': RM '+r.toFixed(4)).join(' · ');
-  const grandCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem">'
+  const grandCard='<div style="background:linear-gradient(135deg,#1a1200 0%,#2a1f00 40%,#1a1200 100%);border:1px solid rgba(180,140,0,0.4);border-top:2px solid rgba(200,160,0,0.7);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 4px 16px rgba(150,100,0,0.2),inset 0 1px 0 rgba(255,220,100,0.07)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
     +'<div>'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">All Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only)</div>'
+    +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#b8920a">All Portfolio Value</div>'
+    +'<div style="font-size:9px;color:#7a6010;margin-top:2px">(Cash + Holdings only)</div>'
     +'</div>'
-    +'<div style="text-align:right">'
-    +'<div style="font-size:28px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
+    +'<div class="pv-val" style="font-size:22px;font-weight:800;white-space:nowrap;color:#c49a0e;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.8))">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div class="pv-hide" style="font-size:22px;font-weight:800;color:#c49a0e;letter-spacing:3px">••••••</div>'
+    +'<div style="font-size:9px;color:#7a6010">MYR equivalent</div>'
     +'</div>'
     +'</div>'
     +'</div>';
@@ -728,7 +900,7 @@ function setDateBar(label){
   db.innerHTML=
     '<span style="color:#7e8ea8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+label+'</span>'
     +'<span style="font-weight:600;text-align:center;white-space:nowrap;color:#eceef4">'+todayStr()+'</span>'
-    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap" id="live-clock"></span>';
+    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap;padding-right:1rem" id="live-clock"></span>';
   liveClock();
   if(_clockTimer)clearInterval(_clockTimer);
   _clockTimer=setInterval(liveClock,1000);
@@ -768,15 +940,16 @@ function renderOverview(p){
   });
   const usedFxCcys=allCcys.filter(function(c){return c!=='MYR';});
   const fxNoteOv=usedFxCcys.map(function(c){return c+': RM '+(_fx[c]||1).toFixed(2);}).join(' · ');
-  const personCard='<div style="background:rgba(255,236,153,.08);border:1px solid rgba(255,236,153,.25);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem">'
+  const personCard='<div style="background:linear-gradient(135deg,#1a1200 0%,#2a1f00 40%,#1a1200 100%);border:1px solid rgba(180,140,0,0.4);border-top:2px solid rgba(200,160,0,0.7);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 4px 16px rgba(150,100,0,0.2),inset 0 1px 0 rgba(255,220,100,0.07)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
     +'<div>'
-    +'<div style="font-size:10px;color:rgba(255,236,153,.6);font-weight:500">'+p.name+' Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">(Cash + Holdings only)</div>'
+    +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#b8920a">'+p.name+' Portfolio Value</div>'
+    +'<div style="font-size:9px;color:#7a6010;margin-top:2px">(Cash + Holdings only)</div>'
     +'</div>'
-    +'<div style="text-align:right">'
-    +'<div style="font-size:28px;font-weight:700;color:#ffec99;white-space:nowrap">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div style="font-size:9px;color:rgba(255,236,153,.4)">MYR equivalent</div>'
+    +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
+    +'<div class="pv-val" style="font-size:22px;font-weight:800;white-space:nowrap;color:#c49a0e;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.8))">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div class="pv-hide" style="font-size:22px;font-weight:800;color:#c49a0e;letter-spacing:3px">••••••</div>'
+    +'<div style="font-size:9px;color:#7a6010">MYR equivalent</div>'
     +'</div>'
     +'</div>'
     +'</div>';
@@ -840,11 +1013,7 @@ function renderOverview(p){
       +'</div>';
 
     // Colour bar (sorted)
-    const barSegs=sortedRows.map((h,i)=>{
-      const w=(h.mktVal/totalMV*100).toFixed(2);
-      return '<div title="'+h.stock+' '+w+'%" style="height:100%;width:'+w+'%;background:'+PAL[i%PAL.length]+';flex-shrink:0"></div>';
-    }).join('');
-    const colourBar=rows.length?'<div style="display:flex;height:6px;border-radius:4px;overflow:hidden;gap:1px;margin-bottom:.75rem;background:var(--bg4)">'+barSegs+'</div>':'';
+    const colourBar='';
 
     let tbody='';
     sortedRows.forEach((hh,i)=>{
@@ -874,13 +1043,23 @@ function renderOverview(p){
     const sumC=sortedRows.reduce((s,h)=>s+h.cost,0);
     const fp2=sumC>0?sumT/sumC*100:null;
     const holdingsTable=rows.length
-      ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'">'
+      ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'" style="border-top:2px solid '+ccyAccent(ccy)+'">'
         +'<thead><tr><th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
         +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - platform fee)</span></th><th></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
         +''
         +'</table></div>'
       :'<p class="m" style="font-size:12px;padding:.5rem 0">No active holdings in '+ccy+'.</p>';
+
+    const miniId='mini-'+ccy+'-'+ci;
+    const miniRow='<div id="'+miniId+'" style="display:none;margin-bottom:.875rem">'+miniCards+'</div>';
+    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+miniId+'\')" title="Tap to show/hide breakdown">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
+      +'</div>';
 
     // Fix 1: Header — remove right-side Total P&L (it's in pie centre now)
     // Header — CCY tag + total value
@@ -893,20 +1072,12 @@ function renderOverview(p){
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
       +'<div style="text-align:right">'
-      +'<span style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-val" style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-hide" style="font-size:18px;font-weight:700">••••</span>'
       +'</div>'
       +'</div>'
-      // Total P&L full-width card
-      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
-      +'</div>'
-      +'</div>'
+      +pnlCard
       +'</div>';
-
-    const miniRow='<div style="margin-bottom:.875rem">'+miniCards+'</div>';
 
     const pieHtml="";
 
@@ -1159,7 +1330,7 @@ function renderTx(p,filterYrCcy){
     +'<div onclick="toggleTxRows(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
     +'<span class="tx-toggle-arrow">▶</span>'
     +'<span>Transactions: '+txs.length+'</span>'
-    +'<span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>'
+    +''
     +'</div>'
     +'<div class="tx-rows-body" style="display:none;overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
     +'<th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th>'
@@ -1235,10 +1406,8 @@ function filterTxTable(){
   if(q||type){
     const body=document.querySelector('.tx-rows-body');
     const arrow=document.querySelector('.tx-toggle-arrow');
-    const hint=document.querySelector('#tx-table-wrap>div>span:last-child');
     if(body)body.style.display='';
     if(arrow)arrow.textContent='▼';
-    if(hint)hint.textContent='(tap to collapse)';
   }
   const cnt=document.getElementById('tx-count');if(cnt)cnt.textContent=visible+' transactions';
 }
@@ -1301,7 +1470,7 @@ function renderJourney(p){
     const rows=data[ccy];if(!rows.length)return'';
     if(window.jSubTab==='dividend'){
       const totalDiv=rows.reduce((s,r)=>s+r.divYr,0);
-      if(!totalDiv)return`<div style="margin-bottom:1.5rem"><span class="ctag">${ccy}</span><p class="m" style="font-size:12px;margin-top:.5rem">No dividends recorded.</p></div>`;
+      if(!totalDiv)return`<div style="margin-bottom:1.5rem">${ccyTag(ccy)}<p class="m" style="font-size:12px;margin-top:.5rem">No dividends recorded.</p></div>`;
       const rowsHtml=rows.filter(r=>r.divYr>0).map(r=>{
         const isCur=r.yr===new Date().getFullYear();
         return`<tr style="${isCur?'background:var(--bdd)':''}">
@@ -1311,7 +1480,7 @@ function renderJourney(p){
       }).join('');
       return`<div style="margin-bottom:2rem">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
-          <span class="ctag">${ccy}</span>
+          ${ccyTag(ccy)}
           <span style="font-size:12px;color:var(--green);font-weight:600">Total: ${fc(totalDiv,ccy)}</span>
         </div>
         <p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see full dividend transactions for that year.</p>
@@ -1339,7 +1508,7 @@ function renderJourney(p){
       }).join('');
       return`<div style="margin-bottom:2rem">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
-          <span class="ctag">${ccy}</span>
+          ${ccyTag(ccy)}
           ${hasReal?`<span style="font-size:12px;font-weight:600" class="${sc(totalNet)}">Net Realized: ${sgn(totalNet,ccy)}</span>`:''}
         </div>
         ${hasReal?`<p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see the Buy/Sell transactions that generated that P&L.</p>
@@ -1378,8 +1547,6 @@ function jDrill(mode,ccy,yr){
     const banner='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.75rem;padding:.75rem 1rem;background:var(--gd);border-radius:var(--r);border-left:3px solid var(--green)">'
       +'<span style="font-size:13px;font-weight:600;color:var(--green)">Dividends — '+ccy+' '+yr+'</span>'
       +'<span style="font-size:15px;font-weight:700;color:var(--green)">+'+fc(totalDiv,ccy)+'</span>'
-      +'<span class="m" style="font-size:11px">total received</span>'
-      +'<span class="m" style="font-size:11px;margin-left:auto">'+txs.length+' transaction'+(txs.length!==1?'s':'')+'</span>'
       +'</div>';
     const searchBar='<div class="search-bar"><input id="jd-search" placeholder="Search stock…" oninput="filterJdrillTable()" style="max-width:280px">'
       +'<span class="m" style="font-size:12px" id="jd-cnt">'+txs.length+' record'+(txs.length!==1?'s':'')+'</span></div>';
@@ -1397,7 +1564,7 @@ function jDrill(mode,ccy,yr){
       ?'<div style="overflow-x:auto"><table class="tbl" id="jd-table">'
         +'<thead><tr><th>Date</th><th>Stock</th><th class="r">Amount</th><th>Note</th></tr></thead>'
         +'<tbody>'+tbody+'</tbody>'
-        +'<tfoot><tr><td colspan="2">Total</td><td class="r g" style="font-weight:700">'+fc(totalDiv,ccy)+'</td><td></td></tr></tfoot>'
+        +'<tfoot><tr><td colspan="2">Total <span class="m" style="font-size:11px;font-weight:400">('+txs.length+' transaction'+(txs.length!==1?'s':'')+')</span></td><td class="r g" style="font-weight:700">'+fc(totalDiv,ccy)+'</td><td></td></tr></tfoot>'
         +'</table></div>'
       :'<p class="m" style="padding:1rem 0;font-size:12px">No dividend transactions for this period.</p>';
     TAB='journey';
@@ -1673,7 +1840,7 @@ function doRestore(e){
 
 // ── Actions ────────────────────────────────────────────────────────────────────
 function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save();render();}
-function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderContent();}
+function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderPfTabs();renderTabMenu();renderContent();}
 function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>el.style.border=el.dataset.c===c?'3px solid #fff':'3px solid transparent');}
 function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;cmm();save();render();}
 function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);cmm();save();render();}
@@ -1783,12 +1950,14 @@ function renderOptions(){
   // ── Total P&L summary — row 1: Total, row 2: Realized | Unrealized ──
   const summary=`<div style="margin-bottom:1.25rem">
     <div class="kc" style="margin-bottom:6px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-right:1rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:nowrap">
         <div>
           <div class="kl" style="margin-bottom:1px;font-size:11px">Total P&L</div>
           <div style="font-size:9px;color:var(--t3)">(realized + unrealized)</div>
         </div>
-        <div style="font-size:28px;font-weight:700;white-space:nowrap;color:${totalPnl>=0?'var(--green)':'var(--red)'}">${fmtN(totalPnl)}</div>
+        <div style="flex:1"></div>
+        <div class="pv-val" style="font-size:18px;font-weight:700;white-space:nowrap;color:${totalPnl>=0?'var(--green)':'var(--red)'}">${fmtN(totalPnl)}</div>
+        <div class="pv-hide" style="font-size:18px;font-weight:700;color:${totalPnl>=0?'var(--green)':'var(--red)'}">••••</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -1859,15 +2028,18 @@ function renderOptions(){
     ...closedRows.map(x=>({...x,_open:false}))
   ];
 
-  const openBar=openRows.length?`<div style="cursor:default;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--t2)">Open positions: ${openRows.length}</div>`:'';
+  const openBar=openRows.length?`<div onclick="toggleOpenOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="open-opts-arrow">▶</span><span>Open positions: ${openRows.length}</span></div>`:'';
 
-  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="closed-opts-arrow">▶</span><span>Closed trades: ${closedRows.length}</span><span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span></div>`:'';
+  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="closed-opts-arrow">▶</span><span>Closed trades: ${closedRows.length}</span></div>`:'';
 
-  const openTable=openRows.length?`<div style="overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
+  const openTable=openRows.length?`<div class="open-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
 
-  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody>${closedTotalRow}</table></div>`:'';
+  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody>${closedTotalRow}</table></div>`:'';
 
-  const combinedTable=trades.length?`${openBar}${openTable}${closedBar}${closedTable}`:'';
+  const combinedTable=trades.length?`
+    <div style="margin-bottom:1.25rem">${openBar}${openTable}</div>
+    <div style="margin-bottom:1.25rem">${closedBar}${closedTable}</div>
+  `:'';
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
 
   return`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:8px">
@@ -1880,14 +2052,19 @@ function renderOptions(){
   <input id="opt-all-search" placeholder="Search all trades…" oninput="filterOptsAll()" style="width:100%;margin-bottom:.75rem;box-sizing:border-box">
   ${combinedTable}${empty}`;
 }
-function toggleClosedOpts(bar){
+function toggleOpenOpts(bar){
   const body=bar.nextElementSibling;
-  const arrow=bar.querySelector('.closed-opts-arrow');
-  const hint=bar.querySelectorAll('span')[2];
+  const arrow=bar.querySelector('.open-opts-arrow');
   const isHidden=body&&body.style.display==='none';
   if(body)body.style.display=isHidden?'':'none';
   if(arrow)arrow.textContent=isHidden?'▼':'▶';
-  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
+}
+function toggleClosedOpts(bar){
+  const body=bar.nextElementSibling;
+  const arrow=bar.querySelector('.closed-opts-arrow');
+  const isHidden=body&&body.style.display==='none';
+  if(body)body.style.display=isHidden?'':'none';
+  if(arrow)arrow.textContent=isHidden?'▼':'▶';
 }
 function filterOptsAll(){
   const input=document.getElementById('opt-all-search');
@@ -2458,34 +2635,49 @@ function ccyCardStyle(ccy){
 // ── Per-CCY coloured tag ──────────────────────────────────────────
 function ccyMiniCardStyle(ccy){
   const m={
-    'MYR':'background:#1a0a2e;border:1px solid #5a2da0',
-    'SGD':'background:#2a1500;border:1px solid #8b4a00',
-    'USD':'background:#003366;border:1px solid #0055aa',
+    'MYR':'background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.3)',
+    'SGD':'background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3)',
+    'USD':'background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3)',
   };
-  return m[ccy]||'background:#1a2744;border:1px solid rgba(255,255,255,.15)';
+  return m[ccy]||'background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.3)';
 }
 function ccyMiniCardStyleDashed(ccy){
   const m={
-    'MYR':'background:#1a0a2e;border:1px dashed #5a2da0',
-    'SGD':'background:#2a1500;border:1px dashed #8b4a00',
-    'USD':'background:#003366;border:1px dashed #0055aa',
+    'MYR':'background:rgba(168,85,247,0.08);border:1px dashed rgba(168,85,247,0.4)',
+    'SGD':'background:rgba(249,115,22,0.08);border:1px dashed rgba(249,115,22,0.4)',
+    'USD':'background:rgba(59,130,246,0.08);border:1px dashed rgba(59,130,246,0.4)',
   };
-  return m[ccy]||'background:#1a2744;border:1px dashed rgba(255,255,255,.15)';
+  return m[ccy]||'background:rgba(79,195,247,0.08);border:1px dashed rgba(79,195,247,0.3)';
+}
+function ccyAccent(ccy){
+  const m={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+  return m[ccy]||'#4fc3f7';
+}
+function ccyFlag(ccy){
+  const flags={'MYR':'🇲🇾','SGD':'🇸🇬','USD':'🇺🇸','HKD':'🇭🇰','GBP':'🇬🇧','EUR':'🇪🇺'};
+  return flags[ccy]||'';
 }
 function ccyTag(ccy,extra){
   const cols={
     'MYR':'background:#a855f7;color:#fff;border-color:#a855f7',
     'SGD':'background:#f97316;color:#fff;border-color:#f97316',
     'USD':'background:#3b82f6;color:#fff;border-color:#3b82f6',
+    'HKD':'background:#ef4444;color:#fff;border-color:#ef4444',
+    'GBP':'background:#6366f1;color:#fff;border-color:#6366f1',
+    'EUR':'background:#10b981;color:#fff;border-color:#10b981',
+  };
+  const flags={
+    'MYR':'🇲🇾','SGD':'🇸🇬','USD':'🇺🇸','HKD':'🇭🇰','GBP':'🇬🇧','EUR':'🇪🇺',
   };
   const st=cols[ccy]||'background:var(--blue);color:#0a0a14;border-color:var(--blue)';
-  return '<span class="ctag" style="'+st+';'+(extra||'')+'">' + ccy + '</span>';
+  const flag=flags[ccy]?'<span style="font-size:11px;margin-right:3px">'+flags[ccy]+'</span>':'';
+  return '<span class="ctag" style="'+st+';'+(extra||'')+'">'+flag+ccy+'</span>';
 }
 
 // ── Drag-and-drop: Portfolio chips ────────────────────────────────────────────
 var _pfDragSrc=null;
 function initPfDrag(){
-  const chips=[].slice.call(document.querySelectorAll('#pftabs .pf-chip[draggable]'));
+  const chips=[].slice.call(document.querySelectorAll('#pf-menu-chips .pf-chip[draggable]'));
   chips.forEach(function(chip){
     chip.addEventListener('dragstart',function(e){
       _pfDragSrc=chip;
@@ -2494,7 +2686,7 @@ function initPfDrag(){
     });
     chip.addEventListener('dragend',function(){
       chip.style.opacity='';
-      document.querySelectorAll('#pftabs .pf-chip').forEach(function(c){
+      document.querySelectorAll('#pf-menu-chips .pf-chip').forEach(function(c){
         c.style.background=''; c.style.outline='';
       });
     });
@@ -2574,6 +2766,8 @@ function renderDeposits(p){
     +'<option value="all">All years</option>'
     +allYears.map(yr=>'<option value="'+yr+'">'+yr+'</option>').join('')
     +'</select>'
+    +'<div style="flex:1"></div>'
+    +'<button class="pri sm" onclick="openDepositModal()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>'
     +'</div>';
 
   // ── Year summary cards (shown when a specific year is selected) ──
@@ -2588,12 +2782,12 @@ function renderDeposits(p){
       const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:8px 10px">'
-        +'<div style="font-size:10px;font-weight:700;color:'+accent+';margin-bottom:6px">'+ccy+'</div>'
-        +'<div style="font-size:9px;color:var(--t2)">Deposited</div><div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">'+(dep>0?'+'+fc(dep,ccy):'—')+'</div>'
-        +'<div style="font-size:9px;color:var(--t2)">Withdrawn</div><div style="font-size:12px;font-weight:600;color:'+(wit>0?'var(--red)':'var(--t3)')+';margin-bottom:4px">'+(wit>0?'-'+fc(wit,ccy):'—')+'</div>'
+        +'<div style="margin-bottom:6px">'+ccyTag(ccy)+'</div>'
+        +'<div style="font-size:9px;color:var(--t2)">Deposited</div><div class="pv-num" style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px">'+(dep>0?'+'+fc(dep,ccy):'—')+'</div>'
+        +'<div style="font-size:9px;color:var(--t2)">Withdrawn</div><div class="pv-num" style="font-size:12px;font-weight:600;color:'+(wit>0?'var(--red)':'var(--t3)')+';margin-bottom:4px">'+(wit>0?'-'+fc(wit,ccy):'—')+'</div>'
         +'<div style="border-top:1px solid var(--b1);padding-top:4px;margin-top:2px">'
         +'<div style="font-size:9px;color:var(--t2)">Net</div>'
-        +'<div style="font-size:13px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
+        +'<div class="pv-num" style="font-size:13px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
         +'</div></div>';
     }).filter(Boolean).join('');
     if(!cards)return'';
@@ -2613,14 +2807,14 @@ function renderDeposits(p){
       const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:10px 12px">'
-        +'<div style="font-size:12px;font-weight:700;color:'+accent+';margin-bottom:10px">'+ccy+'</div>'
+        +'<div style="margin-bottom:10px">'+ccyTag(ccy)+'</div>'
         +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Deposit</div>'
-        +'<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
+        +'<div class="pv-num" style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
         +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Withdrawal</div>'
-        +'<div style="font-size:13px;font-weight:600;color:'+(totWit>0?'var(--red)':'var(--t3)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
+        +'<div class="pv-num" style="font-size:13px;font-weight:600;color:'+(totWit>0?'var(--red)':'var(--t3)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
         +'<div style="border-top:1px solid var(--b1);padding-top:8px">'
         +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Net Capital</div>'
-        +'<div style="font-size:14px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
+        +'<div class="pv-num" style="font-size:14px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
         +'</div>'
         +'</div>';
     }).join('')
@@ -2650,8 +2844,8 @@ function renderDeposits(p){
     return'<div style="margin-bottom:1.25rem">'
       +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
       +'<span class="dep-toggle-arrow-'+safeKey+'">▶</span>'
-      +'<span>'+ccy+' Transactions: '+cdeps.length+'</span>'
-      +'<span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>'
+      +'<span>'+ccyFlag(ccy)+' '+ccy+' Transactions: '+cdeps.length+'</span>'
+      +''
       +'</div>'
       +'<div class="dep-section-body-'+safeKey+'" style="display:none;overflow-x:auto"><table class="tbl">'
       +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
@@ -2659,31 +2853,39 @@ function renderDeposits(p){
       +'</div>';
   }).join('');
 
-  return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
-    +'<button class="pri sm" onclick="openDepositModal()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button></div>'
-    +yearFilterHtml
+  return yearFilterHtml
     +yearSummaryCards
     +ccyCards
     +sections;
 }
 
+let _privacyOn=false;
+function togglePrivacy(){
+  _privacyOn=!_privacyOn;
+  document.body.classList.toggle('privacy-on',_privacyOn);
+}
+function toggleMini(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const hidden=el.style.display==='none';
+  el.style.display=hidden?'':'none';
+  const card=el.previousElementSibling;
+  if(card){
+  }
+}
 function toggleTxRows(bar){
   const body=bar.nextElementSibling;
   const arrow=bar.querySelector('.tx-toggle-arrow');
-  const hint=bar.querySelectorAll('span')[2];
   const isHidden=body&&body.style.display==='none';
   if(body)body.style.display=isHidden?'':'none';
   if(arrow)arrow.textContent=isHidden?'▼':'▶';
-  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
 }
 function toggleDepRows(bar,key){
   const body=bar.nextElementSibling;
   const arrow=bar.querySelector('.dep-toggle-arrow-'+key);
-  const hint=bar.querySelectorAll('span')[2];
   const isHidden=body&&body.style.display==='none';
   if(body)body.style.display=isHidden?'':'none';
   if(arrow)arrow.textContent=isHidden?'▼':'▶';
-  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
 }
 function filterDepYear(yr){
   // Show/hide all-time summary cards
@@ -2740,7 +2942,7 @@ function delDeposit(i){
   pf().deposits.splice(i,1);save();renderContent();
 }
 
-function render(){renderPfTabs();renderContent();}
+function render(){renderPfTabs();renderTabMenu();renderContent();}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>swTab(b.dataset.tab)));
 // + Transaction button now rendered inline in renderTx
 $('bpx').addEventListener('click',()=>omm('px'));
@@ -2755,7 +2957,7 @@ showWelcomeIfFirstLoad();
 
 // ── Swipe left/right to switch tabs ──────────────────────────────
 (function(){
-  const TAB_ORDER=['dashboard','overview','transactions','options','journey','deposits'];
+  const TAB_ORDER=['dashboard','overview','transactions','options','deposits','journey'];
   let _tx=0,_ty=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _tx=e.touches[0].clientX;
@@ -2806,8 +3008,8 @@ function fixLayout(){
 }
 fixLayout();
 window.addEventListener('resize',fixLayout);
-// Re-run after fonts load
 setTimeout(fixLayout,200);
+renderTabMenu();
 </script>
 </body>
 </html>

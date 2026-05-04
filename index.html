@@ -1838,8 +1838,6 @@ function renderOptions(){
 
   const openRows=trades.map((t,i)=>({t,i})).filter(x=>isOpen(x.t));
   const closedRows=trades.map((t,i)=>({t,i})).filter(x=>!isOpen(x.t));
-
-  // Open positions totals
   const openTotalUnr=openRows.reduce((s,x)=>{const t=x.t,o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0,hasMkt=t.mktValue!=null&&t.mktValue!=='',m=hasMkt?parseFloat(t.mktValue)||0:null;return m!==null?s+(o+m-of0):s;},0);
   const openTotalRow=openRows.length?`<tfoot><tr style="background:var(--bg3)">
     <td colspan="2" style="font-weight:600;color:var(--t2)">Total (${openRows.length} position${openRows.length!==1?'s':''})</td>
@@ -1861,30 +1859,15 @@ function renderOptions(){
     ...closedRows.map(x=>({...x,_open:false}))
   ];
 
-  const openCountRow=openRows.length?`<tr style="background:var(--bg3)">
-    <td colspan="10" style="font-size:8px;font-weight:600;color:var(--t2);padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">Open positions: ${openRows.length}</td>
-  </tr>`:'';
-
-  const spacerRow=`<tr><td colspan="10" style="padding:2px;background:transparent;border:none"></td></tr>`.repeat(6);
-
-  const closedCountRow=closedRows.length?`<tr style="background:rgba(251,191,36,0.12);cursor:pointer" onclick="toggleClosedOpts(this)" title="Click to show/hide closed trades">
-    <td colspan="10" style="font-size:8px;font-weight:600;color:#fbbf24;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">▶ Closed trades: ${closedRows.length} &nbsp;<span style="font-size:7px;font-weight:400;opacity:.6;text-transform:none;letter-spacing:0">(tap to expand)</span></td>
-  </tr>`:'';
-
   const openBar=openRows.length?`<div style="cursor:default;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--t2)">Open positions: ${openRows.length}</div>`:'';
 
-  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">
-    <span class="closed-opts-arrow">▶</span>
-    <span>Closed trades: ${closedRows.length}</span>
-    <span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>
-  </div>`:'';
+  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="closed-opts-arrow">▶</span><span>Closed trades: ${closedRows.length}</span><span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span></div>`:'';
 
-  const openTable=openRows.length?`<div style="overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>`:'';
+  const openTable=openRows.length?`<div style="overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
 
-  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody></table></div>`:'';
+  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody>${closedTotalRow}</table></div>`:'';
 
-  const combinedTable=allRows.length?`${openBar}${openTable}${closedBar}${closedTable}`:'';
-
+  const combinedTable=trades.length?`${openBar}${openTable}${closedBar}${closedTable}`:'';
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
 
   return`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:8px">

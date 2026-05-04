@@ -139,7 +139,7 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 #tb-wrap{background:var(--bg2);border-bottom:1px solid var(--b1);position:fixed;left:0;right:0;z-index:99;}
 
 #mn{max-width:1300px;margin:0 auto;padding:16px 16px 60px}
-#date-bar{font-size:12px;}
+#date-bar{font-size:12px;color:#eceef4;}
 
 /* Back button */
 .bb{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--blue);cursor:pointer;margin-bottom:1rem;padding:4px 0}
@@ -218,8 +218,8 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
     <button class="tab" data-tab="overview">Overview</button>
     <button class="tab" data-tab="transactions">Transactions</button>
     <button class="tab" data-tab="options">Options</button>
-    <button class="tab" data-tab="journey">Journey</button>
     <button class="tab" data-tab="deposits">Capital Flows</button>
+    <button class="tab" data-tab="journey">Journey</button>
     <div style="flex:1;min-width:8px"></div>
   </div>
 </div>
@@ -446,10 +446,16 @@ function journeyData(p0){
       const yr=t.date.slice(0,4);
       divByYr[yr]=(divByYr[yr]||0)+(t.amount!=null?+t.amount:0);
     });
+    const pfByYr={};
+    txs.filter(t=>t.ccy===ccy&&t.type==='Platform Fee').forEach(t=>{
+      const yr=t.date.slice(0,4);
+      pfByYr[yr]=Math.round(((pfByYr[yr]||0)+(+t.amount||0))*100)/100;
+    });
     for(let yr=firstYr;yr<=curYr;yr++){
       const divYr=divByYr[String(yr)]||0;
       const realYr=realByYr[String(yr)]||0;
-      if(divYr>0||realYr!==0)result[ccy].push({yr,divYr,realYr});
+      const pfYr=pfByYr[String(yr)]||0;
+      if(divYr>0||realYr!==0||pfYr!==0)result[ccy].push({yr,divYr,realYr,pfYr});
     }
   });
   return result;
@@ -701,14 +707,31 @@ function goPortfolio(id){
   render();
 }
 
+function liveClock(){
+  const el=document.getElementById('live-clock');
+  if(!el)return;
+  const now=new Date();
+  const h=String(now.getHours()).padStart(2,'0');
+  const m=String(now.getMinutes()).padStart(2,'0');
+  const s=String(now.getSeconds()).padStart(2,'0');
+  el.textContent=h+':'+m+':'+s;
+}
+let _clockTimer=null;
 function setDateBar(label){
   const db=document.getElementById('date-bar');
   if(!db)return;
-  db.style.display='flex';
+  db.style.display='grid';
+  db.style.gridTemplateColumns='1fr auto 1fr';
   db.style.alignItems='center';
   db.style.gap='8px';
-  db.innerHTML='<span style="color:var(--t2)">'+label+'</span>'
-    +'<span style="font-weight:600">'+todayStr()+'</span>';
+  db.style.color='#eceef4';
+  db.innerHTML=
+    '<span style="color:#7e8ea8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+label+'</span>'
+    +'<span style="font-weight:600;text-align:center;white-space:nowrap;color:#eceef4">'+todayStr()+'</span>'
+    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap" id="live-clock"></span>';
+  liveClock();
+  if(_clockTimer)clearInterval(_clockTimer);
+  _clockTimer=setInterval(liveClock,1000);
   fixLayout();
 }
 function renderContent(){
@@ -718,7 +741,7 @@ function renderContent(){
     const db=document.getElementById('date-bar');if(db)db.style.display='none';
     $('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);fixLayout();return;
   }
-  if(TAB==='dashboard'){setDateBar('All Portfolios — Dashboard');$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
+  if(TAB==='dashboard'){setDateBar('Dashboard');$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
   else if(TAB==='overview'){setDateBar(pf().name+' — Overview');$('ct').innerHTML=renderOverview(p);}
   else if(TAB==='holdings'){setDateBar(pf().name+' — Holdings');$('ct').innerHTML=renderHoldings(p);}
   else if(TAB==='transactions'){setDateBar(pf().name+' — Transactions');$('ct').innerHTML=renderTx(p);}
@@ -1078,9 +1101,10 @@ function renderTx(p,filterYrCcy){
     html+='<div style="display:flex;gap:8px;margin-bottom:.75rem">'
       +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="flex:1">'
       +'<select id="tx-type-filter" onchange="filterTxTable()" style="flex:1">'+typeFilterOpts+'</select>'
-      +'<button class="pri sm" id="bat" onclick="omm(\'at\')" style="white-space:nowrap">+ Transaction</button>'
+      +'<button class="pri sm" id="bat" onclick="omm(\'at\')" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>'
       +'</div>'
-      +'<div style="font-size:11px;color:var(--t2);margin-bottom:.5rem" id="tx-count">'+txs.length+' transactions</div>';
+      +'<div style="font-size:11px;color:var(--t2);margin-bottom:.5rem" id="tx-count">'+txs.length+' transactions</div>'
+      +'<script>setTimeout(function(){var l=document.getElementById("tx-table-count-label");if(l)l.textContent="('+txs.length+')";},0);</scr'+'ipt>';
   }
   // Build closed trades view (hidden by default)
   const _closedAll=getHoldings(p,false).filter(h=>(h.realized!==0||h.divs!==0));
@@ -1131,7 +1155,13 @@ function renderTx(p,filterYrCcy){
     +'</tr></thead><tbody>'+_closedRows+'</tbody></table></div>'
     +(_closedAll.length===0?'<div class="m" style="text-align:center;padding:2rem;font-size:12px">No realized P&L yet.</div>':'')
     +'</div>';
-  html+='<div id="tx-table-wrap"><div style="overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
+  html+='<div id="tx-table-wrap">'
+    +'<div onclick="toggleTxRows(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
+    +'<span class="tx-toggle-arrow">▶</span>'
+    +'<span>Transactions: '+txs.length+'</span>'
+    +'<span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>'
+    +'</div>'
+    +'<div class="tx-rows-body" style="display:none;overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
     +'<th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th>'
     +'<th class="r">Fee</th><th class="r">Amount</th><th>Note</th>'
     +(isFiltered?'':'<th style="width:52px"></th>')
@@ -1157,8 +1187,7 @@ function renderTx(p,filterYrCcy){
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
-  if(txs.length===0)html+='<div class="m" style="text-align:center;padding:2rem;font-size:12px">No transactions found.</div>';
-  return html;
+  if(txs.length===0)html+='<div class="m" style="text-align:center;padding:2rem;font-size:12px">No transactions found.</div>';  return html;
 }
 function filterSdTx(){
   const q=(document.getElementById('sd-tx-search')||{value:''}).value.toLowerCase();
@@ -1188,7 +1217,6 @@ function filterTxTable(){
     if(cnt)cnt.textContent='';
     return;
   }
-  // Hide closed view, show normal table
   const ct=document.getElementById('tx-closed-view');
   const tt=document.getElementById('tx-table-wrap');
   if(ct)ct.style.display='none';
@@ -1203,6 +1231,15 @@ function filterTxTable(){
     r.style.display=show?'':'none';
     if(show)visible++;
   });
+  // Auto-expand if filtering
+  if(q||type){
+    const body=document.querySelector('.tx-rows-body');
+    const arrow=document.querySelector('.tx-toggle-arrow');
+    const hint=document.querySelector('#tx-table-wrap>div>span:last-child');
+    if(body)body.style.display='';
+    if(arrow)arrow.textContent='▼';
+    if(hint)hint.textContent='(tap to collapse)';
+  }
   const cnt=document.getElementById('tx-count');if(cnt)cnt.textContent=visible+' transactions';
 }
 
@@ -1285,31 +1322,37 @@ function renderJourney(p){
         </table></div>
       </div>`;
     } else {
-      // PnL tab
-      const totalReal=(function(){
-        const gross=rows.reduce((s,r)=>s+r.realYr,0);
-        const pfFee=p.transactions.filter(t=>t.type==='Platform Fee'&&t.ccy===ccy).reduce((s,t)=>s+(+t.amount||0),0);
-        return Math.round((gross-pfFee)*100)/100;
-      })();
-      const hasReal=rows.some(r=>r.realYr!==0);
-      const rowsHtml=rows.filter(r=>r.realYr!==0).map(r=>{
+      // PnL tab — realYr is gross realized, pfYr is platform fees for that year
+      const totalGross=Math.round(rows.reduce((s,r)=>s+r.realYr,0)*100)/100;
+      const totalPf=Math.round(rows.reduce((s,r)=>s+(r.pfYr||0),0)*100)/100;
+      const totalNet=Math.round((totalGross-totalPf)*100)/100;
+      const hasReal=rows.some(r=>r.realYr!==0||r.pfYr>0);
+      const rowsHtml=rows.filter(r=>r.realYr!==0||r.pfYr>0).map(r=>{
         const isCur=r.yr===new Date().getFullYear();
+        const net=Math.round((r.realYr-(r.pfYr||0))*100)/100;
         return`<tr style="${isCur?'background:var(--bdd)':''}">
           <td style="font-weight:600;color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="jDrill('pnl','${ccy}',${r.yr})">${r.yr}${isCur?' ◂':''}</td>
-          <td class="r ${sc(r.realYr)}" style="font-weight:600">${sgn(r.realYr,ccy)}</td>
+          <td class="r ${sc(r.realYr)}" style="font-weight:600">${r.realYr!==0?sgn(r.realYr,ccy):'—'}</td>
+          <td class="r rr" style="font-weight:600">${r.pfYr>0?'−'+fc(r.pfYr,ccy):'—'}</td>
+          <td class="r ${sc(net)}" style="font-weight:700">${sgn(net,ccy)}</td>
         </tr>`;
       }).join('');
       return`<div style="margin-bottom:2rem">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
           <span class="ctag">${ccy}</span>
-          ${hasReal?`<span style="font-size:12px;font-weight:600" class="${sc(totalReal)}">Realized: ${sgn(totalReal,ccy)}</span>`:''}
+          ${hasReal?`<span style="font-size:12px;font-weight:600" class="${sc(totalNet)}">Net Realized: ${sgn(totalNet,ccy)}</span>`:''}
         </div>
         ${hasReal?`<p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see the Buy/Sell transactions that generated that P&L.</p>
-        <div style="overflow-x:auto"><table class="tbl" style="max-width:320px">
-          <thead><tr><th>Year</th><th class="r">Realized P&L</th></tr></thead>
+        <div style="overflow-x:auto"><table class="tbl" style="max-width:480px">
+          <thead><tr><th>Year</th><th class="r">Realized P&L</th><th class="r">Platform Fees</th><th class="r">Net P&L</th></tr></thead>
           <tbody>${rowsHtml}</tbody>
           <tfoot>
-            <tr><td style="font-weight:600">Total realized</td><td class="r ${sc(totalReal)}" style="font-weight:700">${sgn(totalReal,ccy)}</td></tr>
+            <tr>
+              <td style="font-weight:600">Total</td>
+              <td class="r ${sc(totalGross)}" style="font-weight:700">${sgn(totalGross,ccy)}</td>
+              <td class="r rr" style="font-weight:700">${totalPf>0?'−'+fc(totalPf,ccy):'—'}</td>
+              <td class="r ${sc(totalNet)}" style="font-weight:700">${sgn(totalNet,ccy)}</td>
+            </tr>
           </tfoot>
         </table></div>`:
         `<p class="m" style="font-size:12px">No realized P&L yet.</p>`}
@@ -1367,30 +1410,31 @@ function jDrill(mode,ccy,yr){
   txs=p.transactions.filter(t=>['Buy','Sell'].includes(t.type)&&t.ccy===ccy&&t.date.slice(0,4)===String(yr));
   txs.sort((a,b)=>b.date.localeCompare(a.date));
 
-  // Compute realized P&L for this year using FIFO avg cost
+  // Compute realized P&L for this year — replay ALL txs chronologically (same logic as journeyData)
   const hh={};
-  p.transactions.filter(t=>t.type==='Buy'&&t.ccy===ccy&&t.stock).forEach(t=>{
-    if(!hh[t.stock])hh[t.stock]={qty:0,cost:0};
-    hh[t.stock].qty+=+t.qty; hh[t.stock].cost+=(+t.qty)*(+t.price)+(+t.fee||0);
+  const allSorted=[...p.transactions].filter(t=>t.ccy===ccy&&t.stock).sort((a,b)=>a.date.localeCompare(b.date));
+  realizedPnl=0;
+  allSorted.forEach(t=>{
+    if(t.type==='Buy'){
+      if(!hh[t.stock])hh[t.stock]={qty:0,cost:0};
+      hh[t.stock].qty+=+t.qty; hh[t.stock].cost+=(+t.qty)*(+t.price)+(+t.fee||0);
+    } else if(t.type==='Sell'){
+      const hs=hh[t.stock]||{qty:0,cost:0};
+      const avg=hs.qty>0?hs.cost/hs.qty:0;
+      const pnl=(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
+      if(t.date.slice(0,4)===String(yr)) realizedPnl=Math.round((realizedPnl+pnl)*100)/100;
+      if(hh[t.stock]){hh[t.stock].cost-=avg*(+t.qty);hh[t.stock].qty-=+t.qty;}
+    }
   });
-  realizedPnl=p.transactions.filter(t=>t.type==='Sell'&&t.ccy===ccy&&t.date.slice(0,4)===String(yr)&&t.stock).reduce((s,t)=>{
-    const hs=hh[t.stock]||{}; const avg=(hs.qty||0)>0?(hs.cost||0)/(hs.qty):0;
-    return s+(+t.qty)*(+t.price)-(+t.fee||0)-avg*(+t.qty);
-  },0);
 
-  // Unrealized P&L for this year: current unrealized for stocks bought in this year or earlier
-  // Use getSummary for current portfolio unrealized
-  const sumData=getSummary(p);
-  unrealizedPnl=sumData.unreal[ccy]||0;
-
-  const totalPnl=realizedPnl+unrealizedPnl;
+  const platformFeeYr=Math.round(p.transactions.filter(t=>t.type==='Platform Fee'&&t.ccy===ccy&&t.date.slice(0,4)===String(yr)).reduce((s,t)=>s+(+t.amount||0),0)*100)/100;
+  const totalPnl=realizedPnl;
   const backBtn='<div class="bb" onclick="window.jSubTab=\'pnl\';renderContent()">← Back to PnL</div>';
 
   // Summary cards
   const cards='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1rem">'
     +'<div class="kc"><div class="kl">Realized P&L '+yr+'</div><div class="kv '+sc(realizedPnl)+'">'+sgn(realizedPnl,ccy)+'</div></div>'
-    +'<div class="kc"><div class="kl">Unrealized P&L (now)</div><div class="kv '+sc(unrealizedPnl)+'">'+sgn(unrealizedPnl,ccy)+'</div></div>'
-    +'<div class="kc"><div class="kl">Total P&L</div><div class="kv '+sc(totalPnl)+'" style="font-size:14px;font-weight:700">'+sgn(totalPnl,ccy)+'</div></div>'
+    +(platformFeeYr>0?'<div class="kc"><div class="kl">Platform Fees '+yr+'</div><div class="kv rr">−'+fc(platformFeeYr,ccy)+'</div></div>':'')
     +'</div>';
 
   const banner='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.75rem;padding:.75rem 1rem;background:var(--bg3);border-radius:var(--r);border-left:3px solid var(--blue)">'
@@ -1762,10 +1806,8 @@ function renderOptions(){
   function mkRow(t,i,extraClass=''){
     const open=isOpen(t);
     const bg=open?'rgba(99,179,237,0.06)':'rgba(251,191,36,0.04)';
-    const display=extraClass?'none':'';
     const cls=extraClass?` class="${extraClass}"`:'';
-    const styleAttr=`style="background:${bg}${display?';display:none':''}"`;
-    const o=parseFloat(t.openValue)||0;
+    const styleAttr=`style="background:${bg}"`;    const o=parseFloat(t.openValue)||0;
     const c=!open?parseFloat(t.closeValue)||0:null;
     const hasMkt=open&&t.mktValue!=null&&t.mktValue!=='';
     const m=hasMkt?parseFloat(t.mktValue)||0:null;
@@ -1820,19 +1862,28 @@ function renderOptions(){
   ];
 
   const openCountRow=openRows.length?`<tr style="background:var(--bg3)">
-    <td colspan="10" style="font-size:8px;font-weight:600;color:var(--t2);padding:2px 8px">Open positions: ${openRows.length}</td>
+    <td colspan="10" style="font-size:8px;font-weight:600;color:var(--t2);padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">Open positions: ${openRows.length}</td>
   </tr>`:'';
 
   const spacerRow=`<tr><td colspan="10" style="padding:2px;background:transparent;border:none"></td></tr>`.repeat(6);
 
   const closedCountRow=closedRows.length?`<tr style="background:rgba(251,191,36,0.12);cursor:pointer" onclick="toggleClosedOpts(this)" title="Click to show/hide closed trades">
-    <td colspan="10" style="font-size:8px;font-weight:600;color:#fbbf24;padding:2px 8px">▶ Closed trades: ${closedRows.length} &nbsp;<span style="font-size:7px;opacity:.7">(tap to expand)</span></td>
+    <td colspan="10" style="font-size:8px;font-weight:600;color:#fbbf24;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">▶ Closed trades: ${closedRows.length} &nbsp;<span style="font-size:7px;font-weight:400;opacity:.6;text-transform:none;letter-spacing:0">(tap to expand)</span></td>
   </tr>`:'';
 
-  const combinedTable=allRows.length?`<div style="overflow-x:auto"><table class="tbl" id="opt-all-table">${thead}<tbody>
-    ${openCountRow}${openRows.map(x=>mkRow(x.t,x.i)).join('')}
-    ${spacerRow}${closedCountRow}${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}
-  </tbody></table></div>`:'';
+  const openBar=openRows.length?`<div style="cursor:default;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--t2)">Open positions: ${openRows.length}</div>`:'';
+
+  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">
+    <span class="closed-opts-arrow">▶</span>
+    <span>Closed trades: ${closedRows.length}</span>
+    <span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>
+  </div>`:'';
+
+  const openTable=openRows.length?`<div style="overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody></table></div>`:'';
+
+  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-bottom:1rem"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody></table></div>`:'';
+
+  const combinedTable=allRows.length?`${openBar}${openTable}${closedBar}${closedTable}`:'';
 
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
 
@@ -1846,22 +1897,26 @@ function renderOptions(){
   <input id="opt-all-search" placeholder="Search all trades…" oninput="filterOptsAll()" style="width:100%;margin-bottom:.75rem;box-sizing:border-box">
   ${combinedTable}${empty}`;
 }
-function toggleClosedOpts(headerRow){
-  const rows=document.querySelectorAll('.closed-opt-row');
-  const isHidden=rows.length&&rows[0].style.display==='none';
-  rows.forEach(r=>r.style.display=isHidden?'':'none');
-  const td=headerRow.querySelector('td');
-  if(td)td.innerHTML=td.innerHTML.replace(isHidden?'▶':'▼',isHidden?'▼':'▶').replace(isHidden?'tap to expand':'collapse',isHidden?'collapse':'tap to expand');
+function toggleClosedOpts(bar){
+  const body=bar.nextElementSibling;
+  const arrow=bar.querySelector('.closed-opts-arrow');
+  const hint=bar.querySelectorAll('span')[2];
+  const isHidden=body&&body.style.display==='none';
+  if(body)body.style.display=isHidden?'':'none';
+  if(arrow)arrow.textContent=isHidden?'▼':'▶';
+  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
 }
 function filterOptsAll(){
   const input=document.getElementById('opt-all-search');
-  const table=document.getElementById('opt-all-table');
-  if(!input||!table)return;
+  if(!input)return;
   const q=input.value.toLowerCase();
-  table.querySelectorAll('tbody tr').forEach(r=>{
-    if(r.querySelector('td[colspan]'))return; // keep label/spacer rows
-    const s=r.getAttribute('data-opt-search')||'';
-    r.style.display=s.includes(q)?'':'none';
+  ['opt-open-table','opt-closed-table'].forEach(function(id){
+    const table=document.getElementById(id);
+    if(!table)return;
+    table.querySelectorAll('tbody tr').forEach(r=>{
+      const s=r.getAttribute('data-opt-search')||'';
+      r.style.display=s.includes(q)?'':'none';
+    });
   });
 }
 function filterOpts(section){
@@ -2524,7 +2579,7 @@ function renderDeposits(p){
 
   if(!deps.length){
     return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
-      +'<button class="pri sm" onclick="openDepositModal()">+ Deposit / Withdrawal</button></div>'
+      +'<button class="pri sm" onclick="openDepositModal()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button></div>'
       +'<div class="card m" style="text-align:center;padding:2rem">No deposits yet. Click + to add one.</div>';
   }
 
@@ -2597,7 +2652,7 @@ function renderDeposits(p){
       const i=p.deposits.indexOf(d);
       const isDep=d.type==='deposit';
       const yr=d.date.slice(0,4);
-      return'<tr class="dep-tx-row" data-yr="'+yr+'" data-ccy="'+ccy+'">'
+      return'<tr class="dep-tx-row dep-tx-row-'+ccy.replace(/[^a-z]/gi,'_')+'" data-yr="'+yr+'" data-ccy="'+ccy+'">'
         +'<td class="m">'+d.date+'</td>'
         +'<td><span class="badge" style="color:'+(isDep?'var(--green)':'var(--red)')+';background:'+(isDep?'var(--gd)':'var(--rd)')+'">'+( isDep?'Deposit':'Withdrawal')+'</span></td>'
         +'<td class="r" style="font-weight:600;color:'+(isDep?'var(--green)':'var(--red)')+'">'+(isDep?'+':'-')+fc(+d.amount,ccy)+'</td>'
@@ -2608,22 +2663,45 @@ function renderDeposits(p){
         +'</td></tr>';
     }).join('');
 
+    const safeKey=ccy.replace(/[^a-z]/gi,'_');
     return'<div style="margin-bottom:1.25rem">'
-      +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.5rem">'+ccy+' Transactions</div>'
-      +'<div style="overflow-x:auto"><table class="tbl">'
+      +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
+      +'<span class="dep-toggle-arrow-'+safeKey+'">▶</span>'
+      +'<span>'+ccy+' Transactions: '+cdeps.length+'</span>'
+      +'<span style="font-size:11px;font-weight:400;opacity:.6">(tap to expand)</span>'
+      +'</div>'
+      +'<div class="dep-section-body-'+safeKey+'" style="display:none;overflow-x:auto"><table class="tbl">'
       +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
       +'<tbody>'+txRows+'</tbody></table></div>'
       +'</div>';
   }).join('');
 
   return'<div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">'
-    +'<button class="pri sm" onclick="openDepositModal()">+ Deposit / Withdrawal</button></div>'
+    +'<button class="pri sm" onclick="openDepositModal()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button></div>'
     +yearFilterHtml
     +yearSummaryCards
     +ccyCards
     +sections;
 }
 
+function toggleTxRows(bar){
+  const body=bar.nextElementSibling;
+  const arrow=bar.querySelector('.tx-toggle-arrow');
+  const hint=bar.querySelectorAll('span')[2];
+  const isHidden=body&&body.style.display==='none';
+  if(body)body.style.display=isHidden?'':'none';
+  if(arrow)arrow.textContent=isHidden?'▼':'▶';
+  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
+}
+function toggleDepRows(bar,key){
+  const body=bar.nextElementSibling;
+  const arrow=bar.querySelector('.dep-toggle-arrow-'+key);
+  const hint=bar.querySelectorAll('span')[2];
+  const isHidden=body&&body.style.display==='none';
+  if(body)body.style.display=isHidden?'':'none';
+  if(arrow)arrow.textContent=isHidden?'▼':'▶';
+  if(hint)hint.textContent=isHidden?'(tap to collapse)':'(tap to expand)';
+}
 function filterDepYear(yr){
   // Show/hide all-time summary cards
   const ccyCardsEl=document.getElementById('dep-ccy-cards');
@@ -2632,8 +2710,9 @@ function filterDepYear(yr){
   document.querySelectorAll('[id^="dep-yr-summary-"]').forEach(function(el){
     el.style.display=(yr!=='all'&&el.id==='dep-yr-summary-'+yr)?'block':'none';
   });
-  // Show/hide transaction rows
+  // Show/hide transaction rows — only if already expanded (don't override collapsed state)
   document.querySelectorAll('.dep-tx-row').forEach(function(r){
+    if(r.style.display==='none'&&yr==='all')return; // keep collapsed if user collapsed
     r.style.display=(yr==='all'||r.dataset.yr===yr)?'':'none';
   });
 }

@@ -852,19 +852,104 @@ function renderDashboard(){
   });
   const grandPnlPct=grandMYRInvested>0?grandMYRPnl/grandMYRInvested*100:null;
   const fxNote=Object.entries(_fx).filter(([c])=>allCcys.includes(c)&&c!=='MYR').map(([c,r])=>c+': RM '+r.toFixed(4)).join(' · ');
-  const grandCard='<div style="background:linear-gradient(135deg,#1a1200 0%,#2a1f00 40%,#1a1200 100%);border:1px solid rgba(180,140,0,0.4);border-top:2px solid rgba(200,160,0,0.7);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 4px 16px rgba(150,100,0,0.2),inset 0 1px 0 rgba(255,220,100,0.07)">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
-    +'<div>'
-    +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#ffffff">All Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px">(Cash + Holdings only)</div>'
+  // ── Arc gauge chart ──────────────────────────────────────────────────────
+  const gaugeInvested=grandMYRInvested||0;
+  const gaugeValue=grandMYR||0;
+  const gaugePct=gaugeInvested>0?Math.min(Math.max(gaugeValue/gaugeInvested,0),2):0;
+  const gaugeAngle=Math.min(gaugePct,1)*270; // max 270 degrees arc
+  const gaugeLoss=gaugeValue<gaugeInvested;
+  const gaugeColor=gaugeLoss?'#ff4d6d':'#00e676';
+  const gaugeColorStart=gaugeLoss?'#ff9a3c':'#00b4d8';
+  const gaugeColorMid=gaugeLoss?'#ff4d6d':'#00e676';
+
+  // SVG arc helper
+  function polarToXY(cx,cy,r,angleDeg){
+    const rad=(angleDeg-225)*Math.PI/180;
+    return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};
+  }
+  const cx=95,cy=100,r=82,sw=20;
+  const startA=0,endA=gaugeAngle;
+  const s=polarToXY(cx,cy,r,startA);
+  const e=polarToXY(cx,cy,r,endA);
+  const largeArc=gaugeAngle>180?1:0;
+  const trackS=polarToXY(cx,cy,r,0);
+  const trackE=polarToXY(cx,cy,r,270);
+
+  // Dot at end of arc
+  const dot=polarToXY(cx,cy,r,endA);
+
+  const gaugeBg='linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%)';
+  const gaugeBorder='rgba(0,212,255,0.12)';
+  const gaugeBorderTop='rgba(0,212,255,0.25)';
+  const gaugeGlowColor='rgba(0,212,255,0.04)';
+  const gaugeRadialColor=gaugeLoss?'255,77,109':'0,230,118';
+
+
+
+  const gaugeChart='<div style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:1rem .75rem 1rem 0;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
+    +'<div style="position:absolute;left:-20px;top:-20px;width:220px;height:220px;background:radial-gradient(circle,rgba('+gaugeRadialColor+',0.08) 0%,transparent 70%);pointer-events:none"></div>'
+    +'<div style="flex-shrink:0;position:relative">'
+    +'<svg width="210" height="155" viewBox="0 0 210 155" style="overflow:hidden">'
+    // Outer subtle rings
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+8)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.08"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+16)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.04"/>'
+    // Tick marks
+    +Array.from({length:9},(_,i)=>{const a=i*(270/8);const p1=polarToXY(cx,cy,r+sw/2+4,a);const p2=polarToXY(cx,cy,r+sw/2+7,a);return'<line x1="'+p1.x+'" y1="'+p1.y+'" x2="'+p2.x+'" y2="'+p2.y+'" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.25"/>';}).join('')
+    // Track
+    +'<path d="M'+trackS.x+' '+trackS.y+' A'+r+' '+r+' 0 1 1 '+trackE.x+' '+trackE.y+'" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="'+sw+'" stroke-linecap="round"/>'
+    // Outer glow arc (wider, blurred)
+    +(gaugeAngle>2?'<path d="M'+s.x+' '+s.y+' A'+r+' '+r+' 0 '+largeArc+' 1 '+e.x+' '+e.y+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="'+(sw+10)+'" stroke-linecap="round" opacity="0.25" filter="url(#outerGlow)"/>':'')
+    // Main arc
+    +(gaugeAngle>2?'<path d="M'+s.x+' '+s.y+' A'+r+' '+r+' 0 '+largeArc+' 1 '+e.x+' '+e.y+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="'+sw+'" stroke-linecap="round" filter="url(#gaugeGlow)"/>':'')
+    // Bright dot tip with rings
+    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="16" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.2"/>':'')
+    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="11" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.35"/>':'')
+    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="7" fill="'+gaugeColor+'" filter="url(#dotGlow)"/>':'')
+    // Defs
+    +'<defs>'
+    +'<linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
+    +'<stop offset="0%" stop-color="'+gaugeColorStart+'"/>'
+    +'<stop offset="100%" stop-color="'+gaugeColorMid+'"/>'
+    +'</linearGradient>'
+    +'<filter id="gaugeGlow" x="-30%" y="-30%" width="160%" height="160%">'
+    +'<feGaussianBlur stdDeviation="4" result="blur"/>'
+    +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
+    +'</filter>'
+    +'<filter id="outerGlow" x="-50%" y="-50%" width="200%" height="200%">'
+    +'<feGaussianBlur stdDeviation="8"/>'
+    +'</filter>'
+    +'<filter id="dotGlow" x="-200%" y="-200%" width="500%" height="500%">'
+    +'<feGaussianBlur stdDeviation="5" result="blur"/>'
+    +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
+    +'</filter>'
+    +'</defs>'
+    // Centre — label
+    +'<text x="'+cx+'" y="'+(cy-22)+'" text-anchor="middle" fill="rgba(0,212,255,0.5)" font-size="7.5" font-family="inherit" letter-spacing="2">PORTFOLIO VALUE</text>'
+    // Value
+    +'<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="900" font-family="inherit" class="pv-val">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</text>'
+    +'<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="900" font-family="inherit" class="pv-hide">••••••</text>'
+    // MYR equiv
+    +'<text x="'+cx+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="7.5" font-family="inherit" letter-spacing="1">MYR EQUIVALENT</text>'
+    // Portfolio count
+    +'<text x="'+cx+'" y="'+(cy+36)+'" text-anchor="middle" fill="rgba(0,212,255,0.8)" font-size="9" font-family="inherit" letter-spacing="1">'+S.portfolios.length+' PORTFOLIO'+(S.portfolios.length!==1?'S':'')+'</text>'
+    +'</svg>'
     +'</div>'
-    +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
-    +'<div class="pv-val" style="font-size:22px;font-weight:800;white-space:nowrap;color:#ffffff;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.8))">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div class="pv-hide" style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:3px">••••••</div>'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.55)">MYR equivalent</div>'
+    // Right side — compact
+    +'<div style="flex:1;display:flex;flex-direction:column;gap:10px">'
+    +'<div>'
+    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Total Invested</div>'
+    +'<div class="pv-val pv-num" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
+    +'<div class="pv-hide" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
+    +'</div>'
+    +'<div>'
+    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Total P&L / %</div>'
+    +'<div class="pv-val pv-num" style="font-size:12px;font-weight:700;color:'+(grandMYRPnl>=0?'#00e676':'#ff4d6d')+'">'+(grandMYRPnl>=0?'+':'')+'RM '+Math.abs(grandMYRPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(grandPnlPct!==null?' ('+(grandPnlPct>=0?'+':'')+grandPnlPct.toFixed(1)+'%)':'')+'</div>'
+    +'<div class="pv-hide" style="font-size:12px;font-weight:700;color:'+(grandMYRPnl>=0?'#00e676':'#ff4d6d')+'">•••••• (•••%)</div>'
     +'</div>'
     +'</div>'
     +'</div>';
+
+  const grandCard=gaugeChart;
   return grandCard+summaryCcyCards;
 }
 

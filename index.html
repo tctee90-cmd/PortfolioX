@@ -867,7 +867,7 @@ function renderDashboard(){
     const rad=(angleDeg-225)*Math.PI/180;
     return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};
   }
-  const cx=95,cy=100,r=82,sw=20;
+  const cx=105,cy=105,r=82,sw=20;
   const startA=0,endA=gaugeAngle;
   const s=polarToXY(cx,cy,r,startA);
   const e=polarToXY(cx,cy,r,endA);
@@ -886,10 +886,9 @@ function renderDashboard(){
 
 
 
-  const gaugeChart='<div style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:1rem .75rem 1rem 0;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
-    +'<div style="position:absolute;left:-20px;top:-20px;width:220px;height:220px;background:radial-gradient(circle,rgba('+gaugeRadialColor+',0.08) 0%,transparent 70%);pointer-events:none"></div>'
-    +'<div style="flex-shrink:0;position:relative">'
-    +'<svg width="210" height="155" viewBox="0 0 210 155" style="overflow:hidden">'
+  const gaugeChart='<div style="display:flex;justify-content:center;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:1rem;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
+    +'<div style="flex-shrink:0;display:flex;justify-content:center;align-items:center">'
+    +'<svg width="210" height="210" viewBox="0 0 210 210" style="overflow:hidden">'
     // Outer subtle rings
     +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+8)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.08"/>'
     +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+16)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.04"/>'
@@ -934,8 +933,7 @@ function renderDashboard(){
     +'<text x="'+cx+'" y="'+(cy+36)+'" text-anchor="middle" fill="rgba(0,212,255,0.8)" font-size="9" font-family="inherit" letter-spacing="1">'+S.portfolios.length+' PORTFOLIO'+(S.portfolios.length!==1?'S':'')+'</text>'
     +'</svg>'
     +'</div>'
-    // Right side — compact
-    +'<div style="flex:1;display:flex;flex-direction:column;gap:10px">'
+    +'<div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:130px">'
     +'<div>'
     +'<div style="font-size:8px;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Total Invested</div>'
     +'<div class="pv-val pv-num" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'

@@ -263,56 +263,58 @@ body.privacy-on #mn div[style*="color:#f87171"]{
 </div>
 <input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
 <div id="hd">
-  <!-- Row 1: Logo centred -->
-  <div style="display:flex;align-items:center;justify-content:center;width:100%;min-height:44px">
-    <div class="logo">
-      <span style="font-size:15px;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 4px #0088ff) drop-shadow(0 0 8px rgba(0,100,255,0.4))">◈</span><span style="background:linear-gradient(180deg,#ffffff 0%,#e8e8e8 20%,#a0a0a0 45%,#d8d8d8 55%,#ffffff 70%,#888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 6px rgba(200,200,255,0.3))"> PORTFOLIO</span><span style="background:linear-gradient(180deg,#ffe566 0%,#ffaa00 30%,#ff6600 60%,#cc3300 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 8px rgba(255,140,0,0.6))">X</span>
+  <div style="display:flex;align-items:stretch;width:100%;min-height:90px">
+    <!-- Left: Logo one line, big and special -->
+    <div style="display:flex;align-items:center;flex:1">
+      <div class="logo" style="flex-direction:row;align-items:center;gap:4px">
+        <span style="font-size:28px;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 6px #0088ff)">◈</span>
+        <span style="background:linear-gradient(180deg,#ffffff 0%,#e8e8e8 20%,#a0a0a0 45%,#d8d8d8 55%,#ffffff 70%,#888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1))">PORTFOLIO</span>
+        <span style="background:linear-gradient(180deg,#ffe566 0%,#ffaa00 30%,#ff6600 60%,#cc3300 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:30px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 10px rgba(255,140,0,0.7))">X</span>
+      </div>
     </div>
-  </div>
-  <!-- Row 2: Portfolio ▾ | [spacer] Tab ▾ [spacer] | ↻ Refresh -->
-  <div style="display:flex;align-items:center;gap:8px;padding:0 0 8px">
-    <!-- Portfolio dropdown -->
-    <div style="position:relative;flex-shrink:0" id="pf-menu-wrap">
-      <button onclick="togglePfMenu()" id="pf-menu-btn" class="hd-btn">
-        <span id="pf-menu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e57373;flex-shrink:0"></span>
-        <span id="pf-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Portfolio</span>
-        <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
-      </button>
-      <div id="pf-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div>
-            <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Portfolios</div>
-            <div id="pf-menu-chips"></div>
-            <button onclick="closePfMenu();omm('ap')" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">➕</span> Add Portfolio</button>
-            <button onclick="closePfMenu();omm('ep')" id="bep" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">✏️</span> Edit Portfolio</button>
-            <button onclick="closePfMenu();omm('dp')" id="bdp" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--red);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">🗑️</span> Delete Portfolio</button>
-          </div>
-          <div style="border-left:1px solid var(--b1);padding-left:8px">
-            <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Data</div>
-            <button onclick="closePfMenu();document.getElementById('bbk').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:#f59e0b;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">💾</span> Backup</button>
-            <button onclick="closePfMenu();document.getElementById('brs').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--green);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📂</span> Restore</button>
-            <button onclick="closePfMenu();document.getElementById('bxl').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📊</span> Download Excel</button>
+    <!-- Right: 3 buttons stacked, smaller -->
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:5px;padding:8px 0">
+      <!-- Hidden real buttons -->
+      <button id="bbk" style="display:none"></button>
+      <button id="brs" style="display:none"></button>
+      <button id="bxl" style="display:none"></button>
+      <!-- Portfolio dropdown -->
+      <div style="position:relative" id="pf-menu-wrap">
+        <button onclick="togglePfMenu()" id="pf-menu-btn" class="hd-btn" style="height:28px;font-size:11px;width:120px">
+          <span id="pf-menu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e57373;flex-shrink:0"></span>
+          <span id="pf-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Portfolio</span>
+          <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
+        </button>
+        <div id="pf-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Portfolios</div>
+              <div id="pf-menu-chips"></div>
+              <button onclick="closePfMenu();omm('ap')" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">➕</span> Add Portfolio</button>
+              <button onclick="closePfMenu();omm('ep')" id="bep" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">✏️</span> Edit Portfolio</button>
+              <button onclick="closePfMenu();omm('dp')" id="bdp" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--red);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">🗑️</span> Delete Portfolio</button>
+            </div>
+            <div style="border-left:1px solid var(--b1);padding-left:8px">
+              <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Data</div>
+              <button onclick="closePfMenu();document.getElementById('bbk').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:#f59e0b;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">💾</span> Backup</button>
+              <button onclick="closePfMenu();document.getElementById('brs').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--green);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📂</span> Restore</button>
+              <button onclick="closePfMenu();document.getElementById('bxl').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📊</span> Download Excel</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Hidden real buttons -->
-    <button id="bbk" style="display:none"></button>
-    <button id="brs" style="display:none"></button>
-    <button id="bxl" style="display:none"></button>
-    <!-- Tab dropdown — centred -->
-    <div style="flex:1;display:flex;justify-content:center">
+      <!-- Tab dropdown -->
       <div style="position:relative" id="tab-menu-wrap">
-        <button onclick="toggleTabMenu()" id="tab-menu-btn" class="hd-btn">
+        <button onclick="toggleTabMenu()" id="tab-menu-btn" class="hd-btn" style="height:28px;font-size:11px;width:120px">
           <span id="tab-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Dashboard</span>
           <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
         </button>
-        <div id="tab-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:6px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+        <div id="tab-menu-dropdown" style="display:none;position:fixed;top:120px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:6px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
         </div>
       </div>
+      <!-- Refresh -->
+      <button class="hd-btn" id="bpx" style="height:28px;font-size:11px;width:120px">↻ Refresh</button>
     </div>
-    <!-- Refresh — right -->
-    <button class="hd-btn" id="bpx">↻ Refresh</button>
   </div>
 </div>
 <div id="tb-wrap" style="display:none"></div>
@@ -616,6 +618,25 @@ function closeTabMenuOutside(e){
   const wrap=document.getElementById('tab-menu-wrap');
   if(wrap&&!wrap.contains(e.target))closeTabMenu();
 }
+function globalPlusClick(){
+  if(TAB==='transactions')omm('at');
+  else if(TAB==='options')addOpt();
+  else if(TAB==='deposits')openDepositModal();
+}
+function updateGlobalPlus(){
+  const btn=document.getElementById('global-add-btn');
+  if(!btn)return;
+  const show=['transactions','options','deposits'].includes(TAB);
+  btn.style.display=show?'block':'none';
+  if(show){
+    const hd=document.getElementById('hd');
+    const db=document.getElementById('date-bar');
+    const hdH=hd?hd.getBoundingClientRect().height:0;
+    const dbH=db&&db.style.display!=='none'?db.getBoundingClientRect().height:0;
+    // Align with the search/filter row: header + datebar + padding(16) + half input row(20)
+    btn.style.top=(hdH+dbH+16+20)+'px';
+  }
+}
 function togglePfMenu(){
   const dd=document.getElementById('pf-menu-dropdown');
   if(!dd)return;
@@ -737,13 +758,13 @@ function renderDashboard(){
       const mvPlusCash=mv+pfCash;
 
       return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')">'
-        +'<td style="max-width:130px">'
-        +'<div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:4px">'
+        +'<td style="max-width:130px;position:sticky;left:0;background:var(--bg2);z-index:2">'
+        +'<div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
         +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+pf0.color+';margin-right:4px;vertical-align:middle"></span>'
         +pf0.name+'</div>'
-        +'<div style="display:flex;align-items:center;gap:5px">'
+        +'<div style="display:flex;align-items:center;gap:5px;margin-top:3px">'
         +'<div style="width:'+(allocPct*0.4).toFixed(1)+'px;height:3px;background:'+pf0.color+';border-radius:3px;flex-shrink:0"></div>'
-        +'<span style="font-size:10px;color:var(--t2)">'+allocPctStr+'%</span>'
+        +'<span style="font-size:9px;color:var(--t2)">'+allocPctStr+'%</span>'
         +'</div>'
         +'</td>'
         +'<td class="r" style="font-weight:600;white-space:nowrap">'+fc(mv,ccy)+'</td>'
@@ -808,7 +829,7 @@ function renderDashboard(){
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
-      +'<div style="text-align:right">'
+      +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
       +'<span class="pv-val" style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
       +'<span class="pv-hide" style="font-size:18px;font-weight:700;color:var(--t1)">••••</span>'
       +'</div>'
@@ -828,7 +849,7 @@ function renderDashboard(){
       // Portfolio allocation table
       +'<div style="overflow-x:auto"><table class="tbl" style="border-top:2px solid '+ccyAccent(ccy)+'">'
       +'<thead><tr>'
-      +'<th>Portfolio</th>'
+      +'<th style="position:sticky;left:0;background:var(--bg3);z-index:3">Portfolio</th>'
       +'<th class="r">Holdings</th>'
       +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - fee)</span></th>'
       +'<th style="width:24px"></th>'
@@ -886,7 +907,7 @@ function renderDashboard(){
 
 
 
-  const gaugeChart='<div style="display:flex;justify-content:center;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:.6rem 1rem;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
+  const gaugeChart='<div onclick="togglePrivacy()" style="cursor:pointer;display:flex;justify-content:center;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:.6rem 1rem;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
     +'<div style="flex-shrink:0;display:flex;justify-content:center;align-items:center">'
     +'<svg width="210" height="165" viewBox="0 0 210 165" style="overflow:hidden">'
     // Outer subtle rings
@@ -947,7 +968,7 @@ function renderDashboard(){
     +'</div>'
     +'</div>';
 
-  const grandCard=gaugeChart;
+  const grandCard='<div id="sticky-grand" style="position:sticky;top:var(--sticky-top,0);z-index:10;margin-bottom:0">'+gaugeChart+'</div>';
   return grandCard+summaryCcyCards;
 }
 
@@ -988,6 +1009,7 @@ function setDateBar(label){
   if(_clockTimer)clearInterval(_clockTimer);
   _clockTimer=setInterval(liveClock,1000);
   fixLayout();
+  updateGlobalPlus();
 }
 function renderContent(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
@@ -1104,7 +1126,7 @@ function renderOverview(p){
       const pct2=hh.cost>0?tot2/hh.cost*100:null;
       const barW=(hh.mktVal/totalMV*100).toFixed(1);
       tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
-        +`<td style="white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${PAL[i%PAL.length]};margin-right:5px;vertical-align:middle;flex-shrink:0"></span><span style="font-weight:600">${hh.stock}</span><span style="font-size:10px;color:var(--t3);margin-left:4px">${barW}%</span></td>`
+        +`<td style="white-space:nowrap;position:sticky;left:0;background:var(--bg2);z-index:2"><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${PAL[i%PAL.length]};flex-shrink:0"></span><span style="font-weight:600">${hh.stock}</span></div><div style="font-size:9px;color:var(--t3);margin-top:1px;padding-left:13px">${barW}%</div></td>`
         +`<td class="r m">${(+hh.qty).toLocaleString()}</td>`
         +`<td class="r m" style="font-size:11px">${hh.avg>0?fc(hh.avg,ccy,3):'—'}</td>`
         +`<td class="r">${fc(hh.cost,ccy)}</td>`
@@ -1127,7 +1149,7 @@ function renderOverview(p){
     const fp2=sumC>0?sumT/sumC*100:null;
     const holdingsTable=rows.length
       ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'" style="border-top:2px solid '+ccyAccent(ccy)+'">'
-        +'<thead><tr><th>Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
+        +'<thead><tr><th style="position:sticky;left:0;background:var(--bg3);z-index:3">Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
         +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - platform fee)</span></th><th></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
         +''
@@ -1136,7 +1158,7 @@ function renderOverview(p){
 
     const miniId='mini-'+ccy+'-'+ci;
     const miniRow='<div id="'+miniId+'" style="display:none;margin-bottom:.875rem">'+miniCards+'</div>';
-    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+miniId+'\')" title="Tap to show/hide breakdown">'
+    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="togglePrivacy();toggleMini(\''+miniId+'\')" title="Tap to show/hide">'
       +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
@@ -1154,7 +1176,7 @@ function renderOverview(p){
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
-      +'<div style="text-align:right">'
+      +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
       +'<span class="pv-val" style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
       +'<span class="pv-hide" style="font-size:18px;font-weight:700">••••</span>'
       +'</div>'
@@ -1171,7 +1193,7 @@ function renderOverview(p){
       +holdingsTable
       +'</div>';
   }).join('');
-  return personCard+summaryCcyCards;
+  return'<div style="position:sticky;top:var(--sticky-top,0);z-index:10;background:var(--bg1);padding-bottom:2px">'+personCard+'</div>'+summaryCcyCards;
 }
 function drawOverviewCharts(p){
   const h=getHoldings(p,true);
@@ -1352,7 +1374,7 @@ function renderTx(p,filterYrCcy){
     html+='<div style="margin-bottom:.75rem;padding:.5rem .75rem;background:var(--bd);border-radius:var(--r);font-size:12px;color:var(--blue)">Dividends for '+filterYrCcy.ccy+' in '+filterYrCcy.yr+'</div>';
   } else {
     const typeFilterOpts=['','Buy','Sell','Dividend','Platform Fee','Closed Trades'].map(t=>'<option value="'+t+'">'+(t||'All types')+'</option>').join('');
-    html+='<div style="display:flex;gap:8px;margin-bottom:.75rem">'
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">'
       +'<input id="tx-search" placeholder="Search stock, note…" oninput="filterTxTable()" style="flex:1">'
       +'<select id="tx-type-filter" onchange="filterTxTable()" style="flex:1">'+typeFilterOpts+'</select>'
       +'<button class="pri sm" id="bat" onclick="omm(\'at\')" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>'
@@ -1923,7 +1945,7 @@ function doRestore(e){
 
 // ── Actions ────────────────────────────────────────────────────────────────────
 function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save();render();}
-function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderPfTabs();renderTabMenu();renderContent();}
+function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderPfTabs();renderTabMenu();renderContent();updateGlobalPlus();}
 function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>el.style.border=el.dataset.c===c?'3px solid #fff':'3px solid transparent');}
 function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;cmm();save();render();}
 function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);cmm();save();render();}
@@ -2125,14 +2147,14 @@ function renderOptions(){
   `:'';
   const empty=!trades.length?`<div class="card m" style="text-align:center;padding:2rem;font-size:12px">No option trades yet. Click <strong style="color:var(--blue)">+ Transaction</strong> to add one.</div>`:'';
 
-  return`<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;gap:8px">
-    <div>
-      <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
-      <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
-    </div>
-    <button class="pri sm" onclick="addOpt()" style="white-space:nowrap;display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%">+</button>
+  return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+    <input id="opt-all-search" placeholder="Search all trades…" oninput="filterOptsAll()" style="flex:1;box-sizing:border-box">
+    <button class="pri sm" onclick="addOpt()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>
+  </div>
+  <div style="margin-bottom:.75rem">
+    <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
+    <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
   </div>${summary}
-  <input id="opt-all-search" placeholder="Search all trades…" oninput="filterOptsAll()" style="width:100%;margin-bottom:.75rem;box-sizing:border-box">
   ${combinedTable}${empty}`;
 }
 function toggleOpenOpts(bar){
@@ -2844,12 +2866,10 @@ function renderDeposits(p){
   // Get all years across all currencies for year filter
   const allYears=[...new Set(deps.map(d=>d.date.slice(0,4)))].sort((a,b)=>b-a);
   const yearFilterHtml='<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">'
-    +'<span style="font-size:11px;color:var(--t2)">Year:</span>'
-    +'<select id="dep-yr-sel" onchange="filterDepYear(this.value)" style="font-size:12px;padding:4px 8px;width:auto">'
+    +'<select id="dep-yr-sel" onchange="filterDepYear(this.value)" style="flex:1;font-size:16px;padding:7px 10px">'
     +'<option value="all">All years</option>'
     +allYears.map(yr=>'<option value="'+yr+'">'+yr+'</option>').join('')
     +'</select>'
-    +'<div style="flex:1"></div>'
     +'<button class="pri sm" onclick="openDepositModal()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>'
     +'</div>';
 
@@ -3088,6 +3108,9 @@ function fixLayout(){
   tb.style.top=hdH+'px';
   if(db&&db.style.display!=='none')db.style.top=(hdH+tbH)+'px';
   mn.style.paddingTop=(hdH+tbH+dbH+16)+'px';
+  // Set sticky top for freeze-pane cards
+  document.documentElement.style.setProperty('--sticky-top',(hdH+tbH+dbH)+'px');
+  updateGlobalPlus();
 }
 fixLayout();
 window.addEventListener('resize',fixLayout);

@@ -149,10 +149,40 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 }
 #hd .logo{
   font-family:'Orbitron','Segoe UI',sans-serif;
-  font-size:13px;font-weight:900;letter-spacing:.5px;white-space:nowrap;
+  font-size:15px;font-weight:900;letter-spacing:.5px;white-space:nowrap;
   flex-shrink:0;display:flex;align-items:center;gap:3px;
 }
 
+@keyframes gemSpin{
+  0%{filter:drop-shadow(0 0 6px #00fff0) drop-shadow(0 0 12px #0088ff);transform:rotate(0deg) scale(1)}
+  25%{filter:drop-shadow(0 0 20px #00fff0) drop-shadow(0 0 40px #0088ff) drop-shadow(0 0 60px rgba(0,136,255,0.5));transform:rotate(90deg) scale(1.2)}
+  50%{filter:drop-shadow(0 0 10px #6600ff) drop-shadow(0 0 25px #0088ff);transform:rotate(180deg) scale(1)}
+  75%{filter:drop-shadow(0 0 20px #00fff0) drop-shadow(0 0 40px #0088ff) drop-shadow(0 0 60px rgba(0,136,255,0.5));transform:rotate(270deg) scale(1.2)}
+  100%{filter:drop-shadow(0 0 6px #00fff0) drop-shadow(0 0 12px #0088ff);transform:rotate(360deg) scale(1)}
+}
+@keyframes xPulse{
+  0%,100%{filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 8px rgba(255,140,0,0.5));transform:scale(1) skewX(0deg)}
+  25%{filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 30px rgba(255,180,0,1)) drop-shadow(0 0 60px rgba(255,80,0,0.9));transform:scale(1.15) skewX(-4deg)}
+  75%{filter:drop-shadow(0 3px 0 #000) drop-shadow(0 0 20px rgba(255,220,0,0.8));transform:scale(1.08) skewX(3deg)}
+}
+@keyframes portfolioShimmer{
+  0%{background-position:200% center}
+  100%{background-position:-200% center}
+}
+@keyframes logoFloat{
+  0%,100%{transform:translateY(0px)}
+  50%{transform:translateY(-4px)}
+}
+@keyframes scanLine{
+  0%{transform:translateX(-100%);opacity:0}
+  20%{opacity:1}
+  80%{opacity:1}
+  100%{transform:translateX(200%);opacity:0}
+}
+@keyframes iconPop{
+  0%,100%{transform:scale(1);opacity:0.3}
+  50%{transform:scale(1.8);opacity:1}
+}
 .pv-hide{display:none}
 body.privacy-on .pv-val{display:none!important}
 body.privacy-on .pv-hide{display:inline!important}
@@ -264,12 +294,20 @@ body.privacy-on #mn div[style*="color:#f87171"]{
 <input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
 <div id="hd">
   <div style="display:flex;align-items:stretch;width:100%;min-height:90px">
-    <!-- Left: Logo one line, big and special -->
-    <div style="display:flex;align-items:center;flex:1">
-      <div class="logo" style="flex-direction:row;align-items:center;gap:4px">
-        <span style="font-size:28px;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 6px #0088ff)">◈</span>
-        <span style="background:linear-gradient(180deg,#ffffff 0%,#e8e8e8 20%,#a0a0a0 45%,#d8d8d8 55%,#ffffff 70%,#888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1))">PORTFOLIO</span>
-        <span style="background:linear-gradient(180deg,#ffe566 0%,#ffaa00 30%,#ff6600 60%,#cc3300 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:30px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1)) drop-shadow(0 0 10px rgba(255,140,0,0.7))">X</span>
+    <!-- Left: Logo + tagline -->
+    <div style="display:flex;flex-direction:column;justify-content:center;flex:1">
+      <div class="logo" id="logo-row" style="flex-direction:row;align-items:center;gap:4px;animation:logoFloat 4s ease-in-out infinite;display:inline-flex">
+        <span id="logo-gem" style="font-size:28px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
+        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
+        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:30px;animation:xPulse 1.8s ease-in-out infinite">X</span>
+      </div>
+      <div id="scan-line-wrap" style="display:flex;align-items:center;gap:5px;margin-top:4px">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff,0 0 16px rgba(0,212,255,0.4);animation:iconPop 2s ease-in-out infinite;flex-shrink:0"></div>
+        <div style="position:relative;flex:1;height:2px;border-radius:2px;overflow:hidden;background:linear-gradient(90deg,rgba(0,212,255,0.05),rgba(0,212,255,0.15),rgba(76,175,130,0.15),rgba(0,212,255,0.05))">
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,212,255,1),rgba(76,175,130,0.8),transparent);animation:scanLine 1.8s ease-in-out infinite"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,200,0,0.6),transparent);animation:scanLine 1.8s ease-in-out infinite;animation-delay:0.9s"></div>
+        </div>
+        <div style="width:5px;height:5px;border-radius:50%;background:#4caf82;box-shadow:0 0 8px #4caf82,0 0 16px rgba(76,175,130,0.4);animation:iconPop 2s ease-in-out infinite;animation-delay:0.9s;flex-shrink:0"></div>
       </div>
     </div>
     <!-- Right: 3 buttons stacked, smaller -->
@@ -922,14 +960,15 @@ function renderDashboard(){
     // Main arc
     +(gaugeAngle>2?'<path d="M'+s.x+' '+s.y+' A'+r+' '+r+' 0 '+largeArc+' 1 '+e.x+' '+e.y+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="'+sw+'" stroke-linecap="round" filter="url(#gaugeGlow)"/>':'')
     // Bright dot tip with rings
-    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="16" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.2"/>':'')
-    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="11" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.35"/>':'')
+    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="16" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.2"><animate attributeName="r" values="14;20;14" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.2;0;0.2" dur="2s" repeatCount="indefinite"/></circle>':'')
+    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="11" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.35"><animate attributeName="r" values="9;13;9" dur="2s" repeatCount="indefinite"/></circle>':'')
     +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="7" fill="'+gaugeColor+'" filter="url(#dotGlow)"/>':'')
     // Defs
     +'<defs>'
     +'<linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
     +'<stop offset="0%" stop-color="'+gaugeColorStart+'"/>'
-    +'<stop offset="100%" stop-color="'+gaugeColorMid+'"/>'
+    +'<stop offset="50%" stop-color="'+gaugeColorMid+'"/>'
+    +'<stop offset="100%" stop-color="'+gaugeColorStart+'"/>'
     +'</linearGradient>'
     +'<filter id="gaugeGlow" x="-30%" y="-30%" width="160%" height="160%">'
     +'<feGaussianBlur stdDeviation="4" result="blur"/>'
@@ -968,6 +1007,27 @@ function renderDashboard(){
     +'</div>'
     +'</div>';
 
+  // Start live arc color animation after render
+  setTimeout(function(){
+    const grad=document.getElementById('gaugeGrad');
+    if(!grad)return;
+    const stops=grad.querySelectorAll('stop');
+    if(!stops.length)return;
+    const c1=gaugeLoss?[240,96,96]:[79,195,247];
+    const c2=gaugeLoss?[240,168,64]:[76,175,130];
+    let t=0;
+    (function animateGauge(){
+      t+=0.018;
+      const lerp=(a,b,x)=>Math.round(a+(b-a)*((Math.sin(x)+1)/2));
+      const r=lerp(c1[0],c2[0],t),g=lerp(c1[1],c2[1],t),bv=lerp(c1[2],c2[2],t);
+      const r2=lerp(c2[0],c1[0],t),g2=lerp(c2[1],c1[1],t),b2=lerp(c2[2],c1[2],t);
+      const col='rgb('+r+','+g+','+bv+')',col2='rgb('+r2+','+g2+','+b2+')';
+      if(stops[0])stops[0].setAttribute('stop-color',col);
+      if(stops[1])stops[1].setAttribute('stop-color',col2);
+      if(stops[2])stops[2].setAttribute('stop-color',col);
+      if(document.getElementById('gaugeGrad'))requestAnimationFrame(animateGauge);
+    })();
+  },200);
   const grandCard='<div id="sticky-grand" style="position:sticky;top:var(--sticky-top,0);z-index:10;margin-bottom:0">'+gaugeChart+'</div>';
   return grandCard+summaryCcyCards;
 }
@@ -3116,6 +3176,13 @@ fixLayout();
 window.addEventListener('resize',fixLayout);
 setTimeout(fixLayout,200);
 renderTabMenu();
+function matchScanLine(){
+  const logo=document.getElementById('logo-row');
+  const scan=document.getElementById('scan-line-wrap');
+  if(logo&&scan)scan.style.width=logo.offsetWidth+'px';
+}
+setTimeout(matchScanLine,300);
+window.addEventListener('resize',matchScanLine);
 </script>
 </body>
 </html>

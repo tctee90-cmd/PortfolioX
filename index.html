@@ -64,7 +64,7 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 /* ── Tables ─────────────────────────────────────────────────────── */
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl thead{background:var(--bg4)}
-.tbl th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:2px solid var(--b2);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.tbl th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:2px solid var(--b2);white-space:nowrap;letter-spacing:.3px}
 .tbl td{padding:8px 10px;border-bottom:1px solid var(--b1);vertical-align:middle;white-space:nowrap;text-align:center}
 .tbl th.r{text-align:center;white-space:nowrap}
 .tbl td.r{text-align:center;white-space:nowrap}
@@ -188,13 +188,27 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 .bnav-btn.active{color:#4fc3f7}
 .bnav-btn.active svg{filter:drop-shadow(0 0 6px rgba(79,195,247,0.8)) drop-shadow(0 0 12px rgba(79,195,247,0.4));transform:translateY(-2px) scale(1.1)}
 .bnav-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:linear-gradient(90deg,transparent,#4fc3f7,transparent);border-radius:2px;box-shadow:0 0 8px #4fc3f7}
+#settings-panel input, #settings-panel select{touch-action:manipulation}
+.settings-btn{padding:8px 6px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t1);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;text-align:center;min-height:34px}
 .bnav-btn:active svg{transform:scale(0.9)}
 #bottom-nav button[data-nav].active{color:var(--blue)}
 #mn{padding-bottom:80px!important}
+@keyframes borderPulse{
+  0%,100%{opacity:0.6}
+  50%{opacity:1}
+}
+@keyframes shimmerSweep{
+  0%{left:-100%}
+  60%,100%{left:150%}
+}
+@keyframes barShimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
 .pv-hide{display:none}
 body.privacy-on .pv-val{display:none!important}
 body.privacy-on .pv-hide{display:inline!important}
-/* Blur everything financial in the main content */
+/* Blur ALL financial numbers across all tabs */
 body.privacy-on .pv-num,
 body.privacy-on .kv,
 body.privacy-on .tbl tbody td,
@@ -206,29 +220,31 @@ body.privacy-on .rr:not(th):not(.kl):not(label){
   filter:blur(5px);
   user-select:none;
 }
-/* Blur all child spans/divs inside financial cards */
 body.privacy-on .kv *,
 body.privacy-on .tbl tbody td *,
 body.privacy-on .tbl tfoot td *,
-body.privacy-on .kc > div:last-child *,
-body.privacy-on [style*="font-weight:700"] span,
-body.privacy-on [style*="font-weight:800"] span,
-body.privacy-on [style*="font-weight:900"] span{
+body.privacy-on .kc > div:last-child *{
   color:transparent!important;
   text-shadow:0 0 7px rgba(180,180,180,0.6);
   filter:blur(5px);
   user-select:none;
 }
-/* Blur inline styled financial values — pnl pills, badges, value spans */
-body.privacy-on #mn span[style*="border-radius"],
-body.privacy-on #mn span[style*="color:#4ade80"],
-body.privacy-on #mn span[style*="color:#f87171"],
+/* Blur inline currency values, % badges, bold numbers throughout */
+body.privacy-on #mn span[style*="font-size:18px"],
+body.privacy-on #mn span[style*="font-size:22px"],
+body.privacy-on #mn div[style*="font-size:18px"],
+body.privacy-on #mn div[style*="font-size:22px"],
+body.privacy-on #mn span[style*="font-size:10px"][style*="color"],
+body.privacy-on #mn span[style*="font-weight:600"],
+body.privacy-on #mn span[style*="font-weight:700"],
+body.privacy-on #mn span[style*="font-weight:800"],
+body.privacy-on #mn div[style*="font-weight:600"],
+body.privacy-on #mn div[style*="font-weight:700"],
+body.privacy-on #mn div[style*="font-weight:800"],
 body.privacy-on #mn span[style*="color:var(--green)"],
 body.privacy-on #mn span[style*="color:var(--red)"],
-body.privacy-on #mn span[style*="color:#ffffff"],
-body.privacy-on #mn div[style*="color:#ffffff"],
-body.privacy-on #mn div[style*="color:#4ade80"],
-body.privacy-on #mn div[style*="color:#f87171"]{
+body.privacy-on #mn span[style*="color:#4caf"],
+body.privacy-on #mn span[style*="color:#f060"]{
   color:transparent!important;
   text-shadow:0 0 7px rgba(180,180,180,0.6);
   filter:blur(5px);
@@ -248,7 +264,7 @@ body.privacy-on #mn div[style*="color:#f87171"]{
 /* KPI grid — stat cards */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-bottom:.75rem}
 .kc{background:var(--bg3);border:1px solid var(--b1);border-top:2px solid var(--b2);border-radius:var(--r);padding:.6rem .75rem;overflow:hidden;min-width:0}
-.kl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kl{font-size:9px;color:var(--t2);letter-spacing:.3px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kv{font-size:12px;font-weight:700;letter-spacing:-.3px;word-break:break-all}
 
 /* Stock rows */
@@ -305,31 +321,26 @@ body.privacy-on #mn div[style*="color:#f87171"]{
     <!-- Left: Logo + tagline -->
     <div style="display:flex;flex-direction:column;justify-content:center;flex:1;padding-right:12px">
       <div class="logo" id="logo-row" style="flex-direction:row;align-items:center;gap:4px;animation:logoFloat 4s ease-in-out infinite;display:inline-flex">
-        <span id="logo-gem" style="font-size:32px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
-        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:26px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
-        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:34px;animation:xPulse 1.8s ease-in-out infinite">X</span>
+        <span id="logo-gem" style="font-size:22px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
+        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:16px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
+        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:22px;animation:xPulse 1.8s ease-in-out infinite">X</span>
       </div>
-      <div id="scan-line-wrap" style="display:inline-block;margin-top:4px">
-        <div id="scan-bar" style="position:relative;height:2px;border-radius:2px;overflow:hidden;background:rgba(255,180,0,0.1)">
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,210,0,1),rgba(255,140,0,0.8),transparent);animation:scanLine 1.8s ease-in-out infinite"></div>
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,100,0,0.6),transparent);animation:scanLine 1.8s ease-in-out infinite;animation-delay:0.9s"></div>
+      <div id="scan-line-wrap" style="display:inline-block;margin-top:3px">
+        <div id="scan-bar" style="position:relative;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,180,0,0.3),rgba(255,140,0,0.5),rgba(255,180,0,0.3),transparent)">
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,210,0,0.9),rgba(255,140,0,0.7),transparent);animation:scanLine 2.5s ease-in-out infinite;filter:blur(0.5px)"></div>
         </div>
       </div>
     </div>
-    <!-- Right: 3 buttons stacked, smaller -->
+    <!-- Right: hidden buttons only -->
     <div style="display:flex;flex-direction:column;justify-content:center;gap:5px;padding:8px 0">
       <!-- Hidden real buttons -->
       <button id="bbk" style="display:none"></button>
       <button id="brs" style="display:none"></button>
       <button id="bxl" style="display:none"></button>
-      <!-- Portfolio dropdown -->
+      <!-- Portfolio dropdown (triggered from bottom nav) -->
       <div style="position:relative" id="pf-menu-wrap">
-        <button onclick="togglePfMenu()" id="pf-menu-btn" class="hd-btn" style="height:28px;font-size:11px;width:120px">
-          <span id="pf-menu-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#e57373;flex-shrink:0"></span>
-          <span id="pf-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Portfolio</span>
-          <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
-        </button>
-        <div id="pf-menu-dropdown" style="display:none;position:fixed;top:88px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
+        <button id="pf-menu-btn" style="display:none"></button>
+        <div id="pf-menu-dropdown" style="display:none;position:fixed;bottom:70px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
             <div>
               <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Portfolios</div>
@@ -347,13 +358,11 @@ body.privacy-on #mn div[style*="color:#f87171"]{
           </div>
         </div>
       </div>
-      <!-- Refresh -->
-      <button class="hd-btn" id="bpx" style="height:28px;font-size:11px;width:120px">↻ Refresh</button>
     </div>
   </div>
 </div>
 <div id="tb-wrap" style="display:none"></div>
-<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem 1rem .4rem 2rem;font-size:12px;"></div>
+<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem .75rem;font-size:12px;"></div>
 <div id="mn">
   <div id="ct"></div>
 </div>
@@ -618,7 +627,7 @@ function triggerPieImg(pfId,ccy){const inp=document.createElement('input');inp.t
 function removePieImg(pfId,ccy){delete S.pieImages[pfId+'_'+ccy];save();renderContent();}
 
 // ── Portfolio tabs with drag-to-reorder ────────────────────────────────────────
-const TAB_LABELS={dashboard:'Dashboard',overview:'Overview',transactions:'Transactions',options:'Options',deposits:'Capital Flows',journey:'Journey'};
+const TAB_LABELS={dashboard:'Dashboard',overview:'Overview',transactions:'Transactions',options:'Transactions',deposits:'Cash Flow',journey:'Journey'};
 const TAB_ICONS={dashboard:'',overview:'',transactions:'',options:'',deposits:'',journey:''};
 function renderTabMenu(){
   const dd=document.getElementById('tab-menu-dropdown');
@@ -654,14 +663,14 @@ function closeTabMenuOutside(e){
   if(wrap&&!wrap.contains(e.target))closeTabMenu();
 }
 function globalPlusClick(){
-  if(TAB==='transactions')omm('at');
-  else if(TAB==='options')addOpt();
-  else if(TAB==='deposits')openDepositModal();
+  if(TAB==='transactions'&&window.txSubTab==='option')addOpt();
+  else if(TAB==='transactions')omm('at');
+  else if(TAB==='deposits'||(TAB==='journey'&&window.jSubTab==='cashflow'))openDepositModal();
 }
 function updateGlobalPlus(){
   const btn=document.getElementById('global-add-btn');
   if(!btn)return;
-  const show=['transactions','options','deposits'].includes(TAB);
+  const show=TAB==='transactions'||(TAB==='journey'&&window.jSubTab==='cashflow');
   btn.style.display=show?'block':'none';
   if(show){
     const hd=document.getElementById('hd');
@@ -691,14 +700,133 @@ function closePfMenuOutside(e){
   const wrap=document.getElementById('pf-menu-wrap');
   if(wrap&&!wrap.contains(e.target))closePfMenu();
 }
+function toggleSettings(){
+  const p=document.getElementById('settings-panel');
+  if(!p)return;
+  const open=p.style.display==='none';
+  if(!open){closeSettings();return;}
+  p.style.display='flex';
+  document.getElementById('settings-overlay').style.display='block';
+  renderSettingsChips();
+  renderSettingsPx();
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){
+  const p=document.getElementById('settings-panel');
+  if(p)p.style.display='none';
+  const ov=document.getElementById('settings-overlay');
+  if(ov)ov.style.display='none';
+  document.body.style.overflow='';
+  document.removeEventListener('click',closeSettingsOutside);
+}
+function closeSettingsOutside(e){}
+function renderSettingsPx(){
+  const seen={};const allStocks=[];
+  S.portfolios.forEach(function(pf0){
+    getHoldings(pf0,true).forEach(function(h){
+      if(h.qty>0&&!seen[h.stock]){
+        seen[h.stock]=true;
+        const mp=pf0.prices[h.stock]||{};
+        allStocks.push({stock:h.stock,price:mp.price||0,ccy:h.ccy,mktVal:h.mktVal||0,pfIds:[pf0.id]});
+      } else if(h.qty>0&&seen[h.stock]){
+        const ex=allStocks.find(function(x){return x.stock===h.stock;});
+        if(ex&&ex.pfIds.indexOf(pf0.id)<0)ex.pfIds.push(pf0.id);
+      }
+    });
+  });
+  const CCY_ORDER=['MYR','SGD','USD'];
+  const byCcy={};
+  allStocks.forEach(function(s){if(!byCcy[s.ccy])byCcy[s.ccy]=[];byCcy[s.ccy].push(s);});
+  Object.keys(byCcy).forEach(function(c){byCcy[c].sort(function(a,b){return b.mktVal-a.mktVal;});});
+  const ccyOrder=[...CCY_ORDER.filter(function(c){return byCcy[c];}),...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
+  const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+  let rowsHtml='';
+  if(allStocks.length){
+    // Single header row at top
+    rowsHtml='<div style="display:grid;grid-template-columns:1fr 60px 90px;gap:4px;padding:2px 2px;margin-bottom:3px;border-bottom:1px solid var(--b1)">'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px">Stock</span>'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px;text-align:center">CCY</span>'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px;text-align:center">Price</span>'
+      +'</div>';
+    ccyOrder.forEach(function(ccy){
+      const group=byCcy[ccy];const accent=CCY_ACCENT[ccy]||'#4fc3f7';
+      // CCY divider — compact single line
+      rowsHtml+='<div style="font-size:9px;font-weight:700;color:'+accent+';margin:4px 0 2px;padding-left:4px;border-left:2px solid '+accent+'">'+ccy+' — '+group.length+' stock'+(group.length!==1?'s':'')+'</div>';
+      group.forEach(function(item){
+        const k=item.stock.replace(/[^a-z0-9]/gi,'_');
+        const opts=CCYS.map(function(c){return'<option '+(item.ccy===c?'selected':'')+'>'+c+'</option>';}).join('');
+        const pfBadges=item.pfIds.map(function(pid){const pf0=S.portfolios.find(function(x){return x.id===pid;})||{};return'<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:'+(pf0.color||'#888')+'"></span>';}).join('');
+        rowsHtml+='<div style="display:grid;grid-template-columns:1fr 60px 90px;gap:4px;margin-bottom:5px;align-items:center">'
+          +'<div style="display:flex;align-items:center;gap:3px;min-width:0"><span style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+item.stock+'</span>'+pfBadges+'</div>'
+          +'<select id="spc-'+k+'" style="font-size:16px;text-align:center;text-align-last:center;transform:scale(0.75);transform-origin:center;margin:-4px -9px;width:80px;height:34px">'+opts+'</select>'
+          +'<input type="number" id="spp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:center;font-size:16px;transform:scale(0.75);transform-origin:center;margin:-4px -13px;padding:0 4px;width:120px;height:34px">'
+          +'</div>';
+      });
+    });
+  } else {rowsHtml='<p class="m" style="font-size:11px">No active holdings.</p>';}
+  const pxList=document.getElementById('settings-px-list');
+  if(pxList)pxList.innerHTML=rowsHtml;
+  const usedFxCcys=[...new Set(allStocks.map(function(s){return s.ccy;}))].filter(function(c){return c&&c!=='MYR';});
+  const fxList=document.getElementById('settings-fx-list');
+  if(fxList&&usedFxCcys.length){
+    fxList.innerHTML='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;padding-top:4px;border-top:1px solid var(--b1)">'
+      +'<span style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">FX→MYR</span>'
+      +usedFxCcys.map(function(ccy){
+        return'<div style="display:flex;align-items:center;gap:3px;flex:1;min-width:80px">'
+          +'<span style="font-size:10px;color:var(--t2);white-space:nowrap">'+ccy+'=</span>'
+          +'<input type="number" id="sfx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:center;font-size:16px;flex:1;transform:scale(0.75);transform-origin:center;margin:-4px -13px;width:100px">'
+          +'</div>';
+      }).join('')
+      +'<button onclick="spxFromSettings()" class="pri" style="height:28px;font-size:11px;padding:0 12px;flex-shrink:0;margin-left:auto">Save</button>'
+      +'</div>';
+  } else if(fxList){fxList.innerHTML='';}
+  // Store for save
+  window._settingsStocks=allStocks;window._settingsFxCcys=usedFxCcys;
+}
+function spxFromSettings(){
+  // Save prices
+  (window._settingsStocks||[]).forEach(function(item){
+    const k=item.stock.replace(/[^a-z0-9]/gi,'_');
+    const priceEl=document.getElementById('spp-'+k);
+    const ccyEl=document.getElementById('spc-'+k);
+    if(!priceEl)return;
+    const price=parseFloat(priceEl.value)||0;
+    const ccy=ccyEl?ccyEl.value:item.ccy;
+    S.portfolios.forEach(function(pf0){if(!pf0.prices)pf0.prices={};if(pf0.prices[item.stock]!==undefined||item.pfIds.includes(pf0.id)){pf0.prices[item.stock]={price,ccy};}});
+  });
+  // Save FX
+  (window._settingsFxCcys||[]).forEach(function(ccy){
+    const el=document.getElementById('sfx-'+ccy);
+    if(el)_fx[ccy]=parseFloat(el.value)||_fx[ccy];
+  });
+  S.fx=_fx;save();
+  const t=$('toast');t.textContent='Prices saved ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2000);
+  render();
+}
+function renderSettingsChips(){
+  const chips=document.getElementById('settings-pf-chips');
+  if(!chips)return;
+  const isDashboard=TAB==='dashboard';
+  const allRow='<button onclick="closeSettings();TAB=\'dashboard\';VIEW=null;journeyFilter=null;render()" style="width:100%;text-align:left;padding:6px 10px;background:'+(isDashboard?'rgba(59,130,246,0.15)':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isDashboard?'var(--blue)':'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px">'
+    +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue)"></span>'
+    +'<span style="font-weight:'+(isDashboard?700:400)+'">All Portfolios</span>'
+    +(isDashboard?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
+    +'</button>';
+  chips.innerHTML=allRow+S.portfolios.map(p=>{
+    const isActive=!isDashboard&&S.activeId===p.id;
+    return'<button onclick="closeSettings();swPf(\''+p.id+'\')" style="width:100%;text-align:left;padding:6px 10px;background:'+(isActive?p.color+'22':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isActive?p.color:'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px">'
+      +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+'"></span>'
+      +'<span style="font-weight:'+(isActive?700:400)+'">'+p.name+'</span>'
+      +(isActive?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
+      +'</button>';
+  }).join('');
+}
+function togglePfMenu(){toggleSettings();}
+function closePfMenu(){closeSettings();}
 function renderPfTabs(){
   const activePf=S.portfolios.find(p=>p.id===S.activeId)||S.portfolios[0];
   const isDashboard=TAB==='dashboard';
-  // Update dropdown button label
-  const dot=document.getElementById('pf-menu-dot');
-  const lbl=document.getElementById('pf-menu-label');
-  if(dot){dot.style.background=isDashboard?'var(--blue)':activePf?activePf.color:'#888';}
-  if(lbl){lbl.textContent=isDashboard?'All Portfolios':activePf?activePf.name:'Portfolio';}
+  renderSettingsChips();
   // Populate chips in dropdown
   const chips=document.getElementById('pf-menu-chips');
   if(chips){
@@ -817,40 +945,40 @@ function renderDashboard(){
       // Row 1: Total Invested | Total Holdings Value
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Invested</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.co,ccy)+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Holdings Value</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.mv,ccy)+'</div>'
       +'</div>'
       +'</div>'
       // Row 2: Unrealized P&L | Realized P&L
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Unrealized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.u)+'">'+sgn(g.u,ccy)+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Realized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
       +'</div>'
       +'</div>'
       // Row 3: Dividends | Platform Fees
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Platform Fees</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Platform Fees</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+((g.pf||0)>0?'var(--red)':'var(--t2)')+'">'+((g.pf||0)>0?'-'+fc(g.pf,ccy):'—')+'</div>'
       +'</div>'
       +'</div>'
       // Row 4: Cash Balance
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
       +'</div>'
       +'<div></div>'
@@ -864,14 +992,14 @@ function renderDashboard(){
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
-      +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
+      +'<div style="text-align:right">'
       +'<span class="pv-val" style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
       +'<span class="pv-hide" style="font-size:18px;font-weight:700;color:var(--t1)">••••</span>'
       +'</div>'
       +'</div>'
       // Total P&L card — clickable toggle
       +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:.875rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+dashMiniId+'\')" title="Tap to show/hide breakdown">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(Unreal + Real + Div - Fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -886,7 +1014,7 @@ function renderDashboard(){
       +'<thead><tr>'
       +'<th style="position:sticky;left:0;background:var(--bg3);z-index:3">Portfolio</th>'
       +'<th class="r">Holdings</th>'
-      +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - fee)</span></th>'
+      +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(Unreal + Real + Div)</span></th>'
       +'<th style="width:24px"></th>'
       +'</tr></thead>'
       +'<tbody>'+pfRows+'</tbody>'
@@ -918,114 +1046,45 @@ function renderDashboard(){
   const gaugeColorStart=gaugeLoss?'#ff9a3c':'#00b4d8';
   const gaugeColorMid=gaugeLoss?'#ff4d6d':'#00e676';
 
-  // SVG arc helper
-  function polarToXY(cx,cy,r,angleDeg){
-    const rad=(angleDeg-225)*Math.PI/180;
-    return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};
-  }
-  const cx=105,cy=95,r=82,sw=20;
-  const startA=0,endA=gaugeAngle;
-  const s=polarToXY(cx,cy,r,startA);
-  const e=polarToXY(cx,cy,r,endA);
-  const largeArc=gaugeAngle>180?1:0;
-  const trackS=polarToXY(cx,cy,r,0);
-  const trackE=polarToXY(cx,cy,r,270);
+  const pnlColor=grandMYRPnl>=0?'#00e676':'#ff4d6d';
+  const pnlBar=grandMYRInvested>0?Math.min(Math.abs(grandMYR/grandMYRInvested)*100,100):0;
+  const barColor=grandMYRPnl>=0?'#00e676':'#ff4d6d';
+  const accentColor=grandMYRPnl>=0?'rgba(0,230,118,':'rgba(255,77,109,';
 
-  // Dot at end of arc
-  const dot=polarToXY(cx,cy,r,endA);
-
-  const gaugeBg='linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%)';
-  const gaugeBorder='rgba(0,212,255,0.12)';
-  const gaugeBorderTop='rgba(0,212,255,0.25)';
-  const gaugeGlowColor='rgba(0,212,255,0.04)';
-  const gaugeRadialColor=gaugeLoss?'255,77,109':'0,230,118';
-
-
-
-  const gaugeChart='<div onclick="togglePrivacy()" style="cursor:pointer;display:flex;justify-content:center;align-items:center;gap:16px;background:linear-gradient(135deg,#060d1a 0%,#0a1628 60%,#060d1a 100%);border:1px solid rgba(0,212,255,0.12);border-top:1px solid rgba(0,212,255,0.25);border-radius:var(--r);padding:.6rem 1rem;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)">'
-    +'<div style="flex-shrink:0;display:flex;justify-content:center;align-items:center">'
-    +'<svg width="210" height="165" viewBox="0 0 210 165" style="overflow:hidden">'
-    // Outer subtle rings
-    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+8)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.08"/>'
-    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+sw/2+16)+'" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.04"/>'
-    // Tick marks
-    +Array.from({length:9},(_,i)=>{const a=i*(270/8);const p1=polarToXY(cx,cy,r+sw/2+4,a);const p2=polarToXY(cx,cy,r+sw/2+7,a);return'<line x1="'+p1.x+'" y1="'+p1.y+'" x2="'+p2.x+'" y2="'+p2.y+'" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.25"/>';}).join('')
-    // Track
-    +'<path d="M'+trackS.x+' '+trackS.y+' A'+r+' '+r+' 0 1 1 '+trackE.x+' '+trackE.y+'" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="'+sw+'" stroke-linecap="round"/>'
-    // Outer glow arc (wider, blurred)
-    +(gaugeAngle>2?'<path d="M'+s.x+' '+s.y+' A'+r+' '+r+' 0 '+largeArc+' 1 '+e.x+' '+e.y+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="'+(sw+10)+'" stroke-linecap="round" opacity="0.25" filter="url(#outerGlow)"/>':'')
-    // Main arc
-    +(gaugeAngle>2?'<path d="M'+s.x+' '+s.y+' A'+r+' '+r+' 0 '+largeArc+' 1 '+e.x+' '+e.y+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="'+sw+'" stroke-linecap="round" filter="url(#gaugeGlow)"/>':'')
-    // Bright dot tip with rings
-    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="16" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.2"><animate attributeName="r" values="14;20;14" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.2;0;0.2" dur="2s" repeatCount="indefinite"/></circle>':'')
-    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="11" fill="none" stroke="'+gaugeColor+'" stroke-width="1" opacity="0.35"><animate attributeName="r" values="9;13;9" dur="2s" repeatCount="indefinite"/></circle>':'')
-    +(gaugeAngle>2?'<circle cx="'+dot.x+'" cy="'+dot.y+'" r="7" fill="'+gaugeColor+'" filter="url(#dotGlow)"/>':'')
-    // Defs
-    +'<defs>'
-    +'<linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
-    +'<stop offset="0%" stop-color="'+gaugeColorStart+'"/>'
-    +'<stop offset="50%" stop-color="'+gaugeColorMid+'"/>'
-    +'<stop offset="100%" stop-color="'+gaugeColorStart+'"/>'
-    +'</linearGradient>'
-    +'<filter id="gaugeGlow" x="-30%" y="-30%" width="160%" height="160%">'
-    +'<feGaussianBlur stdDeviation="4" result="blur"/>'
-    +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
-    +'</filter>'
-    +'<filter id="outerGlow" x="-50%" y="-50%" width="200%" height="200%">'
-    +'<feGaussianBlur stdDeviation="8"/>'
-    +'</filter>'
-    +'<filter id="dotGlow" x="-200%" y="-200%" width="500%" height="500%">'
-    +'<feGaussianBlur stdDeviation="5" result="blur"/>'
-    +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
-    +'</filter>'
-    +'</defs>'
-    // Centre — label
-    +'<text x="'+cx+'" y="'+(cy-22)+'" text-anchor="middle" fill="rgba(0,212,255,0.5)" font-size="7.5" font-family="inherit" letter-spacing="2">PORTFOLIO VALUE</text>'
-    // Value
-    +'<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="900" font-family="inherit" class="pv-val">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</text>'
-    +'<text x="'+cx+'" y="'+(cy+2)+'" text-anchor="middle" fill="#ffffff" font-size="17" font-weight="900" font-family="inherit" class="pv-hide">••••••</text>'
-    // MYR equiv
-    +'<text x="'+cx+'" y="'+(cy+17)+'" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="7.5" font-family="inherit" letter-spacing="1">MYR EQUIVALENT</text>'
-    // Portfolio count
-    +'<text x="'+cx+'" y="'+(cy+36)+'" text-anchor="middle" fill="rgba(0,212,255,0.8)" font-size="9" font-family="inherit" letter-spacing="1">'+S.portfolios.length+' PORTFOLIO'+(S.portfolios.length!==1?'S':'')+'</text>'
-    +'</svg>'
+  const gaugeChart='<div onclick="togglePrivacy()" id="grand-card" style="cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,#060d1a 0%,#0b1628 50%,#060d1a 100%);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 8px 40px rgba(0,0,0,0.6)">'
+    // Animated border via pseudo-like overlay
+    +'<div style="position:absolute;inset:0;border-radius:var(--r);padding:1.5px;background:linear-gradient(135deg,rgba(0,212,255,0.6),'+accentColor+'0.4),rgba(0,212,255,0.1),rgba(0,212,255,0.6));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;animation:borderPulse 3s ease-in-out infinite"></div>'
+    // Top shimmer sweep
+    +'<div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);animation:shimmerSweep 4s ease-in-out infinite;pointer-events:none"></div>'
+    // Content
+    +'<div style="position:relative;z-index:1">'
+    // Row 1: label + count
+    +'<div style="font-size:9px;color:rgba(0,212,255,0.7);letter-spacing:.8px;font-weight:600;margin-bottom:3px">Total Portfolio Value <span style="color:rgba(0,212,255,0.4)">('+S.portfolios.length+')</span></div>'
+    // Row 2: big value
+    +'<div class="pv-val" style="font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.1;text-shadow:0 0 20px rgba(0,212,255,0.2)">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
+    +'<div class="pv-hide" style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px;line-height:1.1">••••••</div>'
+    // Row 3: MYR label
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:1.5px;margin-bottom:6px;text-align:right">MYR EQUIVALENT</div>'
+    // Row 4: animated progress bar
+    +'<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:8px;overflow:hidden">'
+    +'<div style="height:100%;width:'+pnlBar+'%;background:linear-gradient(90deg,'+barColor+',rgba(255,255,255,0.6),'+barColor+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+barColor+';animation:barShimmer 2s linear infinite"></div>'
     +'</div>'
-    +'<div style="flex-shrink:0;display:flex;flex-direction:column;gap:10px;min-width:130px">'
+    // Row 5: Invested + P&L
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
     +'<div>'
-    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Total Invested</div>'
-    +'<div class="pv-val pv-num" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
-    +'<div class="pv-hide" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
+    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);letter-spacing:.3px;margin-bottom:2px">Total Invested</div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
+    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)">••••••</div>'
     +'</div>'
     +'<div>'
-    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Total P&L / %</div>'
-    +'<div class="pv-val pv-num" style="font-size:12px;font-weight:700;color:'+(grandMYRPnl>=0?'#00e676':'#ff4d6d')+'">'+(grandMYRPnl>=0?'+':'')+'RM '+Math.abs(grandMYRPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(grandPnlPct!==null?' ('+(grandPnlPct>=0?'+':'')+grandPnlPct.toFixed(1)+'%)':'')+'</div>'
-    +'<div class="pv-hide" style="font-size:12px;font-weight:700;color:'+(grandMYRPnl>=0?'#00e676':'#ff4d6d')+'">•••••• (•••%)</div>'
+    +'<div style="font-size:8px;color:'+pnlColor+';opacity:.8;letter-spacing:.3px;margin-bottom:2px">Total P&L / %</div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+pnlColor+';text-shadow:0 0 10px '+pnlColor+'40">'+(grandMYRPnl>=0?'+':'')+'RM '+Math.abs(grandMYRPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(grandPnlPct!==null?' ('+(grandPnlPct>=0?'+':'')+grandPnlPct.toFixed(1)+'%)':'')+'</div>'
+    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+pnlColor+'">•••••• (•••%)</div>'
+    +'</div>'
     +'</div>'
     +'</div>'
     +'</div>';
-
-  // Start live arc color animation after render
-  setTimeout(function(){
-    const grad=document.getElementById('gaugeGrad');
-    if(!grad)return;
-    const stops=grad.querySelectorAll('stop');
-    if(!stops.length)return;
-    const c1=gaugeLoss?[240,96,96]:[79,195,247];
-    const c2=gaugeLoss?[240,168,64]:[76,175,130];
-    let t=0;
-    (function animateGauge(){
-      t+=0.018;
-      const lerp=(a,b,x)=>Math.round(a+(b-a)*((Math.sin(x)+1)/2));
-      const r=lerp(c1[0],c2[0],t),g=lerp(c1[1],c2[1],t),bv=lerp(c1[2],c2[2],t);
-      const r2=lerp(c2[0],c1[0],t),g2=lerp(c2[1],c1[1],t),b2=lerp(c2[2],c1[2],t);
-      const col='rgb('+r+','+g+','+bv+')',col2='rgb('+r2+','+g2+','+b2+')';
-      if(stops[0])stops[0].setAttribute('stop-color',col);
-      if(stops[1])stops[1].setAttribute('stop-color',col2);
-      if(stops[2])stops[2].setAttribute('stop-color',col);
-      if(document.getElementById('gaugeGrad'))requestAnimationFrame(animateGauge);
-    })();
-  },200);
-  const grandCard='<div id="sticky-grand" style="position:sticky;top:var(--sticky-top,0);z-index:10;margin-bottom:0">'+gaugeChart+'</div>';
+   const grandCard='<div id="sticky-grand" onclick="togglePrivacy()" style="position:sticky;top:var(--sticky-top,0);z-index:10;margin-bottom:0;cursor:pointer">'+gaugeChart+'</div>';
   return grandCard+summaryCcyCards;
 }
 
@@ -1059,9 +1118,9 @@ function setDateBar(label){
   db.style.gap='8px';
   db.style.color='#eceef4';
   db.innerHTML=
-    '<span style="color:#7e8ea8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+label+'</span>'
+    '<span style="color:#7e8ea8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px">'+label+'</span>'
     +'<span style="font-weight:600;text-align:center;white-space:nowrap;color:#eceef4">'+todayStr()+'</span>'
-    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap;padding-right:1rem" id="live-clock"></span>';
+    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap" id="live-clock"></span>';
   liveClock();
   if(_clockTimer)clearInterval(_clockTimer);
   _clockTimer=setInterval(liveClock,1000);
@@ -1076,12 +1135,12 @@ function renderContent(){
     $('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);fixLayout();return;
   }
   if(TAB==='dashboard'){setDateBar('Dashboard');$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
-  else if(TAB==='overview'){setDateBar(pf().name+' — Overview');$('ct').innerHTML=renderOverview(p);}
-  else if(TAB==='holdings'){setDateBar(pf().name+' — Holdings');$('ct').innerHTML=renderHoldings(p);}
-  else if(TAB==='transactions'){setDateBar(pf().name+' — Transactions');$('ct').innerHTML=renderTx(p);}
-  else if(TAB==='options'){setDateBar(pf().name+' — Options');$('ct').innerHTML=renderOptions();}
-  else if(TAB==='journey'){setDateBar(pf().name+' — Journey');$('ct').innerHTML=renderJourney(p);}
-  else if(TAB==='deposits'){setDateBar(pf().name+' — Capital Flows');$('ct').innerHTML=renderDeposits(p);}
+  else if(TAB==='overview'){setDateBar((p?p.name:'')+'  — Overview');$('ct').innerHTML=renderOverview(p);}
+  else if(TAB==='holdings'){setDateBar((p?p.name:'')+'  — Holdings');$('ct').innerHTML=renderHoldings(p);}
+  else if(TAB==='transactions'){setDateBar((p?p.name:'')+'  — Transactions');$('ct').innerHTML=renderTransactions(p);}
+  else if(TAB==='options'){window.txSubTab='option';TAB='transactions';setDateBar((p?p.name:'')+'  — Transactions');$('ct').innerHTML=renderTransactions(p);}
+  else if(TAB==='journey'){setDateBar((p?p.name:'')+'  — Journey');$('ct').innerHTML=renderJourney(p);}
+  else if(TAB==='deposits'){window.jSubTab='cashflow';TAB='journey';setDateBar((p?p.name:'')+'  — Cash Flow');$('ct').innerHTML=renderJourney(p);}
 }
 
 // ── Overview ────────────────────────────────────────────────────────────────────
@@ -1105,10 +1164,10 @@ function renderOverview(p){
   const personCard='<div style="background:linear-gradient(135deg,#1a1200 0%,#2a1f00 40%,#1a1200 100%);border:1px solid rgba(180,140,0,0.4);border-top:2px solid rgba(200,160,0,0.7);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 4px 16px rgba(150,100,0,0.2),inset 0 1px 0 rgba(255,220,100,0.07)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
     +'<div>'
-    +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#ffffff">'+p.name+' Portfolio Value</div>'
+    +'<div style="font-size:10px;font-weight:600;letter-spacing:.5px;color:#ffffff">'+p.name+' Portfolio Value</div>'
     +'<div style="font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px">(Cash + Holdings only)</div>'
     +'</div>'
-    +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
+    +'<div style="text-align:right">'
     +'<div class="pv-val" style="font-size:22px;font-weight:800;white-space:nowrap;color:#ffffff;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.8))">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
     +'<div class="pv-hide" style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:3px">••••••</div>'
     +'<div style="font-size:9px;color:rgba(255,255,255,0.55)">MYR equivalent</div>'
@@ -1135,40 +1194,40 @@ function renderOverview(p){
       // Row 1: Total Invested | Total Holdings Value
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Invested</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Invested</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(co,ccy)+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Total Holdings Value</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Holdings Value</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(sumMkt,ccy)+'</div>'
       +'</div>'
       +'</div>'
       // Row 2: Unrealized P&L | Realized P&L
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Unrealized P&L</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Unrealized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(u)+'">'+sgn(u,ccy)+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Realized P&L</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Realized P&L</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(r)+'">'+sgn(r,ccy)+'</div>'
       +'</div>'
       +'</div>'
       // Row 3: Dividends | Platform Fees
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Dividends</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Dividends</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(d>0?'+'+fc(d,ccy):'—')+'</div>'
       +'</div>'
       +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Platform Fees</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Platform Fees</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+(pf>0?'var(--red)':'var(--t2)')+'">'+(pf>0?'-'+fc(pf,ccy):'—')+'</div>'
       +'</div>'
       +'</div>'
       // Row 4: Cash Balance left side only
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.875rem">'
       +'<div style="padding:8px 10px;'+ccyMiniCardStyleDashed(ccy)+';border-radius:var(--r);cursor:pointer" onclick="openCashModal(\''+p.id+'\',\''+ccy+'\')" title="Click to edit cash balance">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px">Cash Balance</div>'
+      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Cash Balance</div>'
       +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashBal>0?fc(cashBal,ccy):'+ Add')+'</div>'
       +'</div>'
       +'<div></div>'
@@ -1207,7 +1266,7 @@ function renderOverview(p){
     const holdingsTable=rows.length
       ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'" style="border-top:2px solid '+ccyAccent(ccy)+'">'
         +'<thead><tr><th style="position:sticky;left:0;background:var(--bg3);z-index:3">Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
-        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(unreal + real + div - platform fee)</span></th><th></th>'
+        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(Unreal + Real + Div)</span></th><th></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
         +''
         +'</table></div>'
@@ -1215,8 +1274,8 @@ function renderOverview(p){
 
     const miniId='mini-'+ccy+'-'+ci;
     const miniRow='<div id="'+miniId+'" style="display:none;margin-bottom:.875rem">'+miniCards+'</div>';
-    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="togglePrivacy();toggleMini(\''+miniId+'\')" title="Tap to show/hide">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(unreal + real + div - fee)</span></div>'
+    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+miniId+'\')" title="Tap to show/hide breakdown">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(Unreal + Real + Div - Fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
       +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
@@ -1233,7 +1292,7 @@ function renderOverview(p){
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
-      +'<div style="text-align:right;cursor:pointer" onclick="togglePrivacy()">'
+      +'<div style="text-align:right">'
       +'<span class="pv-val" style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
       +'<span class="pv-hide" style="font-size:18px;font-weight:700">••••</span>'
       +'</div>'
@@ -1250,7 +1309,7 @@ function renderOverview(p){
       +holdingsTable
       +'</div>';
   }).join('');
-  return'<div style="position:sticky;top:var(--sticky-top,0);z-index:10;background:var(--bg1);padding-bottom:2px">'+personCard+'</div>'+summaryCcyCards;
+  return'<div id="sticky-person" onclick="togglePrivacy()" style="position:sticky;top:var(--sticky-top,0);z-index:10;background:var(--bg1);padding-bottom:2px;cursor:pointer">'+personCard+'</div>'+summaryCcyCards;
 }
 function drawOverviewCharts(p){
   const h=getHoldings(p,true);
@@ -1420,6 +1479,19 @@ function renderStockDetail(p,stock,ccy){
 }
 
 // ── Transactions tab with search ─────────────────────────────────────────────────
+function renderTransactions(p){
+  if(window.txSubTab===undefined)window.txSubTab='trade';
+  function tabBtn(key,label){
+    const on=window.txSubTab===key;
+    return`<button onclick="window.txSubTab='${key}';renderContent()" style="padding:6px 18px;font-size:12px;font-weight:${on?700:500};border-radius:20px;border:1.5px solid ${on?'var(--blue)':'var(--b2)'};color:${on?'var(--blue)':'var(--t2)'};background:${on?'var(--bd)':'transparent'};cursor:pointer;transition:all .15s">${label}</button>`;
+  }
+  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem">${tabBtn('trade','Trade')}${tabBtn('option','Option')}</div>`;
+  if(window.txSubTab==='option'){
+    return`<div>${subTabs}${renderOptions()}</div>`;
+  }
+  return`<div>${subTabs}${renderTx(p)}</div>`;
+}
+
 function renderTx(p,filterYrCcy){
   let txs=[...p.transactions].filter(t=>['Buy','Sell','Dividend','Platform Fee'].includes(t.type));
   if(filterYrCcy){txs=txs.filter(t=>t.type==='Dividend'&&t.date.slice(0,4)===String(filterYrCcy.yr)&&t.ccy===filterYrCcy.ccy);}
@@ -1441,7 +1513,7 @@ function renderTx(p,filterYrCcy){
   }
   // Build closed trades view (hidden by default)
   const _closedAll=getHoldings(p,false).filter(h=>(h.realized!==0||h.divs!==0));
-  // Deduct platform fees from closed summary
+  // Deduct fees from closed summary
   const _pfByCcy={};
   p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{_pfByCcy[t.ccy]=(_pfByCcy[t.ccy]||0)+(+t.amount||0);});
   const _closedByCcy={};
@@ -1457,10 +1529,10 @@ function renderTx(p,filterYrCcy){
   const _closedSummary=Object.entries(_closedByCcy).map(([ccy,v])=>
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem">'
     +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'
-    +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">P&L Realized ('+ccy+')</div>'
+    +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">P&L Realized ('+ccy+')</div>'
     +'<div style="font-size:14px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,ccy)+'</div></div>'
     +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'
-    +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Dividends ('+ccy+')</div>'
+    +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">Dividends ('+ccy+')</div>'
     +'<div style="font-size:14px;font-weight:700;color:'+(v.d>0?'var(--green)':'var(--t3)')+'">'+( v.d>0?fc(v.d,ccy):'—')+'</div></div>'
     +'</div>'
   ).join('');
@@ -1491,7 +1563,7 @@ function renderTx(p,filterYrCcy){
   html+='<div id="tx-table-wrap">'
     +'<div onclick="toggleTxRows(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
     +'<span class="tx-toggle-arrow">▶</span>'
-    +'<span>Transactions: '+txs.length+'</span>'
+    +'<span>Trades: '+txs.length+'</span>'
     +''
     +'</div>'
     +'<div class="tx-rows-body" style="display:none;overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
@@ -1580,13 +1652,13 @@ function renderClosed(p){
   // Overall closed P&L by CCY
   const _clByCcy={};
   all.forEach(h=>{if(!_clByCcy[h.ccy])_clByCcy[h.ccy]={r:0,d:0};_clByCcy[h.ccy].r+=h.realized;_clByCcy[h.ccy].d+=h.divs;});
-  // Deduct platform fees from closed trades summary
+  // Deduct fees from closed trades summary
   p.transactions.filter(t=>t.type==='Platform Fee').forEach(t=>{if(_clByCcy[t.ccy])_clByCcy[t.ccy].r=Math.round((_clByCcy[t.ccy].r-(+t.amount||0))*100)/100;});
   const _clCards=Object.entries(_clByCcy).map(([c,v])=>{
     return '<div style="display:flex;gap:12px;padding:6px 12px;background:#1a2744;border-radius:var(--r);border:1px solid rgba(255,255,255,.15)">'
-      +'<div><div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">'+c+' Realized</div>'
+      +'<div><div style="font-size:10px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">'+c+' Realized</div>'
       +'<div style="font-size:13px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,c)+'</div></div>'
-      +(v.d>0?'<div><div style="font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Dividends</div>'
+      +(v.d>0?'<div><div style="font-size:10px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">Dividends</div>'
       +'<div style="font-size:13px;font-weight:700;color:var(--green)">'+fc(v.d,c)+'</div></div>':'')
       +'</div>';
   }).join('');
@@ -1626,7 +1698,14 @@ function renderJourney(p){
     const on=window.jSubTab===key;
     return`<button onclick="window.jSubTab='${key}';renderContent()" style="padding:6px 18px;font-size:12px;font-weight:${on?700:500};border-radius:20px;border:1.5px solid ${on?'var(--blue)':'var(--b2)'};color:${on?'var(--blue)':'var(--t2)'};background:${on?'var(--bd)':'transparent'};cursor:pointer;transition:all .15s">${label}</button>`;
   }
-  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem">${tabBtn('dividend','Dividend')}${tabBtn('pnl','PnL')}</div>`;
+  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem">${tabBtn('dividend','Dividend')}${tabBtn('pnl','PnL')}${tabBtn('cashflow','Cash Flow')}</div>`;
+
+  if(window.jSubTab==='cashflow'){
+    const depContent=p?renderDeposits(p):'<p class="m" style="padding:1rem;font-size:12px">Select a portfolio to view cash flows.</p>';
+    return`<div class="card"><div class="stl">Cash Flow</div>
+    ${subTabs}${depContent}
+    </div>`;
+  }
 
   const sections=ccys.map(ccy=>{
     const rows=data[ccy];if(!rows.length)return'';
@@ -1643,7 +1722,7 @@ function renderJourney(p){
       return`<div style="margin-bottom:2rem">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:.6rem;flex-wrap:wrap">
           ${ccyTag(ccy)}
-          <span style="font-size:12px;color:var(--green);font-weight:600">Total: ${fc(totalDiv,ccy)}</span>
+          <span class="pv-num" style="font-size:12px;color:var(--green);font-weight:600">Total: ${fc(totalDiv,ccy)}</span>
         </div>
         <p style="font-size:11px;color:var(--t2);margin-bottom:.5rem">Click a year to see full dividend transactions for that year.</p>
         <div style="overflow-x:auto"><table class="tbl" style="max-width:320px">
@@ -1653,7 +1732,7 @@ function renderJourney(p){
         </table></div>
       </div>`;
     } else {
-      // PnL tab — realYr is gross realized, pfYr is platform fees for that year
+      // PnL tab — realYr is gross realized, pfYr is fees for that year
       const totalGross=Math.round(rows.reduce((s,r)=>s+r.realYr,0)*100)/100;
       const totalPf=Math.round(rows.reduce((s,r)=>s+(r.pfYr||0),0)*100)/100;
       const totalNet=Math.round((totalGross-totalPf)*100)/100;
@@ -1691,7 +1770,7 @@ function renderJourney(p){
     }
   }).join('');
 
-  return`<div class="card"><div class="stl">${window.jSubTab==='dividend'?'Dividend history':'PnL history'}</div>
+  return`<div class="card"><div class="stl">${window.jSubTab==='dividend'?'Dividend History':'PnL History'}</div>
   ${subTabs}${sections}
   </div>`;
 }
@@ -1909,9 +1988,9 @@ function renderModal(){
           +'</div>';
         // Column headers
         rowsHtml+='<div style="display:grid;grid-template-columns:1fr 70px 100px;gap:6px;padding:0 2px;margin-bottom:3px">'
-          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px">Stock</span>'
-          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;text-align:right">CCY</span>'
-          +'<span style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;text-align:right">Price</span>'
+          +'<span style="font-size:10px;color:var(--t3);letter-spacing:.3px">Stock</span>'
+          +'<span style="font-size:10px;color:var(--t3);letter-spacing:.3px;text-align:center">CCY</span>'
+          +'<span style="font-size:10px;color:var(--t3);letter-spacing:.3px;text-align:center">Price</span>'
           +'</div>';
         group.forEach(function(item){
           const k=item.stock.replace(/[^a-z0-9]/gi,'_');
@@ -1925,8 +2004,8 @@ function renderModal(){
             +'<span style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+item.stock+'</span>'
             +pfBadges
             +'</div>'
-            +'<select id="pc-'+k+'" style="padding:4px;font-size:12px">'+opts+'</select>'
-            +'<input type="number" id="pp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:right;font-size:13px">'
+            +'<select id="pc-'+k+'" style="padding:4px;font-size:16px;text-align:center;text-align-last:center">'+opts+'</select>'
+            +'<input type="number" id="pp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:center;font-size:16px">'
             +'</div>';
         });
       });
@@ -1937,23 +2016,19 @@ function renderModal(){
     const usedFxCcys=[...new Set(allStocks.map(function(s){return s.ccy;}))].filter(function(c){return c&&c!=='MYR';});
 
     h='<h3>Update Market Prices</h3>'
-      +'<p style="font-size:11px;color:var(--t2);margin-bottom:1rem">Sorted by holding value. Only active holdings shown.</p>'
       +'<div id="px-list" style="margin-bottom:1rem">'+rowsHtml+'</div>'
       +(usedFxCcys.length?
         '<div style="border-top:1px solid var(--b1);padding-top:.875rem;margin-bottom:1rem">'
-        +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.5rem">FX Rates to MYR (for grand total)</div>'
-        +'<div style="display:grid;grid-template-columns:repeat('+Math.min(usedFxCcys.length,3)+',1fr);gap:8px">'
+        +'<div style="font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.5rem">FX Rates to MYR</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
         +usedFxCcys.map(function(ccy){
-          return '<div>'
-            +'<label style="font-size:11px;color:var(--t2);display:block;margin-bottom:3px">1 '+ccy+' =</label>'
-            +'<div style="display:flex;align-items:center;gap:4px">'
-            +'<input type="number" id="fx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:right;font-size:13px">'
+          return '<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">'
+            +'<span style="font-size:11px;color:var(--t2);white-space:nowrap">1 '+ccy+' =</span>'
+            +'<input type="number" id="fx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:center;font-size:16px;flex:1">'
             +'<span style="font-size:11px;color:var(--t2);white-space:nowrap">MYR</span>'
-            +'</div>'
             +'</div>';
         }).join('')
         +'</div>'
-
         +'</div>'
       :'')
       +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">'
@@ -2214,7 +2289,7 @@ function renderOptions(){
     <button class="pri sm" onclick="addOpt()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>
   </div>
   <div style="margin-bottom:.75rem">
-    <div style="font-size:16px;font-weight:700;margin-bottom:3px">Options P&L</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:3px">Option P&L</div>
     <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
   </div>${summary}
   ${combinedTable}${empty}`;
@@ -2273,10 +2348,10 @@ function showOptModal(t,idx){
     <div class="full"><label class="lbl">Ticker / Symbol</label><input id="op-tk" value="${t.ticker||''}" placeholder="e.g. TSLA, SPY"></div>
     <div><label class="lbl">Open date</label><input type="date" id="op-od" value="${t.openDate||''}"></div>
     <div><label class="lbl">Open value (USD) — signed</label><input type="number" id="op-ov" step="0.01" value="${t.openValue||''}" placeholder="-500 if paid, +200 if credit"></div>
-    <div><label class="lbl">Open fee (USD) <span style="color:var(--t3)">platform fee, always +ve</span></label><input type="number" id="op-of" step="0.01" min="0" value="${of_}" placeholder="e.g. 2.50"></div>
+    <div><label class="lbl">Open fee (USD) <span style="color:var(--t3)">fee, always +ve</span></label><input type="number" id="op-of" step="0.01" min="0" value="${of_}" placeholder="e.g. 2.50"></div>
     <div><label class="lbl">Close date <span style="color:var(--t3)">(blank = open)</span></label><input type="date" id="op-cd" value="${t.closeDate||''}"></div>
     <div><label class="lbl">Close value (USD) <span style="color:var(--t3)">(blank = open)</span></label><input type="number" id="op-cv" step="0.01" value="${cv}" placeholder="Leave blank if still open"></div>
-    <div><label class="lbl">Close fee (USD) <span style="color:var(--t3)">platform fee, always +ve</span></label><input type="number" id="op-cf" step="0.01" min="0" value="${cf_}" placeholder="e.g. 2.50"></div>
+    <div><label class="lbl">Close fee (USD) <span style="color:var(--t3)">fee, always +ve</span></label><input type="number" id="op-cf" step="0.01" min="0" value="${cf_}" placeholder="e.g. 2.50"></div>
     <div><label class="lbl">Current holding value (USD) <span style="color:var(--t3)">unrealized P&L only</span></label><input type="number" id="op-mv" step="0.01" value="${mv}" placeholder="Current position value"></div>
     <div class="full"><label class="lbl">Note</label><input id="op-nt" value="${t.note||''}" placeholder="e.g. TSLA 300C Jan25…"></div>
   </div>
@@ -2973,12 +3048,12 @@ function renderDeposits(p){
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:10px 12px">'
         +'<div style="margin-bottom:10px">'+ccyTag(ccy)+'</div>'
-        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Deposit</div>'
+        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Total Deposit</div>'
         +'<div class="pv-num" style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
-        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Total Withdrawal</div>'
+        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Total Withdrawal</div>'
         +'<div class="pv-num" style="font-size:13px;font-weight:600;color:'+(totWit>0?'var(--red)':'var(--t3)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
         +'<div style="border-top:1px solid var(--b1);padding-top:8px">'
-        +'<div style="font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">Net Capital</div>'
+        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Net Capital</div>'
         +'<div class="pv-num" style="font-size:14px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
         +'</div>'
         +'</div>';
@@ -3009,7 +3084,7 @@ function renderDeposits(p){
     return'<div style="margin-bottom:1.25rem">'
       +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
       +'<span class="dep-toggle-arrow-'+safeKey+'">▶</span>'
-      +'<span>'+ccyFlag(ccy)+' '+ccy+' Transactions: '+cdeps.length+'</span>'
+      +'<span>'+ccyFlag(ccy)+' '+ccy+' Cash Flow: '+cdeps.length+'</span>'
       +''
       +'</div>'
       +'<div class="dep-section-body-'+safeKey+'" style="display:none;overflow-x:auto"><table class="tbl">'
@@ -3029,15 +3104,7 @@ function togglePrivacy(){
   _privacyOn=!_privacyOn;
   document.body.classList.toggle('privacy-on',_privacyOn);
 }
-// Tap anywhere on #mn to toggle privacy
-document.addEventListener('click',function(e){
-  const mn=document.getElementById('mn');
-  if(mn&&mn.contains(e.target)){
-    // Only trigger if tapping a financial value area (kc, kv, tbl td, or pv-val)
-    const fin=e.target.closest('.kc,.kv,.tbl td,.pv-val,.pv-num,[onclick*="togglePrivacy"]');
-    if(fin)togglePrivacy();
-  }
-});
+// Privacy toggle - only on the 2 main cards (gauge + person)
 function toggleMini(id){
   const el=document.getElementById(id);
   if(!el)return;
@@ -3119,7 +3186,7 @@ function delDeposit(i){
 function render(){renderPfTabs();renderTabMenu();renderContent();}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>swTab(b.dataset.tab)));
 // + Transaction button now rendered inline in renderTx
-$('bpx').addEventListener('click',()=>omm('px'));
+// bpx now inside settings panel, no separate listener needed
 $('bep').addEventListener('click',()=>omm('ep'));
 $('bdp').addEventListener('click',()=>omm('dp'));
 $('bbk').addEventListener('click',doBackup);
@@ -3131,7 +3198,7 @@ showWelcomeIfFirstLoad();
 
 // ── Swipe left/right to switch tabs ──────────────────────────────
 (function(){
-  const TAB_ORDER=['dashboard','overview','transactions','options','deposits','journey'];
+  const TAB_ORDER=['dashboard','overview','transactions','journey'];
   let _tx=0,_ty=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _tx=e.touches[0].clientX;
@@ -3142,6 +3209,19 @@ showWelcomeIfFirstLoad();
     const dx=e.changedTouches[0].clientX-_tx;
     const dy=e.changedTouches[0].clientY-_ty;
     if(Math.abs(dx)<60||Math.abs(dy)>Math.abs(dx)*0.5)return;
+    // Don't swipe if settings panel is open — swipe right to close it
+    const sp=document.getElementById('settings-panel');
+    if(sp&&sp.style.display!=='none'){
+      if(dx>0)closeSettings();
+      return;
+    }
+    // Don't swipe if touch ended over bottom nav
+    const bn=document.getElementById('bottom-nav');
+    if(bn){
+      const r=bn.getBoundingClientRect();
+      const ey=e.changedTouches[0].clientY;
+      if(ey>=r.top)return;
+    }
     // Check if touch started inside a horizontally scrollable container
     // and that container still has scroll room in the swipe direction
     let el=_target;
@@ -3162,6 +3242,7 @@ showWelcomeIfFirstLoad();
     const idx=TAB_ORDER.indexOf(TAB);
     if(idx===-1)return;
     if(dx<0&&idx<TAB_ORDER.length-1)swTab(TAB_ORDER[idx+1]);
+    else if(dx<0&&idx===TAB_ORDER.length-1)toggleSettings();
     if(dx>0&&idx>0)swTab(TAB_ORDER[idx-1]);
   },{passive:true});
 })();
@@ -3183,6 +3264,17 @@ function fixLayout(){
   document.documentElement.style.setProperty('--sticky-top',(hdH+tbH+dbH)+'px');
   updateGlobalPlus();
 }
+// Prevent iOS zoom on input focus
+(function(){
+  function preventZoom(){
+    var m=document.querySelector('meta[name=viewport]');
+    if(m)m.setAttribute('content','width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no');
+  }
+  document.addEventListener('focusin',function(e){
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA')preventZoom();
+  });
+  document.addEventListener('focusout',preventZoom);
+})();
 fixLayout();
 window.addEventListener('resize',fixLayout);
 setTimeout(fixLayout,200);
@@ -3209,20 +3301,71 @@ setTimeout(matchScanLine,300);
   </button>
   <button onclick="swTab('transactions')" data-nav="transactions" class="bnav-btn">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h13"/><path d="M17 7l4 4-4 4"/><path d="M21 11H8"/></svg>
-    <span>Txn</span>
-  </button>
-  <button onclick="swTab('options')" data-nav="options" class="bnav-btn">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/><polygon points="12,7 17,10 17,14 12,17 7,14 7,10"/></svg>
-    <span>Options</span>
-  </button>
-  <button onclick="swTab('deposits')" data-nav="deposits" class="bnav-btn">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c0-1.5 4-3 9-3s9 1.5 9 3v10c0 1.5-4 3-9 3s-9-1.5-9-3z"/><ellipse cx="12" cy="7" rx="9" ry="3"/><path d="M3 12c0 1.5 4 3 9 3s9-1.5 9-3"/></svg>
-    <span>Flows</span>
+    <span>Transactions</span>
   </button>
   <button onclick="swTab('journey')" data-nav="journey" class="bnav-btn">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L8 14 L13 17 L21 8"/><polyline points="15,8 21,8 21,14"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/><circle cx="13" cy="17" r="1.5" fill="currentColor"/></svg>
     <span>Journey</span>
   </button>
+  <button onclick="toggleSettings()" class="bnav-btn" id="bnav-settings">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Settings</span>
+  </button>
+</div>
+
+<!-- Settings Full-Page Modal -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.6)" onclick="closeSettings()"></div>
+<div id="settings-panel" style="display:none;position:fixed;inset:0;z-index:200;background:#0f1420;flex-direction:column">
+
+  <!-- Header -->
+  <div style="flex-shrink:0;background:#0f1420;border-bottom:1px solid var(--b1);padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:16px;font-weight:700">⚙️ Settings</span>
+    <button onclick="closeSettings()" style="background:transparent;border:none;color:var(--t2);font-size:22px;cursor:pointer;padding:0 4px;line-height:1">✕</button>
+  </div>
+
+  <!-- Market Prices header — no save button -->
+  <div style="flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--b1)">
+    <div style="padding:6px 12px">
+      <span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Market Prices</span>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;background:var(--bg2);border-bottom:1px solid var(--b1);padding:4px 12px;min-height:0">
+    <div id="settings-px-list"></div>
+    <div id="settings-fx-list" style="margin-top:4px"></div>
+  </div>
+  <!-- Bottom: Portfolios (wider) + Data (narrow) — fixed, no scroll -->
+  <div style="flex-shrink:0;display:grid;grid-template-columns:2fr 1fr;border-top:1px solid var(--b1)">
+
+    <!-- Portfolios -->
+    <div style="padding:8px 12px;border-right:1px solid var(--b1);display:flex;gap:8px">
+      <!-- Portfolio list -->
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Portfolios</div>
+        <div id="settings-pf-chips" style="max-height:120px;overflow-y:auto"></div>
+      </div>
+      <!-- Add/Edit/Delete as vertical column -->
+      <div style="display:flex;flex-direction:column;gap:4px;justify-content:flex-start;padding-top:22px;flex-shrink:0">
+        <button onclick="closeSettings();omm('ap')" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap">➕ Add</button>
+        <button onclick="closeSettings();omm('ep')" id="bep" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap">✏️ Edit</button>
+        <button onclick="closeSettings();omm('dp')" id="bdp" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap;color:var(--red)">🗑️ Del</button>
+      </div>
+    </div>
+
+    <!-- Data — with labels -->
+    <div style="padding:8px 10px">
+      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Data</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button onclick="closeSettings();document.getElementById('bbk').click()" class="settings-btn" style="color:#f59e0b;font-size:11px">💾 Backup</button>
+        <button onclick="closeSettings();document.getElementById('brs').click()" class="settings-btn" style="color:var(--green);font-size:11px">📂 Restore</button>
+        <button onclick="closeSettings();document.getElementById('bxl').click()" class="settings-btn" style="color:var(--blue);font-size:11px">📊 Excel</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Safe area spacer -->
+  <div style="flex-shrink:0;height:env(safe-area-inset-bottom,0px);background:#0f1420"></div>
+
 </div>
 </body>
 </html>

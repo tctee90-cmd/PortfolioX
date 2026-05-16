@@ -183,6 +183,14 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   0%,100%{transform:scale(1);opacity:0.3}
   50%{transform:scale(1.8);opacity:1}
 }
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;cursor:pointer;padding:6px 8px;color:#5a6580;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-family:inherit;transition:all .25s;position:relative;flex:1}
+.bnav-btn svg{transition:all .25s}
+.bnav-btn.active{color:#4fc3f7}
+.bnav-btn.active svg{filter:drop-shadow(0 0 6px rgba(79,195,247,0.8)) drop-shadow(0 0 12px rgba(79,195,247,0.4));transform:translateY(-2px) scale(1.1)}
+.bnav-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:linear-gradient(90deg,transparent,#4fc3f7,transparent);border-radius:2px;box-shadow:0 0 8px #4fc3f7}
+.bnav-btn:active svg{transform:scale(0.9)}
+#bottom-nav button[data-nav].active{color:var(--blue)}
+#mn{padding-bottom:80px!important}
 .pv-hide{display:none}
 body.privacy-on .pv-val{display:none!important}
 body.privacy-on .pv-hide{display:inline!important}
@@ -293,21 +301,19 @@ body.privacy-on #mn div[style*="color:#f87171"]{
 </div>
 <input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
 <div id="hd">
-  <div style="display:flex;align-items:stretch;width:100%;min-height:90px">
+  <div style="display:flex;align-items:center;width:100%;min-height:90px;flex-wrap:nowrap">
     <!-- Left: Logo + tagline -->
-    <div style="display:flex;flex-direction:column;justify-content:center;flex:1">
+    <div style="display:flex;flex-direction:column;justify-content:center;flex:1;padding-right:12px">
       <div class="logo" id="logo-row" style="flex-direction:row;align-items:center;gap:4px;animation:logoFloat 4s ease-in-out infinite;display:inline-flex">
-        <span id="logo-gem" style="font-size:28px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
-        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:22px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
-        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:30px;animation:xPulse 1.8s ease-in-out infinite">X</span>
+        <span id="logo-gem" style="font-size:32px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
+        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:26px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
+        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:34px;animation:xPulse 1.8s ease-in-out infinite">X</span>
       </div>
-      <div id="scan-line-wrap" style="display:flex;align-items:center;gap:5px;margin-top:4px">
-        <div style="width:5px;height:5px;border-radius:50%;background:#00d4ff;box-shadow:0 0 8px #00d4ff,0 0 16px rgba(0,212,255,0.4);animation:iconPop 2s ease-in-out infinite;flex-shrink:0"></div>
-        <div style="position:relative;flex:1;height:2px;border-radius:2px;overflow:hidden;background:linear-gradient(90deg,rgba(0,212,255,0.05),rgba(0,212,255,0.15),rgba(76,175,130,0.15),rgba(0,212,255,0.05))">
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,212,255,1),rgba(76,175,130,0.8),transparent);animation:scanLine 1.8s ease-in-out infinite"></div>
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,200,0,0.6),transparent);animation:scanLine 1.8s ease-in-out infinite;animation-delay:0.9s"></div>
+      <div id="scan-line-wrap" style="display:inline-block;margin-top:4px">
+        <div id="scan-bar" style="position:relative;height:2px;border-radius:2px;overflow:hidden;background:rgba(255,180,0,0.1)">
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,210,0,1),rgba(255,140,0,0.8),transparent);animation:scanLine 1.8s ease-in-out infinite"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,100,0,0.6),transparent);animation:scanLine 1.8s ease-in-out infinite;animation-delay:0.9s"></div>
         </div>
-        <div style="width:5px;height:5px;border-radius:50%;background:#4caf82;box-shadow:0 0 8px #4caf82,0 0 16px rgba(76,175,130,0.4);animation:iconPop 2s ease-in-out infinite;animation-delay:0.9s;flex-shrink:0"></div>
       </div>
     </div>
     <!-- Right: 3 buttons stacked, smaller -->
@@ -339,15 +345,6 @@ body.privacy-on #mn div[style*="color:#f87171"]{
               <button onclick="closePfMenu();document.getElementById('bxl').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📊</span> Download Excel</button>
             </div>
           </div>
-        </div>
-      </div>
-      <!-- Tab dropdown -->
-      <div style="position:relative" id="tab-menu-wrap">
-        <button onclick="toggleTabMenu()" id="tab-menu-btn" class="hd-btn" style="height:28px;font-size:11px;width:120px">
-          <span id="tab-menu-label" style="flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center">Dashboard</span>
-          <span style="font-size:9px;opacity:.6;flex-shrink:0">▾</span>
-        </button>
-        <div id="tab-menu-dropdown" style="display:none;position:fixed;top:120px;right:8px;left:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:6px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.6)">
         </div>
       </div>
       <!-- Refresh -->
@@ -2005,7 +2002,12 @@ function doRestore(e){
 
 // ── Actions ────────────────────────────────────────────────────────────────────
 function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save();render();}
-function swTab(t){TAB=t;VIEW=null;journeyFilter=null;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));renderPfTabs();renderTabMenu();renderContent();updateGlobalPlus();}
+function swTab(t){
+  TAB=t;VIEW=null;journeyFilter=null;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===t));
+  renderPfTabs();renderTabMenu();renderContent();updateGlobalPlus();
+}
 function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>el.style.border=el.dataset.c===c?'3px solid #fff':'3px solid transparent');}
 function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;cmm();save();render();}
 function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);cmm();save();render();}
@@ -3027,6 +3029,15 @@ function togglePrivacy(){
   _privacyOn=!_privacyOn;
   document.body.classList.toggle('privacy-on',_privacyOn);
 }
+// Tap anywhere on #mn to toggle privacy
+document.addEventListener('click',function(e){
+  const mn=document.getElementById('mn');
+  if(mn&&mn.contains(e.target)){
+    // Only trigger if tapping a financial value area (kc, kv, tbl td, or pv-val)
+    const fin=e.target.closest('.kc,.kv,.tbl td,.pv-val,.pv-num,[onclick*="togglePrivacy"]');
+    if(fin)togglePrivacy();
+  }
+});
 function toggleMini(id){
   const el=document.getElementById(id);
   if(!el)return;
@@ -3175,14 +3186,43 @@ function fixLayout(){
 fixLayout();
 window.addEventListener('resize',fixLayout);
 setTimeout(fixLayout,200);
+setTimeout(fixLayout,500);
 renderTabMenu();
+setTimeout(function(){document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===TAB));},100);
 function matchScanLine(){
   const logo=document.getElementById('logo-row');
-  const scan=document.getElementById('scan-line-wrap');
-  if(logo&&scan)scan.style.width=logo.offsetWidth+'px';
+  const bar=document.getElementById('scan-bar');
+  if(logo&&bar)bar.style.width=logo.offsetWidth+'px';
 }
 setTimeout(matchScanLine,300);
-window.addEventListener('resize',matchScanLine);
 </script>
+
+<!-- Bottom tab bar -->
+<div id="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(15,20,32,0.85),rgba(10,15,25,0.98));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(79,195,247,0.2);display:flex;align-items:center;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom));box-shadow:0 -8px 32px rgba(0,0,0,0.6),0 -1px 0 rgba(79,195,247,0.1)">
+  <button onclick="swTab('dashboard')" data-nav="dashboard" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 8l10 6 10-6-10-6z"/><path d="M2 16l10 6 10-6"/><path d="M2 12l10 6 10-6"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button onclick="swTab('overview')" data-nav="overview" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.5 6.5"/><path d="M12 12L3.5 8"/></svg>
+    <span>Overview</span>
+  </button>
+  <button onclick="swTab('transactions')" data-nav="transactions" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l-4-4 4-4"/><path d="M3 13h13"/><path d="M17 7l4 4-4 4"/><path d="M21 11H8"/></svg>
+    <span>Txn</span>
+  </button>
+  <button onclick="swTab('options')" data-nav="options" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/><polygon points="12,7 17,10 17,14 12,17 7,14 7,10"/></svg>
+    <span>Options</span>
+  </button>
+  <button onclick="swTab('deposits')" data-nav="deposits" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7c0-1.5 4-3 9-3s9 1.5 9 3v10c0 1.5-4 3-9 3s-9-1.5-9-3z"/><ellipse cx="12" cy="7" rx="9" ry="3"/><path d="M3 12c0 1.5 4 3 9 3s9-1.5 9-3"/></svg>
+    <span>Flows</span>
+  </button>
+  <button onclick="swTab('journey')" data-nav="journey" class="bnav-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L8 14 L13 17 L21 8"/><polyline points="15,8 21,8 21,14"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/><circle cx="13" cy="17" r="1.5" fill="currentColor"/></svg>
+    <span>Journey</span>
+  </button>
+</div>
 </body>
 </html>

@@ -2348,12 +2348,12 @@ function doRestore(e){
       });
       if(!S.activeId&&S.portfolios.length)S.activeId=S.portfolios[0].id;
       save();
-      // Close settings and go to dashboard
-      const sp=document.getElementById('settings-panel');
-      if(sp)sp.style.display='none';
-      TAB='dashboard';VIEW=null;journeyFilter=null;
-      render();
-      const t=$('toast');t.textContent='Restored ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2500);
+      closeSettings();
+      setTimeout(function(){
+        TAB='dashboard';VIEW=null;journeyFilter=null;
+        render();
+        const t=$('toast');t.textContent='Restored ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2500);
+      },100);
     }catch(err){alert('Error: invalid or corrupted backup file. Please use a valid .json backup.');}
     e.target.value='';
   };

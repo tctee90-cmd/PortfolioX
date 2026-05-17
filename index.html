@@ -794,15 +794,18 @@ function toggleSettings(){
   if(!p)return;
   const open=p.style.display==='none';
   if(!open){closeSettings();return;}
+  // Show panel instantly
   p.style.display='flex';
   document.getElementById('settings-overlay').style.display='block';
-  renderSettingsChips();
-  renderSettingsPx();
   document.body.style.overflow='hidden';
-  // Highlight settings button in nav
   document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.remove('active'));
   const sb=document.getElementById('bnav-settings');
   if(sb)sb.classList.add('active');
+  // Defer heavy renders to next frame so UI appears instantly
+  requestAnimationFrame(function(){
+    renderSettingsChips();
+    renderSettingsPx();
+  });
 }
 function closeSettings(){
   const p=document.getElementById('settings-panel');
@@ -2365,9 +2368,12 @@ function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save
 function swTab(t){
   closeSettings();
   TAB=t;VIEW=null;journeyFilter=null;
+  // Update nav instantly
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===t));
-  renderPfTabs();renderTabMenu();renderContent();updateGlobalPlus();
+  renderPfTabs();renderTabMenu();
+  // Defer heavy content render
+  requestAnimationFrame(function(){renderContent();updateGlobalPlus();});
 }
 function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>{const sel=el.dataset.c===c;el.style.border=sel?'2px solid #fff':'2px solid '+el.dataset.c+'44';el.style.boxShadow=sel?'0 0 8px '+c+',0 0 16px '+c+'88':'none';});}
 function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;window._fromSettings=false;cmm();save();render();toggleSettings();}
@@ -3501,7 +3507,7 @@ showWelcomeIfFirstLoad();
 
 // ── Swipe left/right to switch tabs ──────────────────────────────
 (function(){
-  const TAB_ORDER=['dashboard','overview','transactions','journey'];
+  const TAB_ORDER=['dashboard','overview','transactions','journey','settings'];
   let _tx=0,_ty=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _tx=e.touches[0].clientX;
@@ -3515,7 +3521,7 @@ showWelcomeIfFirstLoad();
     // Don't swipe if settings panel is open — swipe right to close it
     const sp=document.getElementById('settings-panel');
     if(sp&&sp.style.display!=='none'){
-      if(dx>0)closeSettings();
+      if(dx>0){closeSettings();TAB='journey';}
       return;
     }
     // Don't swipe if touch ended over bottom nav
@@ -3534,19 +3540,24 @@ showWelcomeIfFirstLoad();
       if(overflowX==='auto'||overflowX==='scroll'){
         const canScrollLeft=el.scrollLeft>0;
         const canScrollRight=el.scrollLeft+el.clientWidth<el.scrollWidth-1;
-        // If swiping left and container can still scroll right — let it scroll
         if(dx<0&&canScrollRight)return;
-        // If swiping right and container can still scroll left — let it scroll
         if(dx>0&&canScrollLeft)return;
         break;
       }
       el=el.parentElement;
     }
-    const idx=TAB_ORDER.indexOf(TAB);
+    const curTab=TAB==='settings'?'settings':TAB;
+    const idx=TAB_ORDER.indexOf(curTab);
     if(idx===-1)return;
-    if(dx<0&&idx<TAB_ORDER.length-1)swTab(TAB_ORDER[idx+1]);
-    else if(dx<0&&idx===TAB_ORDER.length-1)toggleSettings();
-    if(dx>0&&idx>0)swTab(TAB_ORDER[idx-1]);
+    if(dx<0&&idx<TAB_ORDER.length-1){
+      const next=TAB_ORDER[idx+1];
+      if(next==='settings')toggleSettings();
+      else swTab(next);
+    }
+    if(dx>0&&idx>0){
+      const prev=TAB_ORDER[idx-1];
+      swTab(prev);
+    }
   },{passive:true});
 })();
 

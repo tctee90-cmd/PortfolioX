@@ -148,8 +148,8 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   position:fixed;top:0;left:0;right:0;z-index:100;
 }
 #hd .logo{
-  font-family:'Orbitron','Segoe UI',sans-serif;
-  font-size:15px;font-weight:900;letter-spacing:.5px;white-space:nowrap;
+  font-family:'Courier New',monospace;
+  font-size:15px;font-weight:700;letter-spacing:.5px;white-space:nowrap;
   flex-shrink:0;display:flex;align-items:center;gap:3px;
 }
 
@@ -179,16 +179,20 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   80%{opacity:1}
   100%{transform:translateX(200%);opacity:0}
 }
+@keyframes barPulse{
+  0%,100%{transform:scaleY(1);opacity:0.7}
+  50%{transform:scaleY(0.3);opacity:1}
+}
 @keyframes iconPop{
   0%,100%{transform:scale(1);opacity:0.3}
   50%{transform:scale(1.8);opacity:1}
 }
-.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;cursor:pointer;padding:6px 8px;color:#5a6580;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-family:inherit;transition:all .25s;position:relative;flex:1}
-.bnav-btn svg{transition:all .25s}
-.bnav-btn.active{color:#4fc3f7}
-.bnav-btn.active svg{filter:drop-shadow(0 0 6px rgba(79,195,247,0.8)) drop-shadow(0 0 12px rgba(79,195,247,0.4));transform:translateY(-2px) scale(1.1)}
-.bnav-btn.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:linear-gradient(90deg,transparent,#4fc3f7,transparent);border-radius:2px;box-shadow:0 0 8px #4fc3f7}
-#settings-panel input, #settings-panel select{touch-action:manipulation}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;cursor:pointer;padding:6px 6px;color:#2d3f5a;font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:'Courier New',monospace;transition:all .2s;position:relative;flex:1}
+.bnav-btn svg{transition:all .2s;opacity:0.45}
+.bnav-btn.active{color:#00d4ff}
+.bnav-btn.active svg{opacity:1;filter:drop-shadow(0 0 4px rgba(0,212,255,0.8));transform:translateY(-1px)}
+.bnav-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:2px;background:linear-gradient(90deg,transparent,#00d4ff,transparent);box-shadow:0 0 8px #00d4ff,0 0 16px rgba(0,212,255,0.4)}
+.bnav-btn:active svg{transform:scale(0.88)}
 .settings-btn{padding:8px 6px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t1);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;text-align:center;min-height:34px}
 .bnav-btn:active svg{transform:scale(0.9)}
 #bottom-nav button[data-nav].active{color:var(--blue)}
@@ -318,17 +322,43 @@ body.privacy-on #mn span[style*="color:#f060"]{
 <input type="file" id="welcome-restore-input" accept=".json" style="display:none" onchange="doWelcomeRestore(event)">
 <div id="hd">
   <div style="display:flex;align-items:center;width:100%;min-height:90px;flex-wrap:nowrap">
-    <!-- Left: Logo + tagline -->
-    <div style="display:flex;flex-direction:column;justify-content:center;flex:1;padding-right:12px">
-      <div class="logo" id="logo-row" style="flex-direction:row;align-items:center;gap:4px;animation:logoFloat 4s ease-in-out infinite;display:inline-flex">
-        <span id="logo-gem" style="font-size:22px;display:inline-block;background:linear-gradient(135deg,#00fff0,#0088ff,#6600ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gemSpin 4s linear infinite">◈</span>
-        <span id="logo-text" style="background:linear-gradient(270deg,#ffffff,#00d4ff,#ffffff,#c0c0c0,#ffffff,#00d4ff,#ffffff);background-size:400% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;font-size:16px;filter:drop-shadow(0 2px 0 rgba(0,0,0,1));animation:portfolioShimmer 3s linear infinite">PORTFOLIO</span>
-        <span id="logo-x" style="display:inline-block;background:linear-gradient(180deg,#fff176 0%,#ffcc00 25%,#ff9900 55%,#ff4400 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;font-style:italic;font-size:22px;animation:xPulse 1.8s ease-in-out infinite">X</span>
+    <!-- Left: Logo centred -->
+    <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1;padding-right:0">
+      <div class="logo" id="logo-row" style="flex-direction:row;align-items:center;gap:6px;display:inline-flex">
+        <!-- Hexagon gem icon -->
+        <svg width="30" height="30" viewBox="0 0 26 26" style="flex-shrink:0;animation:gemSpin 6s linear infinite;filter:drop-shadow(0 0 6px #00d4ff) drop-shadow(0 0 12px rgba(0,150,255,0.4))">
+          <polygon points="13,2 22,7 22,19 13,24 4,19 4,7" fill="none" stroke="url(#gemGrad)" stroke-width="1.5"/>
+          <polygon points="13,6 19,9.5 19,16.5 13,20 7,16.5 7,9.5" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.3)" stroke-width="0.5"/>
+          <line x1="13" y1="2" x2="13" y2="24" stroke="rgba(0,212,255,0.15)" stroke-width="0.5"/>
+          <line x1="4" y1="7" x2="22" y2="19" stroke="rgba(0,212,255,0.15)" stroke-width="0.5"/>
+          <line x1="22" y1="7" x2="4" y2="19" stroke="rgba(0,212,255,0.15)" stroke-width="0.5"/>
+          <circle cx="13" cy="13" r="2" fill="#00d4ff" opacity="0.9"/>
+          <defs>
+            <linearGradient id="gemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00fff0"/>
+              <stop offset="50%" stop-color="#0088ff"/>
+              <stop offset="100%" stop-color="#6600ff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <!-- PORTFOLIO text with glitch effect -->
+        <span id="logo-text" style="font-family:'Courier New',monospace;font-size:18px;font-weight:700;letter-spacing:4px;background:linear-gradient(90deg,#e0f0ff,#00d4ff,#ffffff,#00d4ff,#e0f0ff);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:portfolioShimmer 4s linear infinite">PORTFOLIO</span>
+        <!-- X with energy burst -->
+        <span id="logo-x" style="font-family:'Courier New',monospace;display:inline-block;font-size:22px;font-weight:900;font-style:normal;background:linear-gradient(135deg,#ffe566,#ff9900,#ff4400);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:xPulse 2s ease-in-out infinite;filter:drop-shadow(0 0 4px rgba(255,140,0,0.8))">_X</span>
       </div>
-      <div id="scan-line-wrap" style="display:inline-block;margin-top:3px">
-        <div id="scan-bar" style="position:relative;height:1px;border-radius:1px;background:linear-gradient(90deg,transparent,rgba(255,180,0,0.3),rgba(255,140,0,0.5),rgba(255,180,0,0.3),transparent)">
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,210,0,0.9),rgba(255,140,0,0.7),transparent);animation:scanLine 2.5s ease-in-out infinite;filter:blur(0.5px)"></div>
-        </div>
+      <div id="scan-line-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-top:6px;justify-content:center">
+        <span id="eq-date" style="font-family:'Courier New',monospace;font-size:10px;color:#ffffff;letter-spacing:1px;margin-right:5px;font-weight:700"></span>
+        <div style="width:3px;height:10px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0s;box-shadow:0 0 5px #00d4ff"></div>
+        <div style="width:3px;height:18px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.1s;box-shadow:0 0 5px #00d4ff"></div>
+        <div style="width:3px;height:8px;background:#00aaff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.2s"></div>
+        <div style="width:3px;height:22px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.3s;box-shadow:0 0 8px #00d4ff"></div>
+        <div style="width:3px;height:12px;background:#00aaff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.4s"></div>
+        <div style="width:3px;height:20px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.5s;box-shadow:0 0 5px #00d4ff"></div>
+        <div style="width:3px;height:10px;background:#ff9900;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.6s;box-shadow:0 0 5px #ff9900"></div>
+        <div style="width:3px;height:24px;background:#ff9900;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.7s;box-shadow:0 0 8px #ff9900"></div>
+        <div style="width:3px;height:14px;background:#ff6600;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.8s;box-shadow:0 0 5px #ff6600"></div>
+        <div style="width:3px;height:9px;background:#ff4400;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.9s"></div>
+        <span id="eq-time" style="font-family:'Courier New',monospace;font-size:10px;color:#ffffff;letter-spacing:1px;margin-left:5px;font-weight:700"></span>
       </div>
     </div>
     <!-- Right: hidden buttons only -->
@@ -681,8 +711,62 @@ function updateGlobalPlus(){
     btn.style.top=(hdH+dbH+16+20)+'px';
   }
 }
+// Stock logo helper
+const STOCK_DOMAINS={
+  'AAPL':'apple.com','MSFT':'microsoft.com','GOOGL':'google.com','GOOG':'google.com',
+  'AMZN':'amazon.com','META':'meta.com','NVDA':'nvidia.com','TSLA':'tesla.com',
+  'AMD':'amd.com','INTC':'intel.com','CRM':'salesforce.com','NOW':'servicenow.com',
+  'ORCL':'oracle.com','PLTR':'palantir.com','NFLX':'netflix.com','DIS':'disney.com',
+  'BABA':'alibaba.com','UBER':'uber.com','SPOT':'spotify.com','SHOP':'shopify.com',
+  'RKLB':'rocketlabusa.com','MapleTree':'mapletree.com.sg','Harta':'hartalega.com.my',
+  'CapLand Ascendas':'capitaland.com','TopGlove SG':'topglove.com',
+};
+function stockLogo(ticker,color,pct,size=36,startPct=0){
+  const r=size/2-3;
+  const circ=2*Math.PI*r;
+  const pctClamped=Math.min(Math.max(pct||0,0),100);
+  const dash=circ*pctClamped/100;
+  const gap=circ-dash;
+  const startAngle=-90+(startPct/100*360);
+  const initial=ticker.replace(/[^A-Z]/gi,'').charAt(0)||'?';
+  const id='g'+ticker.replace(/[^a-z0-9]/gi,'_')+size;
+  const h=size/2;
+  // Hexagon points
+  const hex=Array.from({length:6},(_,i)=>{
+    const a=(i*60-90)*Math.PI/180;
+    return`${h+r*Math.cos(a)},${h+r*Math.sin(a)}`;
+  }).join(' ');
+  return`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0">
+    <defs>
+      <linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0.4"/>
+      </linearGradient>
+      <filter id="glow${id}">
+        <feGaussianBlur stdDeviation="1.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="clip${id}"><polygon points="${hex}"/></clipPath>
+    </defs>
+    <!-- Dark bg hex -->
+    <polygon points="${hex}" fill="#0a0f1e" stroke="${color}" stroke-width="0.5" opacity="0.6"/>
+    <!-- Gradient fill hex -->
+    <polygon points="${hex}" fill="url(#${id})" opacity="0.7"/>
+    <!-- Inner hex ring -->
+    <polygon points="${Array.from({length:6},(_,i)=>{const a=(i*60-90)*Math.PI/180;const ri=r*0.65;return`${h+ri*Math.cos(a)},${h+ri*Math.sin(a)}`;}).join(' ')}" fill="none" stroke="${color}" stroke-width="0.5" opacity="0.3"/>
+    <!-- Initial letter -->
+    <text x="${h}" y="${h+1}" dominant-baseline="middle" text-anchor="middle" font-size="${Math.round(size*.38)}" font-weight="800" fill="#fff" font-family="'Courier New',monospace" opacity="0.95">${initial}</text>
+    <!-- Track arc -->
+    <circle cx="${h}" cy="${h}" r="${r+2}" fill="none" stroke="${color}" stroke-width="1" opacity="0.1"/>
+    <!-- Glowing arc -->
+    <circle cx="${h}" cy="${h}" r="${r+2}" fill="none" stroke="${color}" stroke-width="2.5"
+      stroke-dasharray="${dash*(r+2)/r} ${gap*(r+2)/r}"
+      stroke-linecap="${pctClamped>=99.9?'butt':'round'}"
+      transform="rotate(${startAngle} ${h} ${h})"
+      filter="url(#glow${id})" opacity="0.9"/>
+  </svg>`;
+}
 function togglePfMenu(){
-  const dd=document.getElementById('pf-menu-dropdown');
   if(!dd)return;
   const open=dd.style.display==='none';
   dd.style.display=open?'':'none';
@@ -1101,29 +1185,37 @@ function goPortfolio(id){
 
 function liveClock(){
   const el=document.getElementById('live-clock');
-  if(!el)return;
   const now=new Date();
   const h=String(now.getHours()).padStart(2,'0');
   const m=String(now.getMinutes()).padStart(2,'0');
   const s=String(now.getSeconds()).padStart(2,'0');
-  el.textContent=h+':'+m+':'+s;
+  if(el)el.textContent=h+':'+m+':'+s;
+  // Update equalizer date/time
+  const eqDate=document.getElementById('eq-date');
+  const eqTime=document.getElementById('eq-time');
+  if(eqDate){
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    eqDate.textContent=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  }
+  if(eqTime){
+    let hr=now.getHours();
+    const ampm=hr>=12?'pm':'am';
+    hr=hr%12||12;
+    const min=String(now.getMinutes()).padStart(2,'0');
+    eqTime.textContent=hr+'.'+min+ampm;
+  }
 }
 let _clockTimer=null;
 function setDateBar(label){
   const db=document.getElementById('date-bar');
   if(!db)return;
-  db.style.display='grid';
-  db.style.gridTemplateColumns='1fr auto 1fr';
+  db.style.display='flex';
   db.style.alignItems='center';
-  db.style.gap='8px';
   db.style.color='#eceef4';
-  db.innerHTML=
-    '<span style="color:#7e8ea8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px">'+label+'</span>'
-    +'<span style="font-weight:600;text-align:center;white-space:nowrap;color:#eceef4">'+todayStr()+'</span>'
-    +'<span style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#7e8ea8;letter-spacing:.5px;font-size:12px;white-space:nowrap" id="live-clock"></span>';
-  liveClock();
+  db.innerHTML='<span style="color:#7e8ea8;font-size:11px;font-family:Courier New,monospace;letter-spacing:.5px">'+label+'</span>';
   if(_clockTimer)clearInterval(_clockTimer);
   _clockTimer=setInterval(liveClock,1000);
+  liveClock();
   fixLayout();
   updateGlobalPlus();
 }
@@ -1237,12 +1329,15 @@ function renderOverview(p){
     const colourBar='';
 
     let tbody='';
+    let cumPct=0;
     sortedRows.forEach((hh,i)=>{
       const tot2=Math.round((hh.unreal+hh.divs+hh.realized)*100)/100;
       const pct2=hh.cost>0?tot2/hh.cost*100:null;
       const barW=(hh.mktVal/totalMV*100).toFixed(1);
+      const startPct=cumPct;
+      cumPct+=parseFloat(barW);
       tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
-        +`<td style="white-space:nowrap;position:sticky;left:0;background:var(--bg2);z-index:2"><div style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${PAL[i%PAL.length]};flex-shrink:0"></span><span style="font-weight:600">${hh.stock}</span></div><div style="font-size:9px;color:var(--t3);margin-top:1px;padding-left:13px">${barW}%</div></td>`
+        +`<td style="white-space:nowrap;position:sticky;left:0;background:var(--bg2);z-index:2"><div style="display:flex;align-items:center;gap:6px">${stockLogo(hh.stock,PAL[i%PAL.length],parseFloat(barW),36,startPct)}<div><div style="font-weight:600">${hh.stock}</div><div style="font-size:9px;color:var(--t3)">${barW}%</div></div></div></td>`
         +`<td class="r m">${(+hh.qty).toLocaleString()}</td>`
         +`<td class="r m" style="font-size:11px">${hh.avg>0?fc(hh.avg,ccy,3):'—'}</td>`
         +`<td class="r">${fc(hh.cost,ccy)}</td>`
@@ -3290,7 +3385,7 @@ setTimeout(matchScanLine,300);
 </script>
 
 <!-- Bottom tab bar -->
-<div id="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(15,20,32,0.85),rgba(10,15,25,0.98));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(79,195,247,0.2);display:flex;align-items:center;justify-content:space-around;padding:6px 0 calc(6px + env(safe-area-inset-bottom));box-shadow:0 -8px 32px rgba(0,0,0,0.6),0 -1px 0 rgba(79,195,247,0.1)">
+<div id="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(2,6,16,0.97),rgba(1,3,10,0.99));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,212,255,0.1);display:flex;align-items:center;justify-content:space-around;padding:5px 0 calc(5px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 rgba(0,212,255,0.05),0 -8px 40px rgba(0,0,0,0.8)">
   <button onclick="swTab('dashboard')" data-nav="dashboard" class="bnav-btn">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 8l10 6 10-6-10-6z"/><path d="M2 16l10 6 10-6"/><path d="M2 12l10 6 10-6"/></svg>
     <span>Dashboard</span>

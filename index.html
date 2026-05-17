@@ -9,108 +9,103 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* Page layers — clearly stepped */
-  --bg:#07090f;       /* deepest — page background */
-  --bg2:#0f1420;      /* cards / surfaces */
-  --bg3:#161d2e;      /* elevated — inputs, mini-cards, hover */
-  --bg4:#1d2640;      /* highest elevation — sub-headers, dropdowns */
-  /* Borders — graduated visibility */
-  --b1:#22304a;       /* subtle dividers */
-  --b2:#2e4060;       /* stronger borders, focus rings */
-  --b3:#3a5070;       /* accent borders */
-  /* Text */
-  --t1:#eceef4;       /* primary */
-  --t2:#7e8ea8;       /* secondary */
-  --t3:#445268;       /* muted / placeholders */
-  /* Accent colours */
-  --blue:#4fc3f7;     --bd:#0d2236;  --bdd:#071827;
-  --green:#4caf82;    --gd:#0d2419;
-  --red:#f06060;      --rd:#2e1212;
-  --amber:#f0a840;
-  /* Shared */
-  --r:8px;--rl:12px;
-  /* Section accent — thin left border on cards */
-  --card-border-top: 1px solid var(--b1);
+  --bg:#04060e;
+  --bg2:#080d18;
+  --bg3:#0d1424;
+  --bg4:#121b30;
+  --b1:#1a2438;
+  --b2:#243048;
+  --b3:#2e3d5c;
+  --t1:#e8edf8;
+  --t2:#6b7fa0;
+  --t3:#364560;
+  --blue:#00d4ff;     --bd:#001e2e;  --bdd:#000f18;
+  --green:#00e676;    --gd:#002614;
+  --red:#ff4d6d;      --rd:#2a0a12;
+  --amber:#ffaa00;
+  --r:6px;--rl:10px;
+  --card-border-top:1px solid var(--b1);
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);font-size:13px;min-height:100vh}
 
-/* ── Inputs & selects ────────────────────────────────────────────── */
+/* ── Inputs & selects ── */
 input,select{font-family:inherit;font-size:16px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);color:var(--t1);padding:7px 10px;outline:none;width:100%;transition:border .15s}
 input[type="date"]{-webkit-appearance:none;appearance:none;min-height:36px;color:var(--t1)}
-input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,195,247,.1)}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(0,212,255,.08)}
 select option{background:var(--bg4)}
 
-/* ── Buttons ─────────────────────────────────────────────────────── */
+/* ── Buttons ── */
 button{font-family:inherit;font-size:12px;cursor:pointer;border-radius:var(--r);border:1px solid var(--b2);padding:6px 14px;background:transparent;color:var(--t1);transition:all .15s}
 button:hover{background:var(--bg3);border-color:var(--b3)}
-button.pri{background:var(--bd);border-color:var(--blue);color:var(--blue);font-weight:600}
-button.pri:hover{background:#122d46}
+button.pri{background:linear-gradient(135deg,#001e2e,#002a3e);border-color:var(--blue);color:var(--blue);font-weight:600;box-shadow:0 0 12px rgba(0,212,255,.15),inset 0 1px 0 rgba(0,212,255,.1)}
+button.pri:hover{box-shadow:0 0 20px rgba(0,212,255,.3)}
 button.dng{background:var(--rd);border-color:var(--red);color:var(--red)}
 button.gdng{border-color:var(--red);color:var(--red);background:transparent}
 button.amb{border-color:var(--amber);color:var(--amber);background:transparent}
 button.sm{padding:4px 10px;font-size:11px}
 button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
 
-/* ── Cards — clearly elevated surfaces with accent top border ────── */
+/* ── Cards ── */
 .card{
-  background:var(--bg2);
+  background:linear-gradient(160deg,var(--bg2) 0%,var(--bg) 100%);
   border:1px solid var(--b1);
-  border-top:2px solid var(--b2);   /* slightly thicker top = section feel */
+  border-top:1px solid var(--b2);
   border-radius:var(--rl);
-  padding:1.125rem 1.25rem;
-  margin-bottom:1rem;
+  padding:1rem 1.125rem;
+  margin-bottom:.875rem;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
 }
 
-/* ── Tables ─────────────────────────────────────────────────────── */
+/* ── Tables ── */
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl thead{background:var(--bg4)}
-.tbl th{padding:8px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:2px solid var(--b2);white-space:nowrap;letter-spacing:.3px}
-.tbl td{padding:8px 10px;border-bottom:1px solid var(--b1);vertical-align:middle;white-space:nowrap;text-align:center}
+.tbl th{padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--t2);border-bottom:1px solid var(--b2);white-space:nowrap;letter-spacing:.3px}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--b1);vertical-align:middle;white-space:nowrap;text-align:center}
 .tbl th.r{text-align:center;white-space:nowrap}
 .tbl td.r{text-align:center;white-space:nowrap}
 .tbl th:first-child,.tbl td:first-child{text-align:left}
 .tbl tbody tr:hover td{background:var(--bg3)}
 .tbl tbody tr.ck:hover td{background:var(--bg3);cursor:pointer}
-.tbl tfoot td{padding:8px 10px;border-top:2px solid var(--b2);font-weight:600;border-bottom:none;background:var(--bg4);white-space:nowrap;color:var(--amber);text-align:center}
+.tbl tfoot td{padding:7px 10px;border-top:1px solid var(--b2);font-weight:600;border-bottom:none;background:var(--bg4);white-space:nowrap;color:var(--amber);text-align:center}
 .tbl tfoot td.r{text-align:center}
 .tbl tfoot td:first-child{text-align:left}
 
-/* ── Colour utility ──────────────────────────────────────────────── */
+/* ── Colour utility ── */
 .g{color:var(--green)}.rr{color:var(--red)}.m{color:var(--t2)}.am{color:var(--amber)}
 
-/* ── Tabs ────────────────────────────────────────────────────────── */
+/* ── Tabs ── */
 .tab{
   border:none;border-bottom:2px solid transparent;border-radius:0;
-  padding:9px 16px;font-size:13px;color:var(--t2);background:transparent;white-space:nowrap;
-  transition:color .15s;
+  padding:8px 14px;font-size:12px;color:var(--t2);background:transparent;white-space:nowrap;
+  transition:color .15s;font-family:'Courier New',monospace;letter-spacing:.5px;
 }
 .tab:hover{color:var(--t1)}
-.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700;text-shadow:0 0 8px rgba(0,212,255,.4)}
 
-/* ── Misc UI ─────────────────────────────────────────────────────── */
+/* ── Misc UI ── */
 .badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
 .ib{border:none;background:transparent;padding:3px 6px;font-size:13px;color:var(--t3);cursor:pointer}
 .ib:hover{color:var(--t1)}
 
-/* Section label — now has a tinted bg strip for visual separation */
 .stl{
-  font-size:10px;font-weight:700;color:var(--t2);
-  text-transform:uppercase;letter-spacing:.7px;
+  font-size:9px;font-weight:700;color:var(--t3);
+  letter-spacing:1px;
   margin-bottom:.75rem;
-  padding:.3rem .5rem;
+  padding:.25rem .75rem;
   background:var(--bg4);
-  border-radius:5px;
+  border:1px solid var(--b1);
+  border-radius:4px;
   display:inline-block;
+  font-family:'Courier New',monospace;
 }
 
 .lbl{font-size:11px;color:var(--t2);margin-bottom:5px;display:block}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px} .full{grid-column:1/-1}
 
-/* CCY tag — now blue-tinted so it reads as "currency" immediately */
 .ctag{
   font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;
-  background:var(--bd);color:var(--blue);display:inline-block;
-  border:1px solid var(--b2);
+  background:rgba(0,212,255,.08);color:var(--blue);display:inline-block;
+  border:1px solid rgba(0,212,255,.2);
 }
 
 .pill{border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;transition:all .15s}
@@ -118,34 +113,34 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   width:130px;height:34px;
   padding:0 10px;
-  background:linear-gradient(160deg,#1e2a3a 0%,#131c28 100%);
-  border:1px solid rgba(0,212,255,0.35);
-  border-top:1px solid rgba(0,212,255,0.65);
-  border-bottom:2px solid rgba(0,90,160,0.9);
+  background:linear-gradient(160deg,#0d1828 0%,#060e1a 100%);
+  border:1px solid rgba(0,212,255,0.2);
+  border-top:1px solid rgba(0,212,255,0.4);
   border-radius:20px;
   font-size:12px;font-weight:600;color:var(--t1);
   cursor:pointer;white-space:nowrap;overflow:hidden;
-  box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 8px rgba(0,180,255,0.12),inset 0 1px 0 rgba(255,255,255,0.07);
+  box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 8px rgba(0,180,255,0.08);
   flex-shrink:0;
 }
 
 /* Toast */
-.toast{position:fixed;bottom:20px;right:20px;background:var(--gd);border:1px solid var(--green);color:var(--green);padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast{position:fixed;bottom:80px;right:16px;background:rgba(0,22,14,0.95);border:1px solid var(--green);color:var(--green);padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-family:'Courier New',monospace;letter-spacing:.5px;box-shadow:0 0 16px rgba(0,230,118,.2)}
 .toast.show{opacity:1}
 
 /* Overlay & modal */
-#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto}
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto;backdrop-filter:blur(4px)}
 #ov.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--b2);border-top:2px solid var(--blue);border-radius:var(--rl);padding:1.75rem;width:580px;max-width:96vw;max-height:90vh;overflow-y:auto}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:1.25rem;color:var(--t1)}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-top:2px solid var(--blue);border-radius:var(--rl);padding:1.5rem;width:580px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,212,255,.08)}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:1.25rem;color:var(--t1);font-family:'Courier New',monospace;letter-spacing:.5px}
 
-/* Header bar — deeper, clearly separated from content */
+/* Header */
 #hd{
-  background:var(--bg2);
-  border-bottom:1px solid var(--b2);
+  background:linear-gradient(180deg,#04060e 0%,#060810 100%);
+  border-bottom:1px solid var(--b1);
   padding:0 16px;
   display:flex;flex-direction:column;justify-content:center;
   position:fixed;top:0;left:0;right:0;z-index:100;
+  box-shadow:0 4px 24px rgba(0,0,0,.6);
 }
 #hd .logo{
   font-family:'Courier New',monospace;
@@ -173,11 +168,36 @@ button.ghost{border-color:var(--b1);color:var(--t2);background:transparent}
   0%,100%{transform:translateY(0px)}
   50%{transform:translateY(-4px)}
 }
+@keyframes holoBG{
+  0%{opacity:0.4}
+  50%{opacity:1}
+  100%{opacity:0.4}
+}
+@keyframes particleDrift{
+  0%{top:85%;opacity:0}
+  10%{opacity:1}
+  90%{opacity:1}
+  100%{top:5%;opacity:0}
+}
 @keyframes scanLine{
   0%{transform:translateX(-100%);opacity:0}
-  20%{opacity:1}
-  80%{opacity:1}
+  10%{opacity:1}
+  90%{opacity:1}
   100%{transform:translateX(200%);opacity:0}
+}
+@keyframes scanLine2{
+  0%,40%{transform:translateX(-100%);opacity:0}
+  50%{opacity:0.7}
+  90%{opacity:0.7}
+  100%{transform:translateX(200%);opacity:0}
+}
+@keyframes cornerPulse{
+  0%,100%{opacity:0.5;box-shadow:none}
+  50%{opacity:1;box-shadow:0 0 8px rgba(255,255,255,0.6)}
+}
+@keyframes rodPulse{
+  0%,100%{box-shadow:0 0 6px rgba(255,255,255,0.4),0 0 14px rgba(255,255,255,0.15)}
+  50%{box-shadow:0 0 10px rgba(255,255,255,0.8),0 0 24px rgba(255,255,255,0.3),0 0 40px rgba(255,255,255,0.1)}
 }
 @keyframes barPulse{
   0%,100%{transform:scaleY(1);opacity:0.7}
@@ -347,7 +367,7 @@ body.privacy-on #mn span[style*="color:#f060"]{
         <span id="logo-x" style="font-family:'Courier New',monospace;display:inline-block;font-size:22px;font-weight:900;font-style:normal;background:linear-gradient(135deg,#ffe566,#ff9900,#ff4400);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:xPulse 2s ease-in-out infinite;filter:drop-shadow(0 0 4px rgba(255,140,0,0.8))">_X</span>
       </div>
       <div id="scan-line-wrap" style="display:inline-flex;align-items:center;gap:3px;margin-top:6px;justify-content:center">
-        <span id="eq-date" style="font-family:'Courier New',monospace;font-size:10px;color:#ffffff;letter-spacing:1px;margin-right:5px;font-weight:700"></span>
+        <span id="eq-date" style="font-family:'Courier New',monospace;font-size:10px;color:rgba(220,235,255,0.75);letter-spacing:1px;margin-right:5px;font-weight:700"></span>
         <div style="width:3px;height:10px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0s;box-shadow:0 0 5px #00d4ff"></div>
         <div style="width:3px;height:18px;background:#00d4ff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.1s;box-shadow:0 0 5px #00d4ff"></div>
         <div style="width:3px;height:8px;background:#00aaff;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.2s"></div>
@@ -358,7 +378,7 @@ body.privacy-on #mn span[style*="color:#f060"]{
         <div style="width:3px;height:24px;background:#ff9900;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.7s;box-shadow:0 0 8px #ff9900"></div>
         <div style="width:3px;height:14px;background:#ff6600;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.8s;box-shadow:0 0 5px #ff6600"></div>
         <div style="width:3px;height:9px;background:#ff4400;border-radius:1px;animation:barPulse 1.2s ease-in-out infinite;animation-delay:0.9s"></div>
-        <span id="eq-time" style="font-family:'Courier New',monospace;font-size:10px;color:#ffffff;letter-spacing:1px;margin-left:5px;font-weight:700"></span>
+        <span id="eq-time" style="font-family:'Courier New',monospace;font-size:10px;color:rgba(220,235,255,0.75);letter-spacing:1px;margin-left:5px;font-weight:700"></span>
       </div>
     </div>
     <!-- Right: hidden buttons only -->
@@ -392,8 +412,10 @@ body.privacy-on #mn span[style*="color:#f060"]{
   </div>
 </div>
 <div id="tb-wrap" style="display:none"></div>
-<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem .75rem;font-size:12px;"></div>
+<div id="date-bar" style="display:none;position:fixed;left:0;right:0;z-index:98;background:var(--bg3);border-bottom:1px solid var(--b1);padding:.4rem .75rem;font-size:12px;text-align:center;"></div>
+<div id="grand-wrap" style="display:none;position:fixed;left:0;right:0;z-index:9;padding:0 16px"></div>
 <div id="mn">
+  <div id="grand-spacer" style="display:none"></div>
   <div id="ct"></div>
 </div>
 <div id="ov"><div class="modal" id="mi"></div></div>
@@ -405,7 +427,7 @@ const SK='pfx_v6';
 const CCYS=['MYR','SGD','USD','HKD','GBP','EUR'];
 const TYPES=['Buy','Sell','Dividend','Platform Fee'];
 const PAL=['#4fc3f7','#66bb6a','#ffb74d','#ce93d8','#ef9a9a','#80deea','#f48fb1','#a5d6a7','#90caf9','#ffcc02'];
-const PFPAL=['#e57373','#64b5f6','#81c784','#ffb300','#ab47bc','#26c6da','#ff7043','#9ccc65','#5c6bc0','#f06292'];
+const PFPAL=['#00d4ff','#00e676','#ff4d6d','#ffaa00','#bf5af2','#ff6b35','#00fff0','#ff2d78','#7b61ff','#39ff14','#ff007f','#00b4d8'];
 const SYM={MYR:'RM',SGD:'S$',USD:'US$',HKD:'HK$',GBP:'£',EUR:'€'};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const $=id=>document.getElementById(id);
@@ -722,8 +744,8 @@ const STOCK_DOMAINS={
   'CapLand Ascendas':'capitaland.com','TopGlove SG':'topglove.com',
 };
 function stockLogo(ticker,color,pct,size=36,startPct=0){
-  const r=size/2-3;
-  const circ=2*Math.PI*r;
+  const arcR=size/2-1;
+  const circ=2*Math.PI*arcR;
   const pctClamped=Math.min(Math.max(pct||0,0),100);
   const dash=circ*pctClamped/100;
   const gap=circ-dash;
@@ -731,39 +753,22 @@ function stockLogo(ticker,color,pct,size=36,startPct=0){
   const initial=ticker.replace(/[^A-Z]/gi,'').charAt(0)||'?';
   const id='g'+ticker.replace(/[^a-z0-9]/gi,'_')+size;
   const h=size/2;
-  // Hexagon points
-  const hex=Array.from({length:6},(_,i)=>{
-    const a=(i*60-90)*Math.PI/180;
-    return`${h+r*Math.cos(a)},${h+r*Math.sin(a)}`;
-  }).join(' ');
-  return`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0">
+  const c=size*0.18;
+  const shape=`${c},0 ${size-c},0 ${size},${c} ${size},${size-c} ${size-c},${size} ${c},${size} 0,${size-c} 0,${c}`;
+  return`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0;overflow:visible">
     <defs>
-      <linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="${color}" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="${color}" stop-opacity="0.4"/>
-      </linearGradient>
-      <filter id="glow${id}">
-        <feGaussianBlur stdDeviation="1.5" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <clipPath id="clip${id}"><polygon points="${hex}"/></clipPath>
+      <filter id="${id}f"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     </defs>
-    <!-- Dark bg hex -->
-    <polygon points="${hex}" fill="#0a0f1e" stroke="${color}" stroke-width="0.5" opacity="0.6"/>
-    <!-- Gradient fill hex -->
-    <polygon points="${hex}" fill="url(#${id})" opacity="0.7"/>
-    <!-- Inner hex ring -->
-    <polygon points="${Array.from({length:6},(_,i)=>{const a=(i*60-90)*Math.PI/180;const ri=r*0.65;return`${h+ri*Math.cos(a)},${h+ri*Math.sin(a)}`;}).join(' ')}" fill="none" stroke="${color}" stroke-width="0.5" opacity="0.3"/>
-    <!-- Initial letter -->
-    <text x="${h}" y="${h+1}" dominant-baseline="middle" text-anchor="middle" font-size="${Math.round(size*.38)}" font-weight="800" fill="#fff" font-family="'Courier New',monospace" opacity="0.95">${initial}</text>
-    <!-- Track arc -->
-    <circle cx="${h}" cy="${h}" r="${r+2}" fill="none" stroke="${color}" stroke-width="1" opacity="0.1"/>
-    <!-- Glowing arc -->
-    <circle cx="${h}" cy="${h}" r="${r+2}" fill="none" stroke="${color}" stroke-width="2.5"
-      stroke-dasharray="${dash*(r+2)/r} ${gap*(r+2)/r}"
+    <polygon points="${shape}" fill="#08101e" stroke="${color}" stroke-width="1" opacity="0.85"/>
+    <text x="${h}" y="${h+1}" dominant-baseline="middle" text-anchor="middle"
+      font-size="${Math.round(size*.42)}" font-weight="900" fill="${color}"
+      font-family="'Courier New',monospace" opacity="0.9">${initial}</text>
+    <circle cx="${h}" cy="${h}" r="${arcR}" fill="none" stroke="${color}" stroke-width="0.5" opacity="0.1"/>
+    <circle cx="${h}" cy="${h}" r="${arcR}" fill="none" stroke="${color}" stroke-width="2.5"
+      stroke-dasharray="${dash} ${gap}"
       stroke-linecap="${pctClamped>=99.9?'butt':'round'}"
       transform="rotate(${startAngle} ${h} ${h})"
-      filter="url(#glow${id})" opacity="0.9"/>
+      filter="url(#${id}f)" opacity="0.95"/>
   </svg>`;
 }
 function togglePfMenu(){
@@ -794,6 +799,10 @@ function toggleSettings(){
   renderSettingsChips();
   renderSettingsPx();
   document.body.style.overflow='hidden';
+  // Highlight settings button in nav
+  document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.remove('active'));
+  const sb=document.getElementById('bnav-settings');
+  if(sb)sb.classList.add('active');
 }
 function closeSettings(){
   const p=document.getElementById('settings-panel');
@@ -801,6 +810,10 @@ function closeSettings(){
   const ov=document.getElementById('settings-overlay');
   if(ov)ov.style.display='none';
   document.body.style.overflow='';
+  // Restore active tab
+  document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===TAB));
+  const sb=document.getElementById('bnav-settings');
+  if(sb)sb.classList.remove('active');
   document.removeEventListener('click',closeSettingsOutside);
 }
 function closeSettingsOutside(e){}
@@ -885,25 +898,50 @@ function spxFromSettings(){
   });
   S.fx=_fx;save();
   const t=$('toast');t.textContent='Prices saved ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2000);
-  render();
+  closeSettings();
+  TAB='dashboard';VIEW=null;render();
 }
 function renderSettingsChips(){
   const chips=document.getElementById('settings-pf-chips');
   if(!chips)return;
   const isDashboard=TAB==='dashboard';
-  const allRow='<button onclick="closeSettings();TAB=\'dashboard\';VIEW=null;journeyFilter=null;render()" style="width:100%;text-align:left;padding:6px 10px;background:'+(isDashboard?'rgba(59,130,246,0.15)':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isDashboard?'var(--blue)':'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px">'
+  const allRow='<div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">'
+    +'<button onclick="closeSettings();TAB=\'dashboard\';VIEW=null;journeyFilter=null;render()" style="flex:1;text-align:left;padding:6px 10px;background:'+(isDashboard?'rgba(59,130,246,0.15)':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isDashboard?'var(--blue)':'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px">'
     +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue)"></span>'
     +'<span style="font-weight:'+(isDashboard?700:400)+'">All Portfolios</span>'
     +(isDashboard?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
-    +'</button>';
+    +'</button></div>';
   chips.innerHTML=allRow+S.portfolios.map(p=>{
     const isActive=!isDashboard&&S.activeId===p.id;
-    return'<button onclick="closeSettings();swPf(\''+p.id+'\')" style="width:100%;text-align:left;padding:6px 10px;background:'+(isActive?p.color+'22':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isActive?p.color:'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:2px">'
+    return'<div id="pfrow-'+p.id+'" style="display:flex;align-items:center;gap:4px;margin-bottom:4px">'
+      +'<button onclick="settingsSelectPf(\''+p.id+'\')" style="flex:1;text-align:left;padding:6px 10px;background:'+(isActive?p.color+'22':'transparent')+';border:none;border-radius:6px;font-size:12px;color:'+(isActive?p.color:'var(--t1)')+';cursor:pointer;display:flex;align-items:center;gap:8px">'
       +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+'"></span>'
       +'<span style="font-weight:'+(isActive?700:400)+'">'+p.name+'</span>'
       +(isActive?'<span style="margin-left:auto;font-size:10px;opacity:.6">✓</span>':'')
-      +'</button>';
+      +'</button>'
+      +'<button id="edit-'+p.id+'" onclick="window._fromSettings=true;S.activeId=\''+p.id+'\';closeSettings();omm(\'ep\')" style="display:none;padding:4px 7px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px;color:var(--t2);font-size:11px;cursor:pointer;flex-shrink:0">✏️</button>'
+      +(S.portfolios.length>1?'<button id="del-'+p.id+'" onclick="window._fromSettings=true;S.activeId=\''+p.id+'\';closeSettings();omm(\'dp\')" style="display:none;padding:4px 7px;background:var(--bg3);border:1px solid var(--b1);border-radius:5px;color:var(--red);font-size:11px;cursor:pointer;flex-shrink:0">🗑️</button>':'')
+      +'</div>';
   }).join('');
+}
+function settingsSelectPf(id){
+  // Show icons for tapped portfolio, hide others
+  S.portfolios.forEach(p=>{
+    const edit=document.getElementById('edit-'+p.id);
+    const del=document.getElementById('del-'+p.id);
+    const show=p.id===id;
+    if(edit)edit.style.display=show?'':'none';
+    if(del)del.style.display=show?'':'none';
+  });
+  // Switch active portfolio
+  swPf(id);
+  // Re-render chips to reflect active state
+  renderSettingsChips();
+  // Show icons again after re-render
+  const edit=document.getElementById('edit-'+id);
+  const del=document.getElementById('del-'+id);
+  if(edit)edit.style.display='';
+  if(del)del.style.display='';
 }
 function togglePfMenu(){toggleSettings();}
 function closePfMenu(){closeSettings();}
@@ -998,27 +1036,41 @@ function renderDashboard(){
       const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pfee=sum.platformFees[ccy]||0;
       const t=Math.round((u+d+r-pfee)*100)/100;
       const tp=co>0?t/co*100:null;
-      // Allocation % of this portfolio in the total for this CCY
       const allocPct=g.mv>0?(mv/g.mv*100):0;
-      const allocPctStr=allocPct.toFixed(1);
       const pfCash=(pf0.cashBalances&&pf0.cashBalances[ccy])||0;
       const mvPlusCash=mv+pfCash;
+      const isPos=t>=0;
+      const pnlColor=isPos?'var(--green)':'var(--red)';
 
-      return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')">'
-        +'<td style="max-width:130px;position:sticky;left:0;background:var(--bg2);z-index:2">'
-        +'<div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
-        +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+pf0.color+';margin-right:4px;vertical-align:middle"></span>'
-        +pf0.name+'</div>'
-        +'<div style="display:flex;align-items:center;gap:5px;margin-top:3px">'
-        +'<div style="width:'+(allocPct*0.4).toFixed(1)+'px;height:3px;background:'+pf0.color+';border-radius:3px;flex-shrink:0"></div>'
-        +'<span style="font-size:9px;color:var(--t2)">'+allocPctStr+'%</span>'
+      return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')" style="border:none">'
+        +'<td colspan="4" style="padding:4px 2px">'
+        +'<div style="background:linear-gradient(135deg,'+pf0.color+'18,'+pf0.color+'08);border:1px solid '+pf0.color+'33;border-left:3px solid '+pf0.color+';border-radius:8px;padding:8px 10px;position:relative;overflow:hidden">'
+        // shimmer line
+        +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+pf0.color+'66,transparent)"></div>'
+        // top row: name + arrow
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+        +'<span style="display:inline-flex;width:8px;height:8px;border-radius:2px;background:'+pf0.color+';box-shadow:0 0 6px '+pf0.color+'"></span>'
+        +'<span style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px">'+pf0.name+'</span>'
+        +'<span style="font-size:9px;color:'+pf0.color+';background:'+pf0.color+'22;padding:1px 5px;border-radius:3px;font-family:Courier New,monospace">'+allocPct.toFixed(1)+'%</span>'
+        +'</div>'
+        +'<span style="color:var(--t3);font-size:12px">›</span>'
+        +'</div>'
+        // allocation bar
+        +'<div style="height:2px;background:rgba(255,255,255,0.06);border-radius:1px;margin-bottom:6px;overflow:hidden">'
+        +'<div style="height:100%;width:'+allocPct.toFixed(1)+'%;background:'+pf0.color+';border-radius:1px;box-shadow:0 0 4px '+pf0.color+'"></div>'
+        +'</div>'
+        // bottom row: holdings value + P&L
+        +'<div style="display:flex;align-items:center;justify-content:space-between">'
+        +'<div><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Holdings</div>'
+        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:#fff">'+fc(mv,ccy)+'</div></div>'
+        +'<div style="text-align:right"><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Total P&L <span style="opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
+        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:'+pnlColor+'">'+sgn(t,ccy)+'</div>'
+        +(tp!==null?'<div class="pv-num" style="font-size:9px;color:'+pnlColor+'">'+fp(tp)+'</div>':'')
+        +'</div>'
+        +'</div>'
         +'</div>'
         +'</td>'
-        +'<td class="r" style="font-weight:600;white-space:nowrap">'+fc(mv,ccy)+'</td>'
-        +'<td class="r '+sc(t)+'" style="font-weight:600">'+sgn(t,ccy)
-        +(tp!==null?'<br><span style="font-size:10px;font-weight:600;color:'+(t>=0?'var(--green)':'var(--red)')+'">'+fp(tp)+'</span>':'')
-        +'</td>'
-        +'<td style="color:var(--t3);font-size:11px">›</td>'
         +'</tr>';
     }).join('');
 
@@ -1068,11 +1120,12 @@ function renderDashboard(){
       +'<div></div>'
       +'</div>';
 
-    return '<div style="'+ccyCardStyle(ccy)+'">'
-      // Header — just CCY tag + total value
+    return '<div style="'+ccyCardStyle(ccy)+';position:relative;padding-top:1.25rem">'
+      // CCY badge overlapping the top border
+      +'<div style="position:absolute;top:-6px;left:14px">'+ccyTag(ccy,'')+'</div>'
+      // Header — CCY tag + total value
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
       +'<div>'
-      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
@@ -1081,26 +1134,32 @@ function renderDashboard(){
       +'<span class="pv-hide" style="font-size:18px;font-weight:700;color:var(--t1)">••••</span>'
       +'</div>'
       +'</div>'
-      // Total P&L card — clickable toggle
-      +'<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:.875rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+dashMiniId+'\')" title="Tap to show/hide breakdown">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(Unreal + Real + Div - Fee)</span></div>'
+      // Total P&L card — 3D colored, clickable toggle
+      +'<div style="padding:10px 12px;border-radius:var(--r);margin-bottom:.875rem;cursor:pointer;position:relative;overflow:hidden;'
+      +'background:linear-gradient(135deg,'+ccyAccent(ccy)+'22 0%,'+ccyAccent(ccy)+'08 100%);'
+      +'border:1px solid '+ccyAccent(ccy)+'44;'
+      +'border-top:2px solid '+ccyAccent(ccy)+'88;'
+      +'box-shadow:0 4px 16px '+ccyAccent(ccy)+'18,inset 0 1px 0 '+ccyAccent(ccy)+'22" onclick="toggleMini(\''+dashMiniId+'\')">'
+      +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'66,transparent)"></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7)">Total P&L / %<br><span style="font-size:8px;opacity:.5;font-weight:400">(Unreal + Real + Div - Fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+(tot>=0?'rgba(0,230,118,.15)':'rgba(255,77,109,.15)')+';border:1px solid '+(tot>=0?'rgba(0,230,118,.3)':'rgba(255,77,109,.3)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
       +'</div>'
       +'</div>'
       // Mini cards — hidden by default
       +'<div id="'+dashMiniId+'" style="display:none">'
       +dashMiniCards
       +'</div>'
-      // Portfolio allocation table
-      +'<div style="overflow-x:auto"><table class="tbl" style="border-top:2px solid '+ccyAccent(ccy)+'">'
-      +'<thead><tr>'
-      +'<th style="position:sticky;left:0;background:var(--bg3);z-index:3">Portfolio</th>'
-      +'<th class="r">Holdings</th>'
-      +'<th class="r">Total P&L<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(Unreal + Real + Div)</span></th>'
-      +'<th style="width:24px"></th>'
-      +'</tr></thead>'
+      // Portfolio cards
+      +'<div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px">'
+      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,'+ccyAccent(ccy)+',transparent)"></div>'
+      +'<span style="font-size:8px;color:var(--t3);font-family:Courier New,monospace;letter-spacing:1px;white-space:nowrap">PORTFOLIOS</span>'
+      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+')"></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px;padding:4px 0"><table style="width:100%;border-collapse:collapse">'
       +'<tbody>'+pfRows+'</tbody>'
       +'</table></div>'
       +'</div>';
@@ -1133,45 +1192,87 @@ function renderDashboard(){
   const pnlColor=grandMYRPnl>=0?'#00e676':'#ff4d6d';
   const pnlBar=grandMYRInvested>0?Math.min(Math.abs(grandMYR/grandMYRInvested)*100,100):0;
   const barColor=grandMYRPnl>=0?'#00e676':'#ff4d6d';
-  const accentColor=grandMYRPnl>=0?'rgba(0,230,118,':'rgba(255,77,109,';
-
-  const gaugeChart='<div id="grand-card" style="cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,#060d1a 0%,#0b1628 50%,#060d1a 100%);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 8px 40px rgba(0,0,0,0.6)">'
-    // Animated border via pseudo-like overlay
-    +'<div style="position:absolute;inset:0;border-radius:var(--r);padding:1.5px;background:linear-gradient(135deg,rgba(0,212,255,0.6),'+accentColor+'0.4),rgba(0,212,255,0.1),rgba(0,212,255,0.6));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;animation:borderPulse 3s ease-in-out infinite"></div>'
-    // Top shimmer sweep
-    +'<div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);animation:shimmerSweep 4s ease-in-out infinite;pointer-events:none"></div>'
-    // Content
-    +'<div style="position:relative;z-index:1">'
-    // Row 1: label + count
-    +'<div style="font-size:9px;color:rgba(0,212,255,0.7);letter-spacing:.8px;font-weight:600;margin-bottom:3px">Total Portfolio Value <span style="color:rgba(0,212,255,0.4)">('+S.portfolios.length+')</span></div>'
-    // Row 2: big value
-    +'<div class="pv-val" style="font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.1;text-shadow:0 0 20px rgba(0,212,255,0.2)">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
-    +'<div class="pv-hide" style="font-size:26px;font-weight:900;color:#fff;letter-spacing:3px;line-height:1.1">••••••</div>'
-    // Row 3: MYR label
-    +'<div style="font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:1.5px;margin-bottom:6px;text-align:right">MYR EQUIVALENT</div>'
-    // Row 4: animated progress bar
-    +'<div style="height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:8px;overflow:hidden">'
-    +'<div style="height:100%;width:'+pnlBar+'%;background:linear-gradient(90deg,'+barColor+',rgba(255,255,255,0.6),'+barColor+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+barColor+';animation:barShimmer 2s linear infinite"></div>'
+  const gaugeChart=
+    '<div id="grand-card" style="cursor:pointer;position:relative;overflow:hidden;'    +'background:linear-gradient(160deg,#050508 0%,#09090f 40%,#050507 70%,#08080d 100%);'    +'border-radius:16px;padding:.9rem 1rem .85rem;'    +'box-shadow:'    +'0 0 0 1px rgba(255,255,255,0.1),'    +'0 0 0 2px rgba(0,0,0,0.8),'    +'0 1px 0 rgba(255,255,255,0.14) inset,'    +'0 -1px 0 rgba(0,0,0,0.9) inset,'    +'0 4px 12px rgba(0,0,0,0.5),'    +'0 8px 24px rgba(0,0,0,0.3)">'
+    // Radial top glow
+    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(255,255,255,0.06),transparent 60%);pointer-events:none"></div>'
+    // Holographic colour shift layer
+    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.03) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.02) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+    // Top edge — peak white with glow
+    +'<div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2) 10%,rgba(255,255,255,0.9) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.9) 65%,rgba(255,255,255,0.2) 90%,transparent);box-shadow:0 0 10px rgba(255,255,255,0.4),0 0 30px rgba(255,255,255,0.1);pointer-events:none"></div>'
+    // Left rod — pulsing
+    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.5) 20%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.5) 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.3);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+    // Energy particles — 3 dots on left bar
+    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 10px rgba(255,255,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,0.7);box-shadow:0 0 4px rgba(255,255,255,0.9);animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
+    // Corner brackets — TL brightest, animated
+    +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:1.5px solid rgba(255,255,255,0.95);border-left:1.5px solid rgba(255,255,255,0.95);border-radius:14px 0 0 0;pointer-events:none;animation:cornerPulse 3s ease-in-out infinite"></div>'
+    +'<div style="position:absolute;top:24px;right:0;width:10px;height:10px;border-top:1px solid rgba(255,255,255,0.4);border-right:1px solid rgba(255,255,255,0.4);pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-left:1px solid rgba(255,255,255,0.3);border-radius:0 0 0 14px;pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-right:1px solid rgba(255,255,255,0.3);border-radius:0 0 14px 0;pointer-events:none"></div>'
+    // Primary scan beam
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.95),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,0.7)"></div>'
+    // Ghost scan beam
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+    // Diagonal shimmer
+    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.07) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+    // Bottom pulse line
+    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);box-shadow:0 0 6px rgba(255,255,255,0.2);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
+    // Notch
+    +'<div style="position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 22px 22px 0;border-color:transparent var(--bg) transparent transparent;z-index:2"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(255,255,255,0.1),transparent 60%);pointer-events:none;z-index:1"></div>'
+    +'<div style="position:absolute;top:5px;right:5px;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 8px rgba(255,255,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
+    +'<div style="position:relative;z-index:1;padding-left:12px">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between">'
+    +'<div>'
+    +'<div style="font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:1px;font-family:Courier New,monospace;text-align:center">TOTAL PORTFOLIO VALUE <span style="opacity:.5">('+(S.portfolios.length)+')</span></div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:.3px">(Cash + Holdings only)</div>'
     +'</div>'
-    // Row 5: Invested + P&L
+    +'<div class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 60px rgba(120,80,255,0.3),0 2px 4px rgba(0,0,0,0.8)">RM '+grandMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:3px;white-space:nowrap">••••••</div>'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">'
+    +'<div style="flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
+    +'<div style="height:100%;width:'+pnlBar+'%;background:linear-gradient(90deg,rgba(255,255,255,0.4),rgba(255,255,255,0.9),rgba(255,255,255,0.4));background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.4);animation:barShimmer 2s linear infinite"></div>'
+    +'</div>'
+    +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">MYR EQUIVALENT</div>'
+    +'</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
     +'<div>'
-    +'<div style="font-size:8px;color:rgba(0,212,255,0.5);letter-spacing:.3px;margin-bottom:2px">Total Invested</div>'
-    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
-    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9)">••••••</div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:2px">Total Invested</div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+gaugeInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
+    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
     +'</div>'
-    +'<div>'
-    +'<div style="font-size:8px;color:'+pnlColor+';opacity:.8;letter-spacing:.3px;margin-bottom:2px">Total P&L / %</div>'
-    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+pnlColor+';text-shadow:0 0 10px '+pnlColor+'40">'+(grandMYRPnl>=0?'+':'')+'RM '+Math.abs(grandMYRPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(grandPnlPct!==null?' ('+(grandPnlPct>=0?'+':'')+grandPnlPct.toFixed(1)+'%)':'')+'</div>'
+    +'<div style="text-align:right">'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+pnlColor+';text-shadow:0 0 12px '+pnlColor+'60">'+(grandMYRPnl>=0?'+':'')+'RM '+Math.abs(grandMYRPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(grandPnlPct!==null?' ('+(grandPnlPct>=0?'+':'')+grandPnlPct.toFixed(1)+'%)':'')+'</div>'
     +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+pnlColor+'">•••••• (•••%)</div>'
     +'</div>'
     +'</div>'
     +'</div>'
     +'</div>';
-   const grandCard='<div id="sticky-grand" onclick="togglePrivacy()" style="position:sticky;top:var(--sticky-top,0);z-index:10;margin-bottom:0;cursor:pointer">'+gaugeChart+'</div>';
+  const grandCard='';
+  setTimeout(function(){
+    const gw=document.getElementById('grand-wrap');
+    const gs=document.getElementById('grand-spacer');
+    if(gw){
+      // Set top immediately before rendering
+      const hd=document.getElementById('hd');
+      const tb=document.getElementById('tb-wrap');
+      const db=document.getElementById('date-bar');
+      const hdH=hd?hd.getBoundingClientRect().height:0;
+      const tbH=tb?tb.getBoundingClientRect().height:0;
+      const dbH=db&&db.style.display!=='none'?db.getBoundingClientRect().height:0;
+      gw.style.top=(hdH+tbH+dbH)+'px';
+      gw.innerHTML='<div onclick="togglePrivacy()" style="cursor:pointer">'+gaugeChart+'</div>';
+      gw.style.display='block';
+      const h=gw.getBoundingClientRect().height;
+      if(gs){gs.style.display='block';gs.style.height=h+'px';}
+      fixLayout();
+    }
+  },0);
   return grandCard+summaryCcyCards;
 }
-
 
 function drawDashboardCharts(){}
 
@@ -1199,10 +1300,11 @@ function liveClock(){
   }
   if(eqTime){
     let hr=now.getHours();
-    const ampm=hr>=12?'pm':'am';
+    const ampm=hr>=12?'PM':'AM';
     hr=hr%12||12;
     const min=String(now.getMinutes()).padStart(2,'0');
-    eqTime.textContent=hr+'.'+min+ampm;
+    const sec=String(now.getSeconds()).padStart(2,'0');
+    eqTime.textContent=hr+':'+min+':'+sec+' '+ampm;
   }
 }
 let _clockTimer=null;
@@ -1211,6 +1313,7 @@ function setDateBar(label){
   if(!db)return;
   db.style.display='flex';
   db.style.alignItems='center';
+  db.style.justifyContent='center';
   db.style.color='#eceef4';
   db.innerHTML='<span style="color:#7e8ea8;font-size:11px;font-family:Courier New,monospace;letter-spacing:.5px">'+label+'</span>';
   if(_clockTimer)clearInterval(_clockTimer);
@@ -1227,7 +1330,11 @@ function renderContent(){
     $('ct').innerHTML=renderStockDetail(p,VIEW.stock,VIEW.ccy);fixLayout();return;
   }
   if(TAB==='dashboard'){setDateBar('Dashboard');$('ct').innerHTML=renderDashboard();setTimeout(drawDashboardCharts,50);}
-  else if(TAB==='overview'){setDateBar((p?p.name:'')+'  — Overview');$('ct').innerHTML=renderOverview(p);}
+  else if(TAB==='overview'){
+    setDateBar((p?p.name:'')+'  — Overview');
+    const content=renderOverview(p);
+    $('ct').innerHTML=content;
+  }
   else if(TAB==='holdings'){setDateBar((p?p.name:'')+'  — Holdings');$('ct').innerHTML=renderHoldings(p);}
   else if(TAB==='transactions'){setDateBar((p?p.name:'')+'  — Transactions');$('ct').innerHTML=renderTransactions(p);}
   else if(TAB==='options'){window.txSubTab='option';TAB='transactions';setDateBar((p?p.name:'')+'  — Transactions');$('ct').innerHTML=renderTransactions(p);}
@@ -1253,20 +1360,66 @@ function renderOverview(p){
   });
   const usedFxCcys=allCcys.filter(function(c){return c!=='MYR';});
   const fxNoteOv=usedFxCcys.map(function(c){return c+': RM '+(_fx[c]||1).toFixed(2);}).join(' · ');
-  const personCard='<div style="background:linear-gradient(135deg,#1a1200 0%,#2a1f00 40%,#1a1200 100%);border:1px solid rgba(180,140,0,0.4);border-top:2px solid rgba(200,160,0,0.7);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;box-shadow:0 4px 16px rgba(150,100,0,0.2),inset 0 1px 0 rgba(255,220,100,0.07)">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+  // Calculate P&L for this portfolio
+  let personInvested=0,personPnl=0;
+  allCcys.forEach(function(ccy){
+    const co=sum.cost[ccy]||0;
+    const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pf=sum.platformFees[ccy]||0;
+    personInvested+=toMYR(co,ccy);
+    personPnl+=toMYR(Math.round((u+d+r-pf)*100)/100,ccy);
+  });
+  const personPnlPct=personInvested>0?personPnl/personInvested*100:null;
+  const personPnlColor=personPnl>=0?'#00e676':'#ff4d6d';
+  const personBar=personInvested>0?Math.min(Math.abs(personMYR/personInvested)*100,100):0;
+
+  const personCard=
+    '<div id="grand-card-ov" style="cursor:pointer;position:relative;overflow:hidden;'    +'background:linear-gradient(160deg,#050508 0%,#09090f 40%,#050507 70%,#08080d 100%);'    +'border-radius:16px;padding:.9rem 1rem .85rem;'    +'box-shadow:'    +'0 0 0 1px rgba(255,255,255,0.1),'    +'0 0 0 2px rgba(0,0,0,0.8),'    +'0 1px 0 rgba(255,255,255,0.14) inset,'    +'0 -1px 0 rgba(0,0,0,0.9) inset,'    +'0 4px 12px rgba(0,0,0,0.5),'    +'0 8px 24px rgba(0,0,0,0.3)">'
+    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(255,255,255,0.06),transparent 60%);pointer-events:none"></div>'
+    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.03) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.02) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2) 10%,rgba(255,255,255,0.9) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.9) 65%,rgba(255,255,255,0.2) 90%,transparent);box-shadow:0 0 10px rgba(255,255,255,0.4),0 0 30px rgba(255,255,255,0.1);pointer-events:none"></div>'
+    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.5) 20%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.5) 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.3);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 10px rgba(255,255,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,0.7);box-shadow:0 0 4px rgba(255,255,255,0.9);animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:1.5px solid rgba(255,255,255,0.95);border-left:1.5px solid rgba(255,255,255,0.95);border-radius:14px 0 0 0;pointer-events:none;animation:cornerPulse 3s ease-in-out infinite"></div>'
+    +'<div style="position:absolute;top:24px;right:0;width:10px;height:10px;border-top:1px solid rgba(255,255,255,0.4);border-right:1px solid rgba(255,255,255,0.4);pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-left:1px solid rgba(255,255,255,0.3);border-radius:0 0 0 14px;pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-right:1px solid rgba(255,255,255,0.3);border-radius:0 0 14px 0;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.95),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,0.7)"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.07) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);box-shadow:0 0 6px rgba(255,255,255,0.2);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 22px 22px 0;border-color:transparent var(--bg) transparent transparent;z-index:2"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(255,255,255,0.1),transparent 60%);pointer-events:none;z-index:1"></div>'
+    +'<div style="position:absolute;top:5px;right:5px;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 8px rgba(255,255,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
+    +'<div style="position:relative;z-index:1;padding-left:12px">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between">'
     +'<div>'
-    +'<div style="font-size:10px;font-weight:600;letter-spacing:.5px;color:#ffffff">'+p.name+' Portfolio Value</div>'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px">(Cash + Holdings only)</div>'
+    +'<div style="font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:1px;font-family:Courier New,monospace;text-align:center">'+p.name.toUpperCase()+' PORTFOLIO VALUE</div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:.3px">(Cash + Holdings only)</div>'
+    +'</div>'
+    +'<div class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 60px rgba(120,80,255,0.3),0 2px 4px rgba(0,0,0,0.8)">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+    +'<div class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:3px;white-space:nowrap">••••••</div>'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">'
+    +'<div style="flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
+    +'<div style="height:100%;width:'+personBar+'%;background:linear-gradient(90deg,rgba(255,255,255,0.4),rgba(255,255,255,0.9),rgba(255,255,255,0.4));background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.4);animation:barShimmer 2s linear infinite"></div>'
+    +'</div>'
+    +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">MYR EQUIVALENT</div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:2px">Total Invested</div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+personInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
+    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
     +'</div>'
     +'<div style="text-align:right">'
-    +'<div class="pv-val" style="font-size:22px;font-weight:800;white-space:nowrap;color:#ffffff;filter:drop-shadow(0 1px 0 rgba(0,0,0,0.8))">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
-    +'<div class="pv-hide" style="font-size:22px;font-weight:800;color:#ffffff;letter-spacing:3px">••••••</div>'
-    +'<div style="font-size:9px;color:rgba(255,255,255,0.55)">MYR equivalent</div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
+    +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+personPnlColor+';text-shadow:0 0 12px '+personPnlColor+'60">'+(personPnl>=0?'+':'')+'RM '+Math.abs(personPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(personPnlPct!==null?' ('+(personPnlPct>=0?'+':'')+personPnlPct.toFixed(1)+'%)':'')+'</div>'
+    +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+personPnlColor+'">•••••• (•••%)</div>'
+    +'</div>'
     +'</div>'
     +'</div>'
     +'</div>';
-
   const summaryCcyCards=allCcys.map((ccy,ci)=>{
     const rows=holdings.filter(h=>h.ccy===ccy);
     const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pf=sum.platformFees[ccy]||0;
@@ -1369,21 +1522,27 @@ function renderOverview(p){
 
     const miniId='mini-'+ccy+'-'+ci;
     const miniRow='<div id="'+miniId+'" style="display:none;margin-bottom:.875rem">'+miniCards+'</div>';
-    const pnlCard='<div style="padding:9px 12px;border-radius:var(--r);margin-bottom:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleMini(\''+miniId+'\')" title="Tap to show/hide breakdown">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.3px">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.5);text-transform:none;letter-spacing:0">(Unreal + Real + Div - Fee)</span></div>'
+    const accent=ccyAccent(ccy);
+    const pnlCard='<div style="padding:10px 12px;border-radius:var(--r);margin-bottom:6px;cursor:pointer;position:relative;overflow:hidden;'
+      +'background:linear-gradient(135deg,'+accent+'22 0%,'+accent+'08 100%);'
+      +'border:1px solid '+accent+'44;'
+      +'border-top:2px solid '+accent+'88;'
+      +'box-shadow:0 4px 16px '+accent+'18,inset 0 1px 0 '+accent+'22" onclick="toggleMini(\''+miniId+'\')">'
+      +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+'66,transparent)"></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div style="font-size:10px;color:rgba(255,255,255,.7)">Total P&L / %<br><span style="font-size:8px;opacity:.5;font-weight:400">(Unreal + Real + Div - Fee)</span></div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:20px;background:'+(tot>=0?'var(--gd)':'var(--rd)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+(tot>=0?'rgba(0,230,118,.15)':'rgba(255,77,109,.15)')+';border:1px solid '+(tot>=0?'rgba(0,230,118,.3)':'rgba(255,77,109,.3)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      +'</div>'
       +'</div>'
       +'</div>';
 
-    // Fix 1: Header — remove right-side Total P&L (it's in pie centre now)
-    // Header — CCY tag + total value
+    // Header — badge overlapping top border
     const pctBadge=pct!==null?pnlPill(pct):'';
     const header='<div style="margin-bottom:.75rem">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:.75rem">'
       +'<div>'
-      +ccyTag(ccy,'margin-bottom:4px;display:inline-block')
       +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
       +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
       +'</div>'
@@ -1397,14 +1556,36 @@ function renderOverview(p){
 
     const pieHtml="";
 
-    return '<div style="'+ccyCardStyle(ccy)+'">'
+    return '<div style="'+ccyCardStyle(ccy)+';position:relative;padding-top:1.25rem">'
+      +'<div style="position:absolute;top:-6px;left:14px">'+ccyTag(ccy,'')+'</div>'
       +header
       +miniRow
       +colourBar
       +holdingsTable
       +'</div>';
   }).join('');
-  return'<div id="sticky-person" onclick="togglePrivacy()" style="position:sticky;top:var(--sticky-top,0);z-index:10;background:var(--bg1);padding-bottom:2px;cursor:pointer">'+personCard+'</div>'+summaryCcyCards;
+  // Inject personCard into grand-wrap (same fixed position as dashboard grand card)
+  setTimeout(function(){
+    const gw=document.getElementById('grand-wrap');
+    const gs=document.getElementById('grand-spacer');
+    if(gw){
+      const hd=document.getElementById('hd');
+      const tb=document.getElementById('tb-wrap');
+      const db=document.getElementById('date-bar');
+      const hdH=hd?hd.getBoundingClientRect().height:0;
+      const tbH=tb?tb.getBoundingClientRect().height:0;
+      const dbH=db&&db.style.display!=='none'?db.getBoundingClientRect().height:0;
+      gw.style.top=(hdH+tbH+dbH)+'px';
+      gw.innerHTML='<div onclick="togglePrivacy()" style="cursor:pointer">'+personCard+'</div>';
+      gw.style.display='block';
+      setTimeout(function(){
+        const h=gw.getBoundingClientRect().height;
+        if(gs){gs.style.display='block';gs.style.height=h+'px';}
+        fixLayout();
+      },50);
+    }
+  },0);
+  return summaryCcyCards;
 }
 function drawOverviewCharts(p){
   const h=getHoldings(p,true);
@@ -1578,9 +1759,9 @@ function renderTransactions(p){
   if(window.txSubTab===undefined)window.txSubTab='trade';
   function tabBtn(key,label){
     const on=window.txSubTab===key;
-    return`<button onclick="window.txSubTab='${key}';renderContent()" style="padding:6px 18px;font-size:12px;font-weight:${on?700:500};border-radius:20px;border:1.5px solid ${on?'var(--blue)':'var(--b2)'};color:${on?'var(--blue)':'var(--t2)'};background:${on?'var(--bd)':'transparent'};cursor:pointer;transition:all .15s">${label}</button>`;
+    return`<button onclick="window.txSubTab='${key}';renderContent()" style="padding:6px 20px;font-size:12px;font-weight:${on?700:500};border-radius:20px;border:1px solid ${on?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)'};color:${on?'#fff':'rgba(255,255,255,0.35)'};background:${on?'rgba(255,255,255,0.08)':'transparent'};cursor:pointer;transition:all .2s;box-shadow:${on?'0 0 12px rgba(255,255,255,0.12),inset 0 1px 0 rgba(255,255,255,0.15)':'none'}">${label}</button>`;
   }
-  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem">${tabBtn('trade','Trade')}${tabBtn('option','Option')}</div>`;
+  const subTabs=`<div style="display:flex;gap:8px;margin-bottom:1.25rem;justify-content:center">${tabBtn('trade','Trade')}${tabBtn('option','Option')}</div>`;
   if(window.txSubTab==='option'){
     return`<div>${subTabs}${renderOptions()}</div>`;
   }
@@ -1622,13 +1803,13 @@ function renderTx(p,filterYrCcy){
     _closedByCcy[ccy].d=Math.round(_closedByCcy[ccy].d*100)/100;
   });
   const _closedSummary=Object.entries(_closedByCcy).map(([ccy,v])=>
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem">'
-    +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'
-    +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">P&L Realized ('+ccy+')</div>'
-    +'<div style="font-size:14px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,ccy)+'</div></div>'
-    +'<div style="padding:8px 12px;background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r)">'
-    +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px;margin-bottom:2px">Dividends ('+ccy+')</div>'
-    +'<div style="font-size:14px;font-weight:700;color:'+(v.d>0?'var(--green)':'var(--t3)')+'">'+( v.d>0?fc(v.d,ccy):'—')+'</div></div>'
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.75rem">'
+    +'<div style="padding:10px 12px;background:linear-gradient(135deg,#090910,#0c0c18);border:1px solid rgba(255,255,255,0.06);border-radius:8px">'
+    +'<div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.3px;margin-bottom:3px">P&L Realized ('+ccy+')</div>'
+    +'<div style="font-size:13px;font-weight:700" class="'+sc(v.r)+'">'+sgn(v.r,ccy)+'</div></div>'
+    +'<div style="padding:10px 12px;background:linear-gradient(135deg,#090910,#0c0c18);border:1px solid rgba(255,255,255,0.06);border-radius:8px">'
+    +'<div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.3px;margin-bottom:3px">Dividends ('+ccy+')</div>'
+    +'<div style="font-size:13px;font-weight:700;color:'+(v.d>0?'var(--green)':'var(--t3)')+'">'+( v.d>0?fc(v.d,ccy):'—')+'</div></div>'
     +'</div>'
   ).join('');
   const _closedRows=_closedAll.map(h=>{
@@ -1656,10 +1837,10 @@ function renderTx(p,filterYrCcy){
     +(_closedAll.length===0?'<div class="m" style="text-align:center;padding:2rem;font-size:12px">No realized P&L yet.</div>':'')
     +'</div>';
   html+='<div id="tx-table-wrap">'
-    +'<div onclick="toggleTxRows(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
-    +'<span class="tx-toggle-arrow">▶</span>'
-    +'<span>Trades: '+txs.length+'</span>'
-    +''
+    +'<div onclick="toggleTxRows(this)" style="cursor:pointer;position:relative;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-left:3px solid rgba(255,255,255,0.4);border-radius:var(--r);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:.5px;font-family:Courier New,monospace">'
+    +'<span class="tx-toggle-arrow" style="font-size:10px;opacity:.5">▶</span>'
+    +'<span>TRADES</span>'
+    +'<span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:1px 8px" id="tx-table-count-label">'+txs.length+'</span>'
     +'</div>'
     +'<div class="tx-rows-body" style="display:none;overflow-x:auto"><table class="tbl" id="tx-table"><thead><tr>'
     +'<th>Date</th><th>Type</th><th>Stock</th><th class="r">Qty</th><th class="r">Price</th>'
@@ -1996,14 +2177,17 @@ function omm(mode,data){
   }
   MM=mode;if(data!==undefined)ETX=data||null;renderModal();$('ov').classList.add('open');
 }
-function cmm(){$('ov').classList.remove('open');MM=null;ETX=null;DTX=null;}
+function cmm(){$('ov').classList.remove('open');MM=null;ETX=null;DTX=null;
+  // If opened from settings context, reopen settings
+  if(window._fromSettings){window._fromSettings=false;toggleSettings();}
+}
 $('ov').addEventListener('click',e=>{if(e.target===$('ov'))cmm();});
 function setupAC(){const inp=$('ts'),list=$('ac-list');if(!inp||!list)return;const dict=stockDict(),stocks=Object.keys(dict);inp.addEventListener('input',()=>{const q=inp.value.trim().toLowerCase();const m=stocks.filter(s=>s.toLowerCase().includes(q)&&q.length>0);if(!m.length){list.classList.remove('open');return;}list.innerHTML=m.map(s=>`<div class="ac-item" onclick="selStk('${s}','${dict[s]}')"><span>${s}</span><span class="ac-ccy">${dict[s]}</span></div>`).join('');list.classList.add('open');});inp.addEventListener('blur',()=>setTimeout(()=>list.classList.remove('open'),200));}
 function selStk(n,c){const i=$('ts'),cc=$('tc'),l=$('ac-list');if(i)i.value=n;if(cc)cc.value=c;if(l)l.classList.remove('open');}
 
 function renderModal(){
   const p=pf();let h='';
-  if(MM==='ap'||MM==='ep'){const ep=MM==='ep'?p:null;h=`<h3>${ep?'Edit portfolio':'New portfolio'}</h3><div style="margin-bottom:12px"><label class="lbl">Name</label><input id="pn" value="${ep?ep.name:''}" placeholder="e.g. My Bursa"></div><label class="lbl">Color</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center">${PFPAL.map(c=>`<div onclick="slc('${c}')" data-c="${c}" style="width:24px;height:24px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${ep&&ep.color===c?'#fff':'transparent'}"></div>`).join('')}<input type="color" id="pc" value="${ep?ep.color:PAL[0]}" style="width:30px;height:30px;padding:2px;border-radius:6px"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="pri" onclick="${ep?'dep()':'aap()'}">${ep?'Save':'Create'}</button></div>`;}
+  if(MM==='ap'||MM==='ep'){const ep=MM==='ep'?p:null;h=`<h3>${ep?'Edit portfolio':'New portfolio'}</h3><div style="margin-bottom:12px"><label class="lbl">Name</label><input id="pn" value="${ep?ep.name:''}" placeholder="e.g. My Bursa"></div><label class="lbl">Color</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center">${PFPAL.map(c=>`<div onclick="slc('${c}')" data-c="${c}" style="width:26px;height:26px;border-radius:4px;background:${c};cursor:pointer;border:2px solid ${ep&&ep.color===c?'#fff':c+'44'};box-shadow:${ep&&ep.color===c?'0 0 8px '+c+',0 0 16px '+c+'88':'none'};transition:all .15s"></div>`).join('')}<input type="color" id="pc" value="${ep?ep.color:PAL[0]}" style="width:30px;height:30px;padding:2px;border-radius:4px"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="pri" onclick="${ep?'dep()':'aap()'}">${ep?'Save':'Create'}</button></div>`;}
   else if(MM==='dp'){h=`<h3>Delete portfolio?</h3><p style="color:var(--t2);line-height:1.7;margin-bottom:1.25rem">Delete <strong style="color:var(--t1)">${p.name}</strong> and all ${p.transactions.length} transactions? Cannot be undone.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="cmm()">Cancel</button><button class="dng" onclick="ddp()">Delete</button></div>`;}
   else if(MM==='at'||MM==='et'){
     const isEdit=MM==='et';
@@ -2155,14 +2339,20 @@ function doRestore(e){
       if(!confirm(`Restore backup? This will replace all current data with ${data.portfolios.length} portfolio(s) from the backup.`))return;
       S=data;
       if(!S.pieImages)S.pieImages={};
-      // Migrate older backups — add any missing fields
+      // Migrate older backups — add any missing fields, preserve colors
       S.portfolios.forEach(function(pf,idx){
-        pf.color=PFPAL[idx%PFPAL.length];
+        if(!pf.color)pf.color=PFPAL[idx%PFPAL.length];
         if(!pf.optionTrades)pf.optionTrades=[];
         if(!pf.cashBalances)pf.cashBalances={};
-        if(!pf.deposits)pf.deposits=[];if(!pf.deposits)pf.deposits=[];
+        if(!pf.deposits)pf.deposits=[];
       });
-      save();render();
+      if(!S.activeId&&S.portfolios.length)S.activeId=S.portfolios[0].id;
+      save();
+      // Close settings and go to dashboard
+      const sp=document.getElementById('settings-panel');
+      if(sp)sp.style.display='none';
+      TAB='dashboard';VIEW=null;journeyFilter=null;
+      render();
       const t=$('toast');t.textContent='Restored ✓';t.classList.add('show');clearTimeout(TT);TT=setTimeout(()=>{t.classList.remove('show');t.textContent='Saved ✓';},2500);
     }catch(err){alert('Error: invalid or corrupted backup file. Please use a valid .json backup.');}
     e.target.value='';
@@ -2173,15 +2363,16 @@ function doRestore(e){
 // ── Actions ────────────────────────────────────────────────────────────────────
 function swPf(id){S.activeId=id;TAB='overview';VIEW=null;journeyFilter=null;save();render();}
 function swTab(t){
+  closeSettings();
   TAB=t;VIEW=null;journeyFilter=null;
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   document.querySelectorAll('#bottom-nav button[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===t));
   renderPfTabs();renderTabMenu();renderContent();updateGlobalPlus();
 }
-function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>el.style.border=el.dataset.c===c?'3px solid #fff':'3px solid transparent');}
-function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;cmm();save();render();}
-function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);cmm();save();render();}
-function ddp(){S.portfolios=S.portfolios.filter(p=>p.id!==S.activeId);S.activeId=S.portfolios[0].id;cmm();save();render();}
+function slc(c){const i=$('pc');if(i)i.value=c;document.querySelectorAll('[data-c]').forEach(el=>{const sel=el.dataset.c===c;el.style.border=sel?'2px solid #fff':'2px solid '+el.dataset.c+'44';el.style.boxShadow=sel?'0 0 8px '+c+',0 0 16px '+c+'88':'none';});}
+function aap(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;const p0={id:uid(),name:n,color:col||PFPAL[S.portfolios.length%PFPAL.length],transactions:[],prices:{}};S.portfolios.push(p0);S.activeId=p0.id;window._fromSettings=false;cmm();save();render();toggleSettings();}
+function dep(){const n=($('pn')||{}).value?.trim(),col=($('pc')||{}).value;if(!n)return;S.portfolios=S.portfolios.map(p=>p.id===S.activeId?{...p,name:n,color:col}:p);window._fromSettings=false;cmm();save();render();toggleSettings();}
+function ddp(){S.portfolios=S.portfolios.filter(p=>p.id!==S.activeId);S.activeId=S.portfolios[0].id;window._fromSettings=false;cmm();save();render();toggleSettings();}
 function ttc(){const t=($('tt')||{}).value,isF=t==='Dividend'||t==='Platform Fee',isPF=t==='Platform Fee';['tqw','tpw','tfw'].forEach(id=>{const e=$(id);if(e)e.style.display=isF?'none':'';});const aw=$('taw');if(aw)aw.style.display=isF?'':'none';const sw=$('tsw');if(sw)sw.style.display=isPF?'none':'';const al=aw?aw.querySelector('label'):null;if(al)al.textContent=isPF?'Fee Amount (deducted from Realized P&L)':'Amount';}
 function gTx(){const type=($('tt')||{}).value,isF=type==='Dividend'||type==='Platform Fee',isPF=type==='Platform Fee';return{date:($('td')||{}).value||'',type,stock:isPF?'':($('ts')?$('ts').value.trim():''),ccy:($('tc')||{}).value||'USD',qty:isF?0:+(($('tq')||{}).value||0),price:isF?0:+(($('tp')||{}).value||0),fee:isF?0:+(($('tf')||{}).value||0),amount:isF?+(($('ta')||{}).value||0):null,note:($('tn')||{}).value||''};}
 function aat(){const d=gTx();if(['Buy','Sell'].includes(d.type)&&!d.stock){alert('Please enter a stock name.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.qty>0)){alert('Please enter a valid quantity.');return;}if(['Buy','Sell'].includes(d.type)&&!(+d.price>0)){alert('Please enter a valid price.');return;}const tx={id:uid(),...d};S.portfolios=S.portfolios.map(p=>p.id!==S.activeId?p:{...p,transactions:[...p.transactions,tx]});cmm();save();render();}
@@ -2286,20 +2477,27 @@ function renderOptions(){
 
   // ── Total P&L summary — row 1: Total, row 2: Realized | Unrealized ──
   const summary=`<div style="margin-bottom:1.25rem">
-    <div class="kc" style="margin-bottom:6px">
+    <div style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0a0a14,#0d0d1c);border:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 14px;margin-bottom:6px;box-shadow:0 2px 0 rgba(255,255,255,0.06) inset,0 4px 16px rgba(0,0,0,0.4)">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)"></div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:nowrap">
         <div>
-          <div class="kl" style="margin-bottom:1px;font-size:11px">Total P&L</div>
-          <div style="font-size:9px;color:var(--t3)">(realized + unrealized)</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:.3px;margin-bottom:1px">Total P&L</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.2)">(realized + unrealized)</div>
         </div>
         <div style="flex:1"></div>
-        <div class="pv-val" style="font-size:18px;font-weight:700;white-space:nowrap;color:${totalPnl>=0?'var(--green)':'var(--red)'}">${fmtN(totalPnl)}</div>
+        <div class="pv-val" style="font-size:18px;font-weight:700;white-space:nowrap;color:${totalPnl>=0?'var(--green)':'var(--red)'};">${fmtN(totalPnl)}</div>
         <div class="pv-hide" style="font-size:18px;font-weight:700;color:${totalPnl>=0?'var(--green)':'var(--red)'}">••••</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div class="kc"><div class="kl">Realized P&L</div><div class="kv ${realPnl>=0?'g':'rr'}" style="white-space:nowrap">${fmtN(realPnl)}</div></div>
-      <div class="kc"><div class="kl">Unrealized P&L</div><div class="kv ${unrPnl>0?'g':unrPnl<0?'rr':'m'}" style="white-space:nowrap">${hasMktCount?fmtN(unrPnl):'—'}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div style="background:linear-gradient(135deg,#090910,#0c0c18);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px">
+        <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:3px">Realized P&L</div>
+        <div style="font-size:13px;font-weight:700;white-space:nowrap;color:${realPnl>=0?'var(--green)':'var(--red)'}">${fmtN(realPnl)}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#090910,#0c0c18);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px">
+        <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:3px">Unrealized P&L</div>
+        <div style="font-size:13px;font-weight:700;white-space:nowrap;color:${unrPnl>0?'var(--green)':unrPnl<0?'var(--red)':'var(--t2)'}">${hasMktCount?fmtN(unrPnl):'—'}</div>
+      </div>
     </div>
   </div>`;
 
@@ -2311,7 +2509,7 @@ function renderOptions(){
 
   function mkRow(t,i,extraClass=''){
     const open=isOpen(t);
-    const bg=open?'rgba(99,179,237,0.06)':'rgba(251,191,36,0.04)';
+    const bg=open?'rgba(0,212,255,0.04)':'rgba(255,255,255,0.02)';
     const cls=extraClass?` class="${extraClass}"`:'';
     const styleAttr=`style="background:${bg}"`;    const o=parseFloat(t.openValue)||0;
     const c=!open?parseFloat(t.closeValue)||0:null;
@@ -2365,9 +2563,9 @@ function renderOptions(){
     ...closedRows.map(x=>({...x,_open:false}))
   ];
 
-  const openBar=openRows.length?`<div onclick="toggleOpenOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="open-opts-arrow">▶</span><span>Open positions: ${openRows.length}</span></div>`:'';
+  const openBar=openRows.length?`<div onclick="toggleOpenOpts(this)" style="cursor:pointer;position:relative;overflow:hidden;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-left:3px solid rgba(255,255,255,0.4);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:.3px"><span class="open-opts-arrow" style="font-size:10px;opacity:.5">▶</span><span>Open positions</span><span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:1px 8px">${openRows.length}</span></div>`:'';
 
-  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24"><span class="closed-opts-arrow">▶</span><span>Closed trades: ${closedRows.length}</span></div>`:'';
+  const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;position:relative;overflow:hidden;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-left:3px solid rgba(255,255,255,0.2);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.3px"><span class="closed-opts-arrow" style="font-size:10px;opacity:.4">▶</span><span>Closed trades</span><span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1px 8px">${closedRows.length}</span></div>`:'';
 
   const openTable=openRows.length?`<div class="open-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
 
@@ -2383,9 +2581,9 @@ function renderOptions(){
     <input id="opt-all-search" placeholder="Search all trades…" oninput="filterOptsAll()" style="flex:1;box-sizing:border-box">
     <button class="pri sm" onclick="addOpt()" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;font-size:18px;line-height:1;border-radius:50%;flex-shrink:0">+</button>
   </div>
-  <div style="margin-bottom:.75rem">
-    <div style="font-size:16px;font-weight:700;margin-bottom:3px">Option P&L</div>
-    <div style="font-size:11px;color:var(--t2)">Standalone option trades — not included in portfolio P&L</div>
+  <div style="margin-bottom:.75rem;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-left:3px solid rgba(255,255,255,0.3);border-radius:var(--r)">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,0.7);margin-bottom:2px">Option P&L</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:.3px">Standalone — not included in portfolio P&L</div>
   </div>${summary}
   ${combinedTable}${empty}`;
 }
@@ -2961,12 +3159,12 @@ function doWelcomeRestore(e){
 
 function ccyCardStyle(ccy){
   const map={
-    'MYR':'border-left:4px solid #a855f7;border-top:1px solid #2a2040;border-right:1px solid #2a2040;border-bottom:1px solid #2a2040;background:#13101e;',
-    'SGD':'border-left:4px solid #f97316;border-top:1px solid #2a1e10;border-right:1px solid #2a1e10;border-bottom:1px solid #2a1e10;background:#141008;',
-    'USD':'border-left:4px solid #3b82f6;border-top:1px solid #10182a;border-right:1px solid #10182a;border-bottom:1px solid #10182a;background:#0c1018;',
+    'MYR':'border-left:3px solid #a855f7;background:#13101e;',
+    'SGD':'border-left:3px solid #f97316;background:#141008;',
+    'USD':'border-left:3px solid #3b82f6;background:#0c1018;',
   };
-  const s=map[ccy]||'border-left:4px solid #4fc3f7;border:1px solid #1a2a3a;background:#0c1420;';
-  return s+'border-radius:var(--rl);padding:1.125rem 1.25rem;margin-bottom:1rem;';
+  const s=map[ccy]||'border-left:3px solid #4fc3f7;background:#0c1420;';
+  return s+'border-top:1px solid rgba(255,255,255,0.06);border-right:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);border-radius:var(--rl);padding:1.125rem 1.25rem;margin-bottom:1rem;margin-top:8px;overflow:visible;';
 }
 
 // ── Per-CCY coloured tag ──────────────────────────────────────────
@@ -3141,14 +3339,15 @@ function renderDeposits(p){
       const net=totDep-totWit;
       const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
-      return'<div style="background:var(--bg3);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:10px 12px">'
+      return'<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#080810,#0c0c18);border-radius:10px;border:1px solid rgba(255,255,255,0.06);border-top:2px solid '+accent+';padding:12px;box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)">'
+        +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+',transparent);opacity:0.6"></div>'
         +'<div style="margin-bottom:10px">'+ccyTag(ccy)+'</div>'
-        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Total Deposit</div>'
-        +'<div class="pv-num" style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
-        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Total Withdrawal</div>'
-        +'<div class="pv-num" style="font-size:13px;font-weight:600;color:'+(totWit>0?'var(--red)':'var(--t3)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
-        +'<div style="border-top:1px solid var(--b1);padding-top:8px">'
-        +'<div style="font-size:9px;color:var(--t2);letter-spacing:.3px">Net Capital</div>'
+        +'<div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.3px">Total Deposit</div>'
+        +'<div class="pv-num" style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">'+(totDep>0?'+'+fc(totDep,ccy):'—')+'</div>'
+        +'<div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.3px">Total Withdrawal</div>'
+        +'<div class="pv-num" style="font-size:13px;font-weight:700;color:'+(totWit>0?'var(--red)':'rgba(255,255,255,0.2)')+';margin-bottom:8px">'+(totWit>0?'-'+fc(totWit,ccy):'—')+'</div>'
+        +'<div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:8px">'
+        +'<div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.3px">Net Capital</div>'
         +'<div class="pv-num" style="font-size:14px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+'">'+fc(net,ccy)+'</div>'
         +'</div>'
         +'</div>';
@@ -3176,11 +3375,13 @@ function renderDeposits(p){
     }).join('');
 
     const safeKey=ccy.replace(/[^a-z]/gi,'_');
+    const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+    const accent=CCY_ACCENT[ccy]||'#4fc3f7';
     return'<div style="margin-bottom:1.25rem">'
-      +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#fbbf24">'
-      +'<span class="dep-toggle-arrow-'+safeKey+'">▶</span>'
-      +'<span>'+ccyFlag(ccy)+' '+ccy+' Cash Flow: '+cdeps.length+'</span>'
-      +''
+      +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-left:3px solid '+accent+';border-radius:var(--r);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.65)">'
+      +'<span class="dep-toggle-arrow-'+safeKey+'" style="font-size:10px;opacity:.5;color:'+accent+'">▶</span>'
+      +'<span>'+ccyFlag(ccy)+' '+ccy+' Cash Flow</span>'
+      +'<span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1px 8px">'+cdeps.length+'</span>'
       +'</div>'
       +'<div class="dep-section-body-'+safeKey+'" style="display:none;overflow-x:auto"><table class="tbl">'
       +'<thead><tr><th>Date</th><th>Type</th><th class="r">Amount</th><th>Note</th><th></th></tr></thead>'
@@ -3278,7 +3479,14 @@ function delDeposit(i){
   pf().deposits.splice(i,1);save();renderContent();
 }
 
-function render(){renderPfTabs();renderTabMenu();renderContent();}
+function render(){
+  renderPfTabs();renderTabMenu();renderContent();
+  // Hide grand-wrap when not on dashboard
+  const gw=document.getElementById('grand-wrap');
+  const gs=document.getElementById('grand-spacer');
+  if(gw&&TAB!=='dashboard'&&TAB!=='overview'){gw.style.display='none';gw.innerHTML='';}
+  if(gs&&TAB!=='dashboard'&&TAB!=='overview'){gs.style.display='none';gs.style.height='0';}
+}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>swTab(b.dataset.tab)));
 // + Transaction button now rendered inline in renderTx
 // bpx now inside settings panel, no separate listener needed
@@ -3357,6 +3565,13 @@ function fixLayout(){
   mn.style.paddingTop=(hdH+tbH+dbH+16)+'px';
   // Set sticky top for freeze-pane cards
   document.documentElement.style.setProperty('--sticky-top',(hdH+tbH+dbH)+'px');
+  const gc=document.getElementById('grand-wrap');
+  if(gc&&gc.style.display!=='none'){
+    gc.style.top=(hdH+tbH+dbH)+'px';
+    const gs=document.getElementById('grand-spacer');
+    const gcH=gc.getBoundingClientRect().height;
+    if(gs&&gcH>0)gs.style.height=gcH+'px';
+  }
   updateGlobalPlus();
 }
 // Prevent iOS zoom on input focus
@@ -3385,7 +3600,7 @@ setTimeout(matchScanLine,300);
 </script>
 
 <!-- Bottom tab bar -->
-<div id="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(180deg,rgba(2,6,16,0.97),rgba(1,3,10,0.99));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,212,255,0.1);display:flex;align-items:center;justify-content:space-around;padding:5px 0 calc(5px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 rgba(0,212,255,0.05),0 -8px 40px rgba(0,0,0,0.8)">
+<div id="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:250;background:linear-gradient(180deg,rgba(2,6,16,0.97),rgba(1,3,10,0.99));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,212,255,0.1);display:flex;align-items:center;justify-content:space-around;padding:5px 0 calc(5px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 rgba(0,212,255,0.05),0 -8px 40px rgba(0,0,0,0.8)">
   <button onclick="swTab('dashboard')" data-nav="dashboard" class="bnav-btn">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 8l10 6 10-6-10-6z"/><path d="M2 16l10 6 10-6"/><path d="M2 12l10 6 10-6"/></svg>
     <span>Dashboard</span>
@@ -3409,8 +3624,8 @@ setTimeout(matchScanLine,300);
 </div>
 
 <!-- Settings Full-Page Modal -->
-<div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.6)" onclick="closeSettings()"></div>
-<div id="settings-panel" style="display:none;position:fixed;inset:0;bottom:65px;z-index:200;background:#0f1420;flex-direction:column">
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.6)"></div>
+<div id="settings-panel" style="display:none;position:fixed;inset:0;bottom:65px;z-index:200;background:#0f1420;flex-direction:column" onclick="event.stopPropagation()">
 
   <!-- Header -->
   <div style="flex-shrink:0;background:#0f1420;border-bottom:1px solid var(--b1);padding:12px 16px 10px;display:flex;align-items:center">
@@ -3431,27 +3646,22 @@ setTimeout(matchScanLine,300);
   <div style="flex-shrink:0;display:grid;grid-template-columns:2fr 1fr;border-top:1px solid var(--b1)">
 
     <!-- Portfolios -->
-    <div style="padding:8px 12px;border-right:1px solid var(--b1);display:flex;gap:8px">
-      <!-- Portfolio list -->
-      <div style="flex:1;min-width:0">
-        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Portfolios</div>
-        <div id="settings-pf-chips" style="max-height:120px;overflow-y:auto"></div>
+    <div style="padding:8px 12px;border-right:1px solid var(--b1)">
+      <!-- Header with + button top right -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Portfolios</div>
+        <button onclick="window._fromSettings=true;closeSettings();omm('ap')" class="settings-btn" style="font-size:15px;padding:2px 8px;line-height:1;min-height:unset" title="Add Portfolio">＋</button>
       </div>
-      <!-- Add/Edit/Delete as vertical column -->
-      <div style="display:flex;flex-direction:column;gap:4px;justify-content:flex-start;padding-top:22px;flex-shrink:0">
-        <button onclick="closeSettings();omm('ap')" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap">➕ Add</button>
-        <button onclick="closeSettings();omm('ep')" id="bep" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap">✏️ Edit</button>
-        <button onclick="closeSettings();omm('dp')" id="bdp" class="settings-btn" style="font-size:11px;padding:5px 8px;white-space:nowrap;color:var(--red)">🗑️ Del</button>
-      </div>
+      <div id="settings-pf-chips" style="max-height:120px;overflow-y:auto"></div>
     </div>
 
     <!-- Data — with labels -->
     <div style="padding:8px 10px">
       <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Data</div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <button onclick="closeSettings();document.getElementById('bbk').click()" class="settings-btn" style="color:#f59e0b;font-size:11px">💾 Backup</button>
-        <button onclick="closeSettings();document.getElementById('brs').click()" class="settings-btn" style="color:var(--green);font-size:11px">📂 Restore</button>
-        <button onclick="closeSettings();document.getElementById('bxl').click()" class="settings-btn" style="color:var(--blue);font-size:11px">📊 Excel</button>
+        <button onclick="doBackup()" class="settings-btn" style="color:#f59e0b;font-size:11px">💾 Backup</button>
+        <button onclick="document.getElementById('restore-input').click()" class="settings-btn" style="color:var(--green);font-size:11px">📂 Restore</button>
+        <button onclick="document.getElementById('bxl').click()" class="settings-btn" style="color:var(--blue);font-size:11px">📊 Excel</button>
       </div>
     </div>
 

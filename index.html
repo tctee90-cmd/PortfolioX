@@ -758,6 +758,7 @@ function journeyData(p0){
 function fc(v,ccy,dp=2){const s=SYM[ccy]||ccy;return`${s} ${Math.abs(+v).toLocaleString('en',{minimumFractionDigits:dp,maximumFractionDigits:dp})}`;}
 function sgn(v,ccy){return(v>=0?'+':'-')+fc(Math.abs(v),ccy);}
 function sc(v){return+v>0?'g':+v<0?'rr':'';}
+function scColor(v){return v>=0?'#00e676':'#ff4d6d';}
 function fp(v){return(v>=0?'+':'')+v.toFixed(2)+'%';}
 function pnlPill(pct){if(pct===null||pct===undefined)return'';const col=pct>=0?'var(--green)':'var(--red)',bg=pct>=0?'rgba(0,230,118,0.08)':'rgba(255,77,109,0.08)',br=pct>=0?'rgba(0,230,118,0.25)':'rgba(255,77,109,0.25)';return`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:${col};background:${bg};border:1px solid ${br};margin-left:5px">${fp(pct)}</span>`;}
 function bdg(type){
@@ -950,27 +951,26 @@ function renderSettingsPx(){
   allStocks.forEach(function(s){if(!byCcy[s.ccy])byCcy[s.ccy]=[];byCcy[s.ccy].push(s);});
   Object.keys(byCcy).forEach(function(c){byCcy[c].sort(function(a,b){return b.mktVal-a.mktVal;});});
   const ccyOrder=[...CCY_ORDER.filter(function(c){return byCcy[c];}),...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
-  const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+  const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
   let rowsHtml='';
   if(allStocks.length){
     // Single header row at top
-    rowsHtml='<div style="display:grid;grid-template-columns:1fr 60px 90px;gap:4px;padding:2px 2px;margin-bottom:3px;border-bottom:1px solid var(--b1)">'
-      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px">Stock</span>'
-      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px;text-align:center">CCY</span>'
-      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.3px;text-align:center">Price</span>'
+    rowsHtml='<div style="display:grid;grid-template-columns:1fr 66px 82px;gap:4px;padding:3px 2px;margin-bottom:3px;border-bottom:1px solid var(--b1)">'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.5px;text-transform:uppercase">Stock</span>'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.5px;text-align:center;text-transform:uppercase">CCY</span>'
+      +'<span style="font-size:9px;color:var(--t3);letter-spacing:.5px;text-align:center;text-transform:uppercase">Price</span>'
       +'</div>';
     ccyOrder.forEach(function(ccy){
       const group=byCcy[ccy];const accent=CCY_ACCENT[ccy]||'#4fc3f7';
-      // CCY divider — compact single line
-      rowsHtml+='<div style="font-size:9px;font-weight:700;color:'+accent+';margin:4px 0 2px;padding-left:4px;border-left:2px solid '+accent+'">'+ccy+' — '+group.length+' stock'+(group.length!==1?'s':'')+'</div>';
+      rowsHtml+='<div style="font-size:9px;font-weight:800;color:'+accent+';margin:2px 0 1px;padding:1px 5px;border-left:2px solid '+accent+';background:'+accent+'12;border-radius:0 3px 3px 0;letter-spacing:.5px">'+ccy+' — '+group.length+' stock'+(group.length!==1?'s':'')+'</div>';
       group.forEach(function(item){
         const k=item.stock.replace(/[^a-z0-9]/gi,'_');
         const opts=CCYS.map(function(c){return'<option '+(item.ccy===c?'selected':'')+'>'+c+'</option>';}).join('');
-        const pfBadges=item.pfIds.map(function(pid){const pf0=S.portfolios.find(function(x){return x.id===pid;})||{};return'<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:'+(pf0.color||'#888')+'"></span>';}).join('');
-        rowsHtml+='<div style="display:grid;grid-template-columns:1fr 60px 90px;gap:4px;margin-bottom:5px;align-items:center">'
-          +'<div style="display:flex;align-items:center;gap:3px;min-width:0"><span style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+item.stock+'</span>'+pfBadges+'</div>'
-          +'<select id="spc-'+k+'" style="font-size:16px;text-align:center;text-align-last:center;transform:scale(0.75);transform-origin:center;margin:-4px -9px;width:80px;height:34px">'+opts+'</select>'
-          +'<input type="number" id="spp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:center;font-size:16px;transform:scale(0.75);transform-origin:center;margin:-4px -13px;padding:0 4px;width:120px;height:34px">'
+        const pfBadges=item.pfIds.map(function(pid){const pf0=S.portfolios.find(function(x){return x.id===pid;})||{};return'<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:'+(pf0.color||'#888')+'"></span>';}).join('');
+        rowsHtml+='<div style="display:grid;grid-template-columns:1fr 66px 82px;gap:4px;margin-bottom:2px;align-items:center">'
+          +'<div style="display:flex;align-items:center;gap:3px;min-width:0"><span style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;color:var(--t1)">'+item.stock+'</span>'+pfBadges+'</div>'
+          +'<div style="overflow:hidden;height:26px"><select id="spc-'+k+'" style="font-size:16px;transform:scale(0.75);transform-origin:top center;padding:0;text-align:center;text-align-last:center;width:133%;height:34px;margin-left:-17%;border-radius:7px">'+opts+'</select></div>'
+          +'<div style="overflow:hidden;height:26px"><input type="number" id="spp-'+k+'" step="0.0001" value="'+item.price+'" style="text-align:center;font-size:16px;transform:scale(0.75);transform-origin:top center;padding:0 2px;width:133%;height:34px;margin-left:-17%;border-radius:7px"></div>'
           +'</div>';
       });
     });
@@ -980,15 +980,15 @@ function renderSettingsPx(){
   const usedFxCcys=[...new Set(allStocks.map(function(s){return s.ccy;}))].filter(function(c){return c&&c!=='MYR';});
   const fxList=document.getElementById('settings-fx-list');
   if(fxList&&usedFxCcys.length){
-    fxList.innerHTML='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;padding-top:4px;border-top:1px solid var(--b1)">'
+    fxList.innerHTML='<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px;padding-top:3px;border-top:1px solid var(--b1)">'
       +'<span style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">FX→MYR</span>'
       +usedFxCcys.map(function(ccy){
-        return'<div style="display:flex;align-items:center;gap:3px;flex:1;min-width:80px">'
+        return'<div style="display:flex;align-items:center;gap:2px;flex:1;min-width:70px">'
           +'<span style="font-size:10px;color:var(--t2);white-space:nowrap">'+ccy+'=</span>'
-          +'<input type="number" id="sfx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:center;font-size:16px;flex:1;transform:scale(0.75);transform-origin:center;margin:-4px -13px;width:100px">'
+          +'<div style="overflow:hidden;height:22px;flex:1;min-width:0"><input type="number" id="sfx-'+ccy+'" step="0.01" value="'+(_fx[ccy]||0).toFixed(2)+'" style="text-align:center;font-size:16px;transform:scale(0.75);transform-origin:top center;width:133%;height:29px;margin-left:-17%;border-radius:7px;padding:0 2px"></div>'
           +'</div>';
       }).join('')
-      +'<button onclick="spxFromSettings()" class="pri" style="height:28px;font-size:11px;padding:0 12px;flex-shrink:0;margin-left:auto">Save</button>'
+      +'<button onclick="spxFromSettings()" class="pri" style="height:24px;font-size:11px;padding:0 10px;flex-shrink:0;margin-left:auto">Save</button>'
       +'</div>';
   } else if(fxList){fxList.innerHTML='';}
   // Store for save
@@ -1158,29 +1158,24 @@ function renderDashboard(){
 
       return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')" style="border:none">'
         +'<td colspan="4" style="padding:4px 2px">'
-        +'<div style="background:linear-gradient(135deg,'+pf0.color+'18,'+pf0.color+'08);border:1px solid '+pf0.color+'33;border-left:3px solid '+pf0.color+';border-radius:8px;padding:8px 10px;position:relative;overflow:hidden">'
-        // shimmer line
-        +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+pf0.color+'66,transparent)"></div>'
-        // top row: name + arrow
+        +'<div style="background:linear-gradient(135deg,'+ccyAccent(ccy)+'15,'+ccyAccent(ccy)+'06);border:1px solid '+ccyAccent(ccy)+'44;border-left:3px solid '+ccyAccent(ccy)+';border-radius:8px;padding:8px 10px;position:relative;overflow:hidden">'
+        +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'55,transparent)"></div>'
         +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
         +'<div style="display:flex;align-items:center;gap:6px">'
-        +'<span style="display:inline-flex;width:8px;height:8px;border-radius:2px;background:'+pf0.color+';box-shadow:0 0 6px '+pf0.color+'"></span>'
+        +'<span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:'+pf0.color+';box-shadow:0 0 5px '+pf0.color+'88;flex-shrink:0"></span>'
         +'<span style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px">'+pf0.name+'</span>'
-        +'<span style="font-size:9px;color:'+pf0.color+';background:'+pf0.color+'22;padding:1px 5px;border-radius:3px;font-family:Courier New,monospace">'+allocPct.toFixed(1)+'%</span>'
+        +'<span style="font-size:9px;color:'+ccyAccent(ccy)+';background:'+ccyAccent(ccy)+'18;padding:1px 5px;border-radius:3px;font-family:Courier New,monospace">'+allocPct.toFixed(1)+'%</span>'
         +'</div>'
         +'<span style="color:var(--t3);font-size:12px">›</span>'
         +'</div>'
-        // allocation bar
         +'<div style="height:2px;background:rgba(255,255,255,0.06);border-radius:1px;margin-bottom:6px;overflow:hidden">'
-        +'<div style="height:100%;width:'+allocPct.toFixed(1)+'%;background:'+pf0.color+';border-radius:1px;box-shadow:0 0 4px '+pf0.color+'"></div>'
+        +'<div style="height:100%;width:'+allocPct.toFixed(1)+'%;background:'+ccyAccent(ccy)+';border-radius:1px;box-shadow:0 0 6px '+ccyAccent(ccy)+'88"></div>'
         +'</div>'
-        // bottom row: holdings value + P&L
         +'<div style="display:flex;align-items:center;justify-content:space-between">'
         +'<div><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Holdings</div>'
         +'<div class="pv-num" style="font-size:12px;font-weight:700;color:#fff">'+fc(mv,ccy)+'</div></div>'
         +'<div style="text-align:right"><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Total P&L <span style="opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
-        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:'+pnlColor+'">'+sgn(t,ccy)+'</div>'
-        +(tp!==null?'<div class="pv-num" style="font-size:9px;color:'+pnlColor+'">'+fp(tp)+'</div>':'')
+        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:'+pnlColor+'">'+sgn(t,ccy)+(tp!==null?' <span style="font-size:9px;opacity:.9">'+fp(tp)+'</span>':'')+'</div>'
         +'</div>'
         +'</div>'
         +'</div>'
@@ -1234,48 +1229,73 @@ function renderDashboard(){
       +'<div></div>'
       +'</div>';
 
-    return '<div style="'+ccyCardStyle(ccy)+';position:relative;padding-top:1.25rem">'
-      // CCY badge overlapping the top border
-      +'<div style="position:absolute;top:-6px;left:14px">'+ccyTag(ccy,'')+'</div>'
-      // Header — CCY tag + total value
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">'
-      +'<div>'
-      +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
-      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
+    return '<div style="position:relative;overflow:hidden;'
+      +'background:linear-gradient(160deg,#06040f 0%,#080614 30%,#04080f 60%,#080610 100%);'
+      +'border-radius:16px;padding:.9rem 1rem .85rem;margin-bottom:1rem;margin-left:-16px;margin-right:-16px;'
+      +'border:1.5px solid rgba(255,255,255,0.15);'
+      +'box-shadow:0 0 0 1px '+ccyAccent(ccy)+'44,0 0 30px '+ccyAccent(ccy)+'22,0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
+      // Rainbow top stripe using currency color
+      +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,'+ccyAccent(ccy)+','+ccyAccent(ccy)+'99,rgba(255,255,255,0.6),'+ccyAccent(ccy)+'99,'+ccyAccent(ccy)+');box-shadow:0 0 12px '+ccyAccent(ccy)+',0 0 24px '+ccyAccent(ccy)+'88;pointer-events:none"></div>'
+      // Radial glow
+      +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,'+ccyAccent(ccy)+'18,transparent 60%);pointer-events:none"></div>'
+      +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,'+ccyAccent(ccy)+'08 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,'+ccyAccent(ccy)+'08 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+      // Left rod in currency color
+      +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,'+ccyAccent(ccy)+' 20%,#fff 50%,'+ccyAccent(ccy)+' 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px '+ccyAccent(ccy)+',0 0 20px '+ccyAccent(ccy)+'88;animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:'+ccyAccent(ccy)+';box-shadow:0 0 6px '+ccyAccent(ccy)+',0 0 12px '+ccyAccent(ccy)+'88;animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+      // Colored corners
+      +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:2px solid '+ccyAccent(ccy)+';border-left:2px solid '+ccyAccent(ccy)+';border-radius:14px 0 0 0;pointer-events:none;box-shadow:0 0 8px '+ccyAccent(ccy)+'88;animation:cornerPulse 3s ease-in-out infinite"></div>'
+      +'<div style="position:absolute;top:0;right:0;width:12px;height:12px;border-top:1.5px solid rgba(255,255,255,0.5);border-right:1.5px solid rgba(255,255,255,0.5);pointer-events:none"></div>'
+      +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1.5px solid '+ccyAccent(ccy)+'66;border-left:1.5px solid '+ccyAccent(ccy)+'66;border-radius:0 0 0 14px;pointer-events:none"></div>'
+      +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1.5px solid rgba(255,255,255,0.25);border-right:1.5px solid rgba(255,255,255,0.25);border-radius:0 0 14px 0;pointer-events:none"></div>'
+      // Scan beams
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+',rgba(255,255,255,0.8),'+ccyAccent(ccy)+',transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px '+ccyAccent(ccy)+'"></div>'
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'44,transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.05) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+      +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'88,transparent);box-shadow:0 0 8px '+ccyAccent(ccy)+'44;animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
+      // Content
+      +'<div style="position:relative;z-index:1;padding-left:10px">'
+      // Header row: CCY tag + market value
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem">'
+      +'<div style="display:flex;align-items:center;gap:8px">'+ccyTag(ccy,'')
+      +'<div><div style="font-size:9px;letter-spacing:1px;font-weight:700;color:rgba(255,255,255,0.5);font-family:Courier New,monospace">TOTAL MARKET VALUE</div>'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.25)">(Cash + Holdings only)</div></div>'
       +'</div>'
       +'<div style="text-align:right">'
-      +'<span class="pv-val" style="font-size:18px;font-weight:700;color:var(--t1)">'+fc(mvWithCash,ccy)+'</span>'
-      +'<span class="pv-hide" style="font-size:18px;font-weight:700;color:var(--t1)">••••</span>'
+      +'<span class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 40px '+ccyAccent(ccy)+'66">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px">••••</span>'
       +'</div>'
       +'</div>'
-      // Total P&L card — 3D colored, clickable toggle
-      +'<div style="padding:10px 12px;border-radius:var(--r);margin-bottom:.875rem;cursor:pointer;position:relative;overflow:hidden;'
-      +'background:linear-gradient(135deg,'+ccyAccent(ccy)+'22 0%,'+ccyAccent(ccy)+'08 100%);'
-      +'border:1px solid '+ccyAccent(ccy)+'44;'
-      +'border-top:2px solid '+ccyAccent(ccy)+'88;'
-      +'box-shadow:0 4px 16px '+ccyAccent(ccy)+'18,inset 0 1px 0 '+ccyAccent(ccy)+'22" onclick="toggleMini(\''+dashMiniId+'\')">'
-      +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'66,transparent)"></div>'
-      +'<div style="display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7)">Total P&L / %<br><span style="font-size:8px;opacity:.5;font-weight:400">(Unreal + Real + Div - Fee)</span></div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+(tot>=0?'rgba(0,230,118,.15)':'rgba(255,77,109,.15)')+';border:1px solid '+(tot>=0?'rgba(0,230,118,.3)':'rgba(255,77,109,.3)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
+      // Progress bar
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">'
+      +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
+      +'<div style="height:100%;width:'+(g.co>0?Math.min(Math.abs(mvWithCash/g.co)*100,100):0).toFixed(1)+'%;background:linear-gradient(90deg,'+ccyAccent(ccy)+',#fff,'+ccyAccent(ccy)+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+ccyAccent(ccy)+'88;animation:barShimmer 2s linear infinite"></div>'
+      +'</div>'
+      +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">'+ccy+' PORTFOLIO</div>'
+      +'</div>'
+      // P&L row
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.875rem">'
+      +'<div><div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:2px">Total Invested</div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">'+fc(g.co,ccy)+'</div>'
+      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal+Real+Div-Fee)</span></div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+scColor(tot)+';text-shadow:0 0 12px '+scColor(tot)+'66" onclick="toggleMini(\''+dashMiniId+'\')">'+sgn(tot,ccy)+(totPct!==null?' ('+(totPct>=0?'+':'')+totPct.toFixed(1)+'%)':'')+'</div>'
+      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+scColor(tot)+'">•••••• (•••%)</div>'
       +'</div>'
       +'</div>'
-      +'</div>'
-      // Mini cards — hidden by default
-      +'<div id="'+dashMiniId+'" style="display:none">'
-      +dashMiniCards
-      +'</div>'
-      // Portfolio cards
+      // Mini cards
+      +'<div id="'+dashMiniId+'" style="display:none">'+dashMiniCards+'</div>'
+      // Portfolios label
       +'<div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px">'
       +'<div style="flex:1;height:1px;background:linear-gradient(90deg,'+ccyAccent(ccy)+',transparent)"></div>'
-      +'<span style="font-size:8px;color:var(--t3);font-family:Courier New,monospace;letter-spacing:1px;white-space:nowrap">PORTFOLIOS</span>'
+      +'<span style="font-size:8px;color:rgba(255,255,255,0.35);font-family:Courier New,monospace;letter-spacing:1px">PORTFOLIOS</span>'
       +'<div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+')"></div>'
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:4px;padding:4px 0"><table style="width:100%;border-collapse:collapse">'
       +'<tbody>'+pfRows+'</tbody>'
       +'</table></div>'
+      +'</div>'
       +'</div>';
   }).join('');
 
@@ -1307,35 +1327,29 @@ function renderDashboard(){
   const pnlBar=grandMYRInvested>0?Math.min(Math.abs(grandMYR/grandMYRInvested)*100,100):0;
   const barColor=grandMYRPnl>=0?'#00e676':'#ff4d6d';
   const gaugeChart=
-    '<div id="grand-card" style="cursor:pointer;position:relative;overflow:hidden;'    +'background:linear-gradient(160deg,#050508 0%,#09090f 40%,#050507 70%,#08080d 100%);'    +'border-radius:16px;padding:.9rem 1rem .85rem;'    +'box-shadow:'    +'0 0 0 1px rgba(255,255,255,0.1),'    +'0 0 0 2px rgba(0,0,0,0.8),'    +'0 1px 0 rgba(255,255,255,0.14) inset,'    +'0 -1px 0 rgba(0,0,0,0.9) inset,'    +'0 4px 12px rgba(0,0,0,0.5),'    +'0 8px 24px rgba(0,0,0,0.3)">'
-    // Radial top glow
-    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(255,255,255,0.06),transparent 60%);pointer-events:none"></div>'
-    // Holographic colour shift layer
-    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.03) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.02) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
-    // Top edge — peak white with glow
-    +'<div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2) 10%,rgba(255,255,255,0.9) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.9) 65%,rgba(255,255,255,0.2) 90%,transparent);box-shadow:0 0 10px rgba(255,255,255,0.4),0 0 30px rgba(255,255,255,0.1);pointer-events:none"></div>'
-    // Left rod — pulsing
-    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.5) 20%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.5) 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.3);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
-    // Energy particles — 3 dots on left bar
-    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 10px rgba(255,255,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
-    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,0.7);box-shadow:0 0 4px rgba(255,255,255,0.9);animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
-    // Corner brackets — TL brightest, animated
-    +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:1.5px solid rgba(255,255,255,0.95);border-left:1.5px solid rgba(255,255,255,0.95);border-radius:14px 0 0 0;pointer-events:none;animation:cornerPulse 3s ease-in-out infinite"></div>'
-    +'<div style="position:absolute;top:24px;right:0;width:10px;height:10px;border-top:1px solid rgba(255,255,255,0.4);border-right:1px solid rgba(255,255,255,0.4);pointer-events:none"></div>'
-    +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-left:1px solid rgba(255,255,255,0.3);border-radius:0 0 0 14px;pointer-events:none"></div>'
-    +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-right:1px solid rgba(255,255,255,0.3);border-radius:0 0 14px 0;pointer-events:none"></div>'
-    // Primary scan beam
-    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.95),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,0.7)"></div>'
-    // Ghost scan beam
-    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
-    // Diagonal shimmer
-    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.07) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
-    // Bottom pulse line
-    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);box-shadow:0 0 6px rgba(255,255,255,0.2);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
-    // Notch
+    '<div id="grand-card" style="cursor:pointer;position:relative;overflow:hidden;'
+    +'background:linear-gradient(160deg,#06040f 0%,#080614 30%,#04080f 60%,#080610 100%);'
+    +'border-radius:16px;padding:.9rem 1rem .85rem 0;'
+    +'border:1.5px solid rgba(255,255,255,0.15);'
+    +'box-shadow:0 0 0 1px rgba(120,80,255,0.3),0 0 30px rgba(120,80,255,0.15),0 0 60px rgba(0,180,255,0.08),0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
+    +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7b61ff,#00b4d8,#00e676,#ffaa00,#ff4d6d,#bf5af2);box-shadow:0 0 12px rgba(120,80,255,0.8),0 0 24px rgba(0,180,255,0.4);pointer-events:none"></div>'
+    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,rgba(120,80,255,0.12),transparent 60%);pointer-events:none"></div>'
+    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.04) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.04) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,#7b61ff 20%,#00b4d8 50%,#7b61ff 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(120,80,255,0.9),0 0 20px rgba(120,80,255,0.4);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#7b61ff;box-shadow:0 0 6px #7b61ff,0 0 12px rgba(120,80,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:#00b4d8;box-shadow:0 0 4px #00b4d8;animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:0;width:18px;height:18px;border-top:2px solid #7b61ff;border-left:2px solid #7b61ff;border-radius:14px 0 0 0;pointer-events:none;box-shadow:0 0 8px rgba(120,80,255,0.6);animation:cornerPulse 3s ease-in-out infinite"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:14px;height:14px;border-top:1.5px solid #00b4d8;border-right:1.5px solid #00b4d8;pointer-events:none;box-shadow:0 0 6px rgba(0,180,216,0.5)"></div>'
+    +'<div style="position:absolute;bottom:0;left:0;width:14px;height:14px;border-bottom:1.5px solid rgba(120,80,255,0.5);border-left:1.5px solid rgba(120,80,255,0.5);border-radius:0 0 0 14px;pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-bottom:1.5px solid rgba(0,180,216,0.4);border-right:1.5px solid rgba(0,180,216,0.4);border-radius:0 0 14px 0;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,80,255,0.8),rgba(0,180,255,0.8),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(120,80,255,0.5)"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.3),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.05) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(120,80,255,0.6),rgba(0,180,255,0.6),transparent);box-shadow:0 0 8px rgba(120,80,255,0.3);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
     +'<div style="position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 22px 22px 0;border-color:transparent var(--bg) transparent transparent;z-index:2"></div>'
-    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(255,255,255,0.1),transparent 60%);pointer-events:none;z-index:1"></div>'
-    +'<div style="position:absolute;top:5px;right:5px;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 8px rgba(255,255,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(120,80,255,0.2),transparent 60%);pointer-events:none;z-index:1"></div>'
+    +'<div style="position:absolute;top:5px;right:5px;width:3px;height:3px;border-radius:50%;background:#7b61ff;box-shadow:0 0 6px #7b61ff,0 0 12px rgba(120,80,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
+    +'<div style="position:relative;z-index:1;padding-left:0">'
     +'<div style="position:relative;z-index:1;padding-left:12px">'
     +'<div style="display:flex;align-items:flex-start;justify-content:space-between">'
     +'<div>'
@@ -1347,7 +1361,7 @@ function renderDashboard(){
     +'</div>'
     +'<div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">'
     +'<div style="flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
-    +'<div style="height:100%;width:'+pnlBar+'%;background:linear-gradient(90deg,rgba(255,255,255,0.4),rgba(255,255,255,0.9),rgba(255,255,255,0.4));background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.4);animation:barShimmer 2s linear infinite"></div>'
+    +'<div style="height:100%;width:'+pnlBar+'%;background:linear-gradient(90deg,#7b61ff,#00b4d8,#00e676);background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(120,80,255,0.6);animation:barShimmer 2s linear infinite"></div>'
     +'</div>'
     +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">MYR EQUIVALENT</div>'
     +'</div>'
@@ -1487,36 +1501,40 @@ function renderOverview(p){
   const personBar=personInvested>0?Math.min(Math.abs(personMYR/personInvested)*100,100):0;
 
   const personCard=
-    '<div id="grand-card-ov" style="cursor:pointer;position:relative;overflow:hidden;'    +'background:linear-gradient(160deg,#050508 0%,#09090f 40%,#050507 70%,#08080d 100%);'    +'border-radius:16px;padding:.9rem 1rem .85rem;'    +'box-shadow:'    +'0 0 0 1px rgba(255,255,255,0.1),'    +'0 0 0 2px rgba(0,0,0,0.8),'    +'0 1px 0 rgba(255,255,255,0.14) inset,'    +'0 -1px 0 rgba(0,0,0,0.9) inset,'    +'0 4px 12px rgba(0,0,0,0.5),'    +'0 8px 24px rgba(0,0,0,0.3)">'
-    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(255,255,255,0.06),transparent 60%);pointer-events:none"></div>'
-    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.03) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.02) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
-    +'<div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2) 10%,rgba(255,255,255,0.9) 35%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.9) 65%,rgba(255,255,255,0.2) 90%,transparent);box-shadow:0 0 10px rgba(255,255,255,0.4),0 0 30px rgba(255,255,255,0.1);pointer-events:none"></div>'
-    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.5) 20%,rgba(255,255,255,1) 50%,rgba(255,255,255,0.5) 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(255,255,255,0.8),0 0 20px rgba(255,255,255,0.3);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
-    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 10px rgba(255,255,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
-    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,0.7);box-shadow:0 0 4px rgba(255,255,255,0.9);animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
-    +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:1.5px solid rgba(255,255,255,0.95);border-left:1.5px solid rgba(255,255,255,0.95);border-radius:14px 0 0 0;pointer-events:none;animation:cornerPulse 3s ease-in-out infinite"></div>'
-    +'<div style="position:absolute;top:24px;right:0;width:10px;height:10px;border-top:1px solid rgba(255,255,255,0.4);border-right:1px solid rgba(255,255,255,0.4);pointer-events:none"></div>'
-    +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-left:1px solid rgba(255,255,255,0.3);border-radius:0 0 0 14px;pointer-events:none"></div>'
-    +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1px solid rgba(255,255,255,0.3);border-right:1px solid rgba(255,255,255,0.3);border-radius:0 0 14px 0;pointer-events:none"></div>'
-    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.95),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,0.7)"></div>'
-    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
-    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.07) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
-    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);box-shadow:0 0 6px rgba(255,255,255,0.2);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
+    '<div id="grand-card-ov" style="cursor:pointer;position:relative;overflow:hidden;'
+    +'background:linear-gradient(160deg,#06040f 0%,#080614 30%,#04080f 60%,#080610 100%);'
+    +'border-radius:16px;padding:.9rem .5rem .85rem .5rem;'
+    +'border:1.5px solid rgba(255,255,255,0.15);'
+    +'box-shadow:0 0 0 1px rgba(120,80,255,0.3),0 0 30px rgba(120,80,255,0.15),0 0 60px rgba(0,180,255,0.08),0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
+    +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7b61ff,#00b4d8,#00e676,#ffaa00,#ff4d6d,#bf5af2);box-shadow:0 0 12px rgba(120,80,255,0.8),0 0 24px rgba(0,180,255,0.4);pointer-events:none"></div>'
+    +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,rgba(120,80,255,0.12),transparent 60%);pointer-events:none"></div>'
+    +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,200,255,0.04) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(180,100,255,0.04) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,#7b61ff 20%,#00b4d8 50%,#7b61ff 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(120,80,255,0.9),0 0 20px rgba(120,80,255,0.4);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#7b61ff;box-shadow:0 0 6px #7b61ff,0 0 12px rgba(120,80,255,0.8);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;width:2px;height:2px;border-radius:50%;background:#00b4d8;box-shadow:0 0 4px #00b4d8;animation:particleDrift 3s ease-in-out infinite 1s;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:0;width:18px;height:18px;border-top:2px solid #7b61ff;border-left:2px solid #7b61ff;border-radius:14px 0 0 0;pointer-events:none;box-shadow:0 0 8px rgba(120,80,255,0.6);animation:cornerPulse 3s ease-in-out infinite"></div>'
+    +'<div style="position:absolute;top:0;right:0;width:14px;height:14px;border-top:1.5px solid #00b4d8;border-right:1.5px solid #00b4d8;pointer-events:none;box-shadow:0 0 6px rgba(0,180,216,0.5)"></div>'
+    +'<div style="position:absolute;bottom:0;left:0;width:14px;height:14px;border-bottom:1.5px solid rgba(120,80,255,0.5);border-left:1.5px solid rgba(120,80,255,0.5);border-radius:0 0 0 14px;pointer-events:none"></div>'
+    +'<div style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-bottom:1.5px solid rgba(0,180,216,0.4);border-right:1.5px solid rgba(0,180,216,0.4);border-radius:0 0 14px 0;pointer-events:none"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,80,255,0.8),rgba(0,180,255,0.8),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(120,80,255,0.5)"></div>'
+    +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,180,255,0.3),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+    +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.05) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+    +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(120,80,255,0.6),rgba(0,180,255,0.6),transparent);box-shadow:0 0 8px rgba(120,80,255,0.3);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
     +'<div style="position:absolute;top:0;right:0;width:0;height:0;border-style:solid;border-width:0 22px 22px 0;border-color:transparent var(--bg) transparent transparent;z-index:2"></div>'
-    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(255,255,255,0.1),transparent 60%);pointer-events:none;z-index:1"></div>'
-    +'<div style="position:absolute;top:5px;right:5px;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff,0 0 8px rgba(255,255,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
-    +'<div style="position:relative;z-index:1;padding-left:12px">'
+    +'<div style="position:absolute;top:0;right:0;width:22px;height:22px;background:linear-gradient(225deg,rgba(120,80,255,0.2),transparent 60%);pointer-events:none;z-index:1"></div>'
+    +'<div style="position:absolute;top:5px;right:5px;width:3px;height:3px;border-radius:50%;background:#7b61ff;box-shadow:0 0 6px #7b61ff,0 0 12px rgba(120,80,255,0.8);animation:cornerPulse 3s ease-in-out infinite;pointer-events:none;z-index:3"></div>'
+    +'<div style="position:relative;z-index:1;padding-left:4px">'
     +'<div style="display:flex;align-items:flex-start;justify-content:space-between">'
     +'<div>'
-    +'<div style="font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:1px;font-family:Courier New,monospace;text-align:center">'+p.name.toUpperCase()+' PORTFOLIO VALUE</div>'
+    +'<div style="font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:1px;font-family:Courier New,monospace;text-transform:uppercase">'+p.name.toUpperCase()+' PORTFOLIO VALUE</div>'
     +'<div style="font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:.3px">(Cash + Holdings only)</div>'
     +'</div>'
     +'<div class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 60px rgba(120,80,255,0.3),0 2px 4px rgba(0,0,0,0.8)">RM '+personMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
     +'<div class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:3px;white-space:nowrap">••••••</div>'
     +'</div>'
     +'<div style="display:flex;align-items:center;gap:8px;margin:6px 0 8px">'
-    +'<div style="flex:1;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
-    +'<div style="height:100%;width:'+personBar+'%;background:linear-gradient(90deg,rgba(255,255,255,0.4),rgba(255,255,255,0.9),rgba(255,255,255,0.4));background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.4);animation:barShimmer 2s linear infinite"></div>'
+    +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
+    +'<div style="height:100%;width:'+personBar+'%;background:linear-gradient(90deg,#7b61ff,#00b4d8,#00e676);background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px rgba(120,80,255,0.6);animation:barShimmer 2s linear infinite"></div>'
     +'</div>'
     +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">MYR EQUIVALENT</div>'
     +'</div>'
@@ -1527,7 +1545,7 @@ function renderOverview(p){
     +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
     +'</div>'
     +'<div style="text-align:right">'
-    +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
+    +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal+Real+Div-Fee)</span></div>'
     +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+personPnlColor+';text-shadow:0 0 12px '+personPnlColor+'60">'+(personPnl>=0?'+':'')+'RM '+Math.abs(personPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(personPnlPct!==null?' ('+(personPnlPct>=0?'+':'')+personPnlPct.toFixed(1)+'%)':'')+'</div>'
     +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+personPnlColor+'">•••••• (•••%)</div>'
     +'</div>'
@@ -1598,23 +1616,19 @@ function renderOverview(p){
     let tbody='';
     let cumPct=0;
     sortedRows.forEach((hh,i)=>{
-      const tot2=Math.round((hh.unreal+hh.divs+hh.realized)*100)/100;
+      const pfee2=hh.platformFees||0;
+      const tot2=Math.round((hh.unreal+hh.divs+hh.realized-pfee2)*100)/100;
       const pct2=hh.cost>0?tot2/hh.cost*100:null;
       const barW=(hh.mktVal/totalMV*100).toFixed(1);
       const startPct=cumPct;
       cumPct+=parseFloat(barW);
-      tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">`
-        +`<td style="white-space:nowrap;position:sticky;left:0;background:var(--bg);z-index:2"><div style="display:flex;align-items:center;gap:6px">${stockLogo(hh.stock,PAL[i%PAL.length],parseFloat(barW),36,startPct)}<div><div style="font-weight:600">${hh.stock}</div><div style="font-size:9px;color:var(--t3)">${barW}%</div></div></div></td>`
-        +`<td class="r m">${(+hh.qty).toLocaleString()}</td>`
-        +`<td class="r m" style="font-size:11px">${hh.avg>0?fc(hh.avg,ccy,3):'—'}</td>`
-        +`<td class="r">${fc(hh.cost,ccy)}</td>`
-        +`<td class="r m" style="font-size:11px">${hh.mktP>0?hh.mktCcy+' '+hh.mktP.toFixed(3):'—'}</td>`
+      tbody+=`<tr class="ck hld-row" data-s="${hh.stock.toLowerCase()} ${hh.ccy.toLowerCase()}" onclick="drillStock('${hh.stock.replace(/'/g,"\\'")}','${hh.ccy}')">` 
+        +`<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:6px">${stockLogo(hh.stock,PAL[i%PAL.length],parseFloat(barW),32,startPct)}<div><div style="font-weight:700;font-size:12px">${hh.stock}</div><div style="font-size:9px;color:var(--t3)">${barW}%</div></div></div></td>`
         +`<td class="r" style="font-weight:600">${hh.mktVal>0?fc(hh.mktVal,hh.mktCcy):'—'}</td>`
-        +`<td class="r ${sc(hh.unreal)}">${sgn(hh.unreal,ccy)}</td>`
-        +`<td class="r ${sc(hh.realized)}">${hh.realized!==0?sgn(hh.realized,ccy):'—'}</td>`
-        +`<td class="r ${hh.divs>0?'g':''}">${hh.divs>0?fc(hh.divs,ccy):'—'}</td>`
-        +`<td class="r ${sc(tot2)}" style="font-weight:600;white-space:nowrap">${sgn(tot2,ccy)}${pct2!==null?'<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;background:'+(pct2>=0?'rgba(0,230,118,0.08)':'rgba(255,77,109,0.08)')+';border:1px solid '+(pct2>=0?'rgba(0,230,118,0.25)':'rgba(255,77,109,0.25)')+';color:'+(pct2>=0?'var(--green)':'var(--red)')+'">'+fp(pct2)+'</span>':''}</td>`
-        +'<td style="color:var(--t3);font-size:11px">›</td>'
+        +`<td class="r" style="font-weight:700;white-space:nowrap">${pct2!==null
+          ?`<div style="color:${tot2>=0?'var(--green)':'var(--red)'};font-weight:700">${sgn(tot2,ccy)}</div><div style="font-size:10px;color:${pct2>=0?'var(--green)':'var(--red)'};opacity:.85">${pct2>=0?'+':''}${pct2.toFixed(1)}%</div>`
+          :'—'}</td>`
+        +'<td style="color:var(--t3);font-size:11px;width:12px">›</td>'
         +'</tr>';
     });
 
@@ -1627,55 +1641,78 @@ function renderOverview(p){
     const fp2=sumC>0?sumT/sumC*100:null;
     const holdingsTable=rows.length
       ?'<div style="overflow-x:auto"><table class="tbl" id="hld-tbl-'+ccy+'" style="border-top:2px solid '+ccyAccent(ccy)+'">'
-        +'<thead><tr><th style="position:sticky;left:0;background:rgba(255,255,255,0.03);z-index:3">Stock</th><th class="r">Qty</th><th class="r">Avg Cost</th><th class="r">Cost Basis</th>'
-        +'<th class="r">Current Price</th><th class="r">Holding Value</th><th class="r">Unrealized</th><th class="r">Realized</th><th class="r">Dividends</th><th class="r">Total P&L / %<br><span style="font-size:9px;font-weight:400;color:var(--t2)">(Unreal + Real + Div)</span></th><th></th>'
+        +'<thead><tr>'
+        +'<th style="text-align:left">Stock</th>'
+        +'<th class="r">Holding Value</th>'
+        +'<th class="r">P&L / %<br><span style="font-size:8px;font-weight:400;opacity:.6">(Unreal+Real+Div-Fee)</span></th>'
+        +'<th style="width:12px"></th>'
         +'</tr></thead><tbody>'+tbody+'</tbody>'
-        +''
         +'</table></div>'
       :'<p class="m" style="font-size:12px;padding:.5rem 0">No active holdings in '+ccy+'.</p>';
 
     const miniId='mini-'+ccy+'-'+ci;
     const miniRow='<div id="'+miniId+'" style="display:none;margin-bottom:.875rem">'+miniCards+'</div>';
     const accent=ccyAccent(ccy);
-    const pnlCard='<div style="padding:10px 12px;border-radius:var(--r);margin-bottom:6px;cursor:pointer;position:relative;overflow:hidden;'
-      +'background:linear-gradient(135deg,'+accent+'22 0%,'+accent+'08 100%);'
-      +'border:1px solid '+accent+'44;'
-      +'border-top:2px solid '+accent+'88;'
-      +'box-shadow:0 4px 16px '+accent+'18,inset 0 1px 0 '+accent+'22" onclick="toggleMini(\''+miniId+'\')">'
-      +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+'66,transparent)"></div>'
-      +'<div style="display:flex;align-items:center;justify-content:space-between">'
-      +'<div style="font-size:10px;color:rgba(255,255,255,.7)">Total P&L / %<br><span style="font-size:8px;opacity:.5;font-weight:400">(Unreal + Real + Div - Fee)</span></div>'
-      +'<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="font-size:13px;font-weight:700;white-space:nowrap" class="'+sc(tot)+'">'+sgn(tot,ccy)+'</span>'
-      +(totPct!==null?'<span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+(tot>=0?'rgba(0,230,118,.15)':'rgba(255,77,109,.15)')+';border:1px solid '+(tot>=0?'rgba(0,230,118,.3)':'rgba(255,77,109,.3)')+';color:'+(tot>=0?'var(--green)':'var(--red)')+'">'+fp(totPct)+'</span>':'')
-      +'</div>'
-      +'</div>'
-      +'</div>';
 
-    // Header — badge overlapping top border
-    const pctBadge=pct!==null?pnlPill(pct):'';
-    const header='<div style="margin-bottom:.75rem">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:.75rem">'
-      +'<div>'
-      +'<div style="font-size:10px;color:var(--t2)">Total Market Value</div>'
-      +'<div style="font-size:9px;color:var(--t3)">(Cash + Holdings only)</div>'
+    return '<div style="position:relative;overflow:hidden;'
+      +'background:linear-gradient(160deg,#06040f 0%,#080614 30%,#04080f 60%,#080610 100%);'
+      +'border-radius:16px;padding:.9rem 1rem .85rem;margin-bottom:1rem;margin-left:-16px;margin-right:-16px;'
+      +'border:1.5px solid rgba(255,255,255,0.15);'
+      +'box-shadow:0 0 0 1px '+accent+'44,0 0 30px '+accent+'22,0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
+      +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,'+accent+','+accent+'99,rgba(255,255,255,0.6),'+accent+'99,'+accent+');box-shadow:0 0 12px '+accent+',0 0 24px '+accent+'88;pointer-events:none"></div>'
+      +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,'+accent+'18,transparent 60%);pointer-events:none"></div>'
+      +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,'+accent+'08 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,'+accent+'08 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,'+accent+' 20%,#fff 50%,'+accent+' 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px '+accent+',0 0 20px '+accent+'88;animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:'+accent+';box-shadow:0 0 6px '+accent+',0 0 12px '+accent+'88;animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:2px solid '+accent+';border-left:2px solid '+accent+';border-radius:14px 0 0 0;pointer-events:none;box-shadow:0 0 8px '+accent+'88;animation:cornerPulse 3s ease-in-out infinite"></div>'
+      +'<div style="position:absolute;top:0;right:0;width:12px;height:12px;border-top:1.5px solid rgba(255,255,255,0.5);border-right:1.5px solid rgba(255,255,255,0.5);pointer-events:none"></div>'
+      +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1.5px solid '+accent+'66;border-left:1.5px solid '+accent+'66;border-radius:0 0 0 14px;pointer-events:none"></div>'
+      +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1.5px solid rgba(255,255,255,0.25);border-right:1.5px solid rgba(255,255,255,0.25);border-radius:0 0 14px 0;pointer-events:none"></div>'
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+',rgba(255,255,255,0.8),'+accent+',transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px '+accent+'"></div>'
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+'44,transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.05) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
+      +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,'+accent+'88,transparent);box-shadow:0 0 8px '+accent+'44;animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:relative;z-index:1;padding-left:10px">'
+      // Header: CCY tag + market value
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem">'
+      +'<div style="display:flex;align-items:center;gap:8px">'+ccyTag(ccy,'')
+      +'<div><div style="font-size:9px;letter-spacing:1px;font-weight:700;color:rgba(255,255,255,0.5);font-family:Courier New,monospace">TOTAL MARKET VALUE</div>'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.25)">(Cash + Holdings only)</div></div>'
       +'</div>'
       +'<div style="text-align:right">'
-      +'<span class="pv-val" style="font-size:18px;font-weight:700">'+fc(mvWithCash,ccy)+'</span>'
-      +'<span class="pv-hide" style="font-size:18px;font-weight:700">••••</span>'
+      +'<span class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 40px '+accent+'66">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px">••••</span>'
       +'</div>'
       +'</div>'
-      +pnlCard
-      +'</div>';
-
-    const pieHtml="";
-
-    return '<div style="'+ccyCardStyle(ccy)+';position:relative;padding-top:1.25rem">'
-      +'<div style="position:absolute;top:-6px;left:14px">'+ccyTag(ccy,'')+'</div>'
-      +header
+      // Progress bar
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">'
+      +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
+      +'<div style="height:100%;width:'+(co>0?Math.min(Math.abs(mvWithCash/co)*100,100):0).toFixed(1)+'%;background:linear-gradient(90deg,'+accent+',#fff,'+accent+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+accent+'88;animation:barShimmer 2s linear infinite"></div>'
+      +'</div>'
+      +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">'+ccy+' PORTFOLIO</div>'
+      +'</div>'
+      // Invested + P&L row
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.875rem">'
+      +'<div><div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:2px">Total Invested</div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">'+fc(co,ccy)+'</div>'
+      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal+Real+Div-Fee)</span></div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+scColor(tot)+';text-shadow:0 0 12px '+scColor(tot)+'66;cursor:pointer" onclick="toggleMini(\''+miniId+'\')">'+sgn(tot,ccy)+(totPct!==null?' ('+(totPct>=0?'+':'')+totPct.toFixed(1)+'%)':'')+'</div>'
+      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+scColor(tot)+'">•••••• (•••%)</div>'
+      +'</div>'
+      +'</div>'
+      // Mini cards (expandable)
       +miniRow
-      +colourBar
+      // Holdings divider
+      +'<div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px">'
+      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,'+accent+',transparent)"></div>'
+      +'<span style="font-size:8px;color:rgba(255,255,255,0.35);font-family:Courier New,monospace;letter-spacing:1px">HOLDINGS</span>'
+      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,'+accent+')"></div>'
+      +'</div>'
       +holdingsTable
+      +'</div>'
       +'</div>';
   }).join('');
   // Inject personCard into grand-wrap (same fixed position as dashboard grand card)
@@ -2365,7 +2402,7 @@ function renderModal(){
                     ...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
 
     let rowsHtml='';
-    const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+    const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
 
     if(allStocks.length){
       ccyOrder.forEach(function(ccy){
@@ -2614,38 +2651,53 @@ function renderOptions(){
     </div>
   </div>`;
 
-  const thead=`<thead><tr>
+  const openThead=`<thead><tr>
+    <th style="text-align:left">Ticker</th>
+    <th class="r">P&L (Unreal)</th>
+  </tr></thead>`;
+
+  const closedThead=`<thead><tr>
     <th>Ticker</th><th>Open date</th><th class="r">Open value</th><th class="r">Open fee</th>
     <th>Close date</th><th class="r">Close / Mkt value</th><th class="r">Close fee</th>
     <th class="r">P&L (USD)</th><th>Note</th><th style="width:52px"></th>
   </tr></thead>`;
 
-  function mkRow(t,i,extraClass=''){
-    const open=isOpen(t);
-    const bg=open?'rgba(0,212,255,0.04)':'rgba(255,255,255,0.02)';
-    const cls=extraClass?` class="${extraClass}"`:'';
-    const styleAttr=`style="background:${bg}"`;    const o=parseFloat(t.openValue)||0;
-    const c=!open?parseFloat(t.closeValue)||0:null;
-    const hasMkt=open&&t.mktValue!=null&&t.mktValue!=='';
+  function mkOpenRow(t,i){
+    const o=parseFloat(t.openValue)||0;
+    const hasMkt=t.mktValue!=null&&t.mktValue!=='';
     const m=hasMkt?parseFloat(t.mktValue)||0:null;
-    const of0=parseFloat(t.openFee)||0, cf0=parseFloat(t.closeFee)||0;
-    const pnl=!open?(o+c-of0-cf0):null;
+    const of0=parseFloat(t.openFee)||0;
     const uPnl=hasMkt?(o+m-of0):null;
-    let pnlHtml,pnlCls;
-    if(pnl!==null){pnlCls=pnl>=0?'g':'rr';pnlHtml=fmtN(pnl)+pctBadge(pnl,o);}
-    else if(uPnl!==null){pnlCls=uPnl>=0?'g':'rr';pnlHtml=fmtN(uPnl)+pctBadge(uPnl,o)+'<span style="font-size:10px;color:var(--t2);margin-left:2px">(unreal)</span>';}
-    else{pnlCls='m';pnlHtml='<span style="font-size:11px;color:var(--t2)">No mkt value</span>';}
-    const closeMktHtml=!open?fmtAbs(c):hasMkt?('<span style="font-size:10px;color:rgba(255,255,255,0.3)">Mkt: </span>'+fmtAbs(m)):'<span class="badge" style="color:var(--blue);background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2)">Open</span>';
-    return`<tr data-opt-search="${(t.ticker||'').toLowerCase()} ${(t.note||'').toLowerCase()}"${cls} ${styleAttr}>
+    const pnlCls=uPnl===null?'m':uPnl>=0?'g':'rr';
+    const pct=uPnl!==null&&o?((uPnl/Math.abs(o))*100):null;
+    const pnlHtml=uPnl!==null
+      ?`<div style="font-weight:700;color:${pnlCls==='g'?'#4ade80':'#f87171'}">${fmtN(uPnl)}</div><div style="font-size:10px;color:${pnlCls==='g'?'#4ade80':'#f87171'};opacity:.8">${pct>=0?'+':''}${pct!==null?pct.toFixed(1)+'%':''}</div>`
+      :`<span style="font-size:11px;color:var(--t2)">No mkt val</span>`;
+    return`<tr data-opt-search="${(t.ticker||'').toLowerCase()}" onclick="showOptDetail(${i})" style="cursor:pointer;background:rgba(0,212,255,0.03)">
+      <td style="font-weight:700;font-family:'Courier New',monospace;letter-spacing:.3px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.ticker||'—'}</td>
+      <td class="r">${pnlHtml}</td>
+    </tr>`;
+  }
+
+  function mkClosedRow(t,i){
+    const bg='rgba(255,255,255,0.02)';
+    const o=parseFloat(t.openValue)||0;
+    const c=parseFloat(t.closeValue)||0;
+    const of0=parseFloat(t.openFee)||0,cf0=parseFloat(t.closeFee)||0;
+    const pnl=o+c-of0-cf0;
+    const pnlCls=pnl>=0?'g':'rr';
+    const pnlHtml=fmtN(pnl)+pctBadge(pnl,o);
+    const closeMktHtml=fmtAbs(c);
+    return`<tr data-opt-search="${(t.ticker||'').toLowerCase()} ${(t.note||'').toLowerCase()}" style="background:${bg}">
       <td style="font-weight:600">${t.ticker||'—'}</td>
       <td class="m">${t.openDate||'—'}</td>
       <td class="r" style="color:${o>=0?'#4ade80':'#f87171'};font-weight:600">${fmtN(o)}</td>
       <td class="r m">${of0>0?fmtAbs(of0):'—'}</td>
-      <td class="m">${!open?(t.closeDate||'—'):'—'}</td>
+      <td class="m">${t.closeDate||'—'}</td>
       <td class="r">${closeMktHtml}</td>
       <td class="r m">${cf0>0?fmtAbs(cf0):'—'}</td>
-      <td class="r" style="font-weight:600;color:${pnlCls==='g'?'#4ade80':pnlCls==='rr'?'#f87171':'var(--t2)'}">${pnlHtml}</td>
-      <td class="m" style="font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.note||''}">${t.note||'—'}</td>
+      <td class="r" style="font-weight:600;color:${pnlCls==='g'?'#4ade80':'#f87171'}">${pnlHtml}</td>
+      <td class="m" style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.note||'—'}</td>
       <td style="white-space:nowrap">
         <button class="ib" onclick="editOpt(${i})">✎</button>
         <button class="ib" onclick="delOpt(${i})" style="color:var(--red)">✕</button>
@@ -2656,11 +2708,9 @@ function renderOptions(){
   const openRows=trades.map((t,i)=>({t,i})).filter(x=>isOpen(x.t));
   const closedRows=trades.map((t,i)=>({t,i})).filter(x=>!isOpen(x.t));
   const openTotalUnr=openRows.reduce((s,x)=>{const t=x.t,o=parseFloat(t.openValue)||0,of0=parseFloat(t.openFee)||0,hasMkt=t.mktValue!=null&&t.mktValue!=='',m=hasMkt?parseFloat(t.mktValue)||0:null;return m!==null?s+(o+m-of0):s;},0);
-  const openTotalRow=openRows.length?`<tfoot><tr style="background:rgba(255,255,255,0.03)">
-    <td colspan="2" style="font-weight:600;color:var(--t2)">Total (${openRows.length} position${openRows.length!==1?'s':''})</td>
-    <td colspan="5"></td>
-    <td class="r" style="font-weight:700;color:${openTotalUnr>=0?'#4ade80':'#f87171'}">${hasMktCount?fmtN(openTotalUnr):'—'} <span style="font-size:10px;color:var(--t2)">(unreal)</span></td>
-    <td colspan="2"></td>
+  const openTotalRow=openRows.length?`<tfoot><tr>
+    <td style="font-size:11px;color:var(--t2)">Total (${openRows.length} position${openRows.length!==1?'s':''})</td>
+    <td class="r" style="font-weight:700;color:${openTotalUnr>=0?'#4ade80':'#f87171'}">${hasMktCount?fmtN(openTotalUnr):'—'}</td>
   </tr></tfoot>`:'';
 
   const closedSumPnl=closedRows.reduce((s,x)=>s+(parseFloat(x.t.openValue)||0)+(parseFloat(x.t.closeValue)||0)-(parseFloat(x.t.openFee)||0)-(parseFloat(x.t.closeFee)||0),0);
@@ -2680,9 +2730,9 @@ function renderOptions(){
 
   const closedBar=closedRows.length?`<div onclick="toggleClosedOpts(this)" style="cursor:pointer;position:relative;overflow:hidden;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.06);border-left:3px solid rgba(255,255,255,0.2);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px"><span class="closed-opts-arrow" style="font-size:10px;color:rgba(255,255,255,0.25)">▶</span><span style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.4)">Closed trades</span><span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1px 8px;color:rgba(255,255,255,0.3)">${closedRows.length}</span></div>`:''
 
-  const openTable=openRows.length?`<div class="open-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-open-table">${thead}<tbody>${openRows.map(x=>mkRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
+  const openTable=openRows.length?`<div class="open-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-open-table">${openThead}<tbody>${openRows.map(x=>mkOpenRow(x.t,x.i)).join('')}</tbody>${openTotalRow}</table></div>`:'';
 
-  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-closed-table">${thead}<tbody>${closedRows.map(x=>mkRow(x.t,x.i,'closed-opt-row')).join('')}</tbody>${closedTotalRow}</table></div>`:'';
+  const closedTable=closedRows.length?`<div class="closed-opts-body" style="display:none;overflow-x:auto;margin-top:6px"><table class="tbl" id="opt-closed-table">${closedThead}<tbody>${closedRows.map(x=>mkClosedRow(x.t,x.i)).join('')}</tbody>${closedTotalRow}</table></div>`:'';
 
   const combinedTable=trades.length?`
     <div style="margin-bottom:1.25rem">${openBar}${openTable}</div>
@@ -2739,6 +2789,70 @@ function filterOpts(section){
 function addOpt(){showOptModal({id:uid(),ticker:'',openDate:new Date().toISOString().split('T')[0],openValue:'',closeDate:'',closeValue:null,mktValue:null,note:''},-1);}
 function editOpt(i){showOptModal(Object.assign({},pf().optionTrades[i]),i);}
 function delOpt(i){if(!confirm('Delete this option trade?'))return;pf().optionTrades.splice(i,1);save();renderContent();}
+
+function showOptDetail(i){
+  const t=pf().optionTrades[i];
+  if(!t)return;
+  const isOpen=t.closeValue===null||t.closeValue===undefined||t.closeValue==='';
+
+  const fld=(label,hint,id,val,type='text',readOnly=false)=>`
+    <div style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div style="flex-shrink:0;min-width:0;flex:1">
+          <div style="font-size:12px;color:rgba(220,235,255,0.9);font-family:'Courier New',monospace;font-weight:600">${label}</div>
+          ${hint?`<div style="font-size:9px;color:rgba(160,185,255,0.45);margin-top:2px;letter-spacing:.2px">${hint}</div>`:''}
+        </div>
+        ${readOnly
+          ?`<span style="font-size:12px;font-weight:700;text-align:right;flex-shrink:0">${val}</span>`
+          :`<input id="od-${id}" type="${type}" value="${val}" style="text-align:center;font-size:16px;font-weight:600;padding:7px 10px;width:160px;flex-shrink:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:8px;color:#eef2ff">`
+        }
+      </div>
+    </div>`;
+
+  const html=`
+    <h3 style="margin-bottom:1.25rem;font-size:13px;font-weight:800;letter-spacing:1.5px;font-family:'Courier New',monospace;text-transform:uppercase">Trade Detail</h3>
+    <div style="margin-bottom:1.25rem">
+      ${fld('Ticker','Contract or stock name','ticker',t.ticker||'')}
+      ${fld('Status','','',isOpen?'<span style="color:var(--blue);font-weight:700">OPEN</span>':'<span style="color:var(--t2)">CLOSED</span>','text',true)}
+      ${fld('Open Date','Date trade was opened','openDate',t.openDate||'','date')}
+      ${fld('Open Value','Received = negative · Paid = positive','openValue',t.openValue||'','number')}
+      ${fld('Open Fee','Positive number (e.g. 6.69)','openFee',t.openFee||'','number')}
+      ${isOpen
+        ? fld('Market Value','Current mkt value · positive or negative','mktValue',t.mktValue||'','number')
+        : fld('Close Date','Date trade was closed','closeDate',t.closeDate||'','date')
+          + fld('Close Value','Paid to close = negative','closeValue',t.closeValue||'','number')
+          + fld('Close Fee','Positive number (e.g. 6.69)','closeFee',t.closeFee||'','number')
+      }
+      ${fld('Note','Expiry date, strategy, memo','note',t.note||'')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="pri" onclick="saveOptDetail(${i})">💾 Save</button>
+      <button class="dng" onclick="cmm();delOpt(${i})">✕ Delete</button>
+    </div>`;
+
+  document.getElementById('mi').innerHTML=html;
+  document.getElementById('ov').classList.add('open');
+}
+
+function saveOptDetail(i){
+  const t=pf().optionTrades[i];
+  if(!t)return;
+  const g=id=>{ const el=document.getElementById('od-'+id); return el?el.value.trim():null; };
+  t.ticker=g('ticker')||t.ticker;
+  t.openDate=g('openDate')||t.openDate;
+  t.openValue=g('openValue')!==null?g('openValue'):t.openValue;
+  t.openFee=g('openFee')!==null?g('openFee'):t.openFee;
+  const mv=g('mktValue');
+  if(mv!==null)t.mktValue=mv===''?null:mv;
+  const cd=g('closeDate');
+  if(cd!==null)t.closeDate=cd;
+  const cv=g('closeValue');
+  if(cv!==null)t.closeValue=cv===''?null:cv;
+  const cf=g('closeFee');
+  if(cf!==null)t.closeFee=cf;
+  t.note=g('note')!==null?g('note'):t.note;
+  save();cmm();renderContent();
+}
 function showOptModal(t,idx){
   const isEdit=idx>=0;
   const cv=(t.closeValue!=null&&t.closeValue!=='')?t.closeValue:'';
@@ -3298,7 +3412,7 @@ function ccyMiniCardStyleDashed(ccy){
   return m[ccy]||'background:rgba(79,195,247,0.08);border:1px dashed rgba(79,195,247,0.3)';
 }
 function ccyAccent(ccy){
-  const m={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+  const m={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
   return m[ccy]||'#4fc3f7';
 }
 function ccyFlag(ccy){
@@ -3307,7 +3421,7 @@ function ccyFlag(ccy){
 }
 function ccyTag(ccy,extra){
   const cols={
-    'MYR':'background:#a855f7;color:#fff;border-color:#a855f7',
+    'MYR':'background:#06b6d4;color:#fff;border-color:#06b6d4',
     'SGD':'background:#f97316;color:#fff;border-color:#f97316',
     'USD':'background:#3b82f6;color:#fff;border-color:#3b82f6',
     'HKD':'background:#ef4444;color:#fff;border-color:#ef4444',
@@ -3318,8 +3432,8 @@ function ccyTag(ccy,extra){
     'MYR':'🇲🇾','SGD':'🇸🇬','USD':'🇺🇸','HKD':'🇭🇰','GBP':'🇬🇧','EUR':'🇪🇺',
   };
   const st=cols[ccy]||'background:var(--blue);color:#0a0a14;border-color:var(--blue)';
-  const flag=flags[ccy]?'<span style="font-size:11px;margin-right:3px">'+flags[ccy]+'</span>':'';
-  return '<span class="ctag" style="'+st+';'+(extra||'')+'">'+flag+ccy+'</span>';
+  const flag=flags[ccy]?'<span style="font-size:11px;margin-right:2px;vertical-align:middle;line-height:1;display:inline-block">'+flags[ccy]+'</span>':'';
+  return '<span class="ctag" style="'+st+';white-space:nowrap;display:inline-flex;align-items:center;'+(extra||'')+'">'+flag+ccy+'</span>';
 }
 
 // ── Drag-and-drop: Portfolio chips ────────────────────────────────────────────
@@ -3425,7 +3539,7 @@ function renderDeposits(p){
       const dep=cd.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
       const wit=cd.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
       const net=dep-wit;
-      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+      const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="background:rgba(255,255,255,0.03);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:8px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)">'
         +'<div style="margin-bottom:6px">'+ccyTag(ccy)+'</div>'
@@ -3450,7 +3564,7 @@ function renderDeposits(p){
       const totDep=cdeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
       const totWit=cdeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
       const net=totDep-totWit;
-      const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+      const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#080810,#0c0c18);border-radius:10px;border:1px solid rgba(255,255,255,0.06);border-top:2px solid '+accent+';padding:12px;box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)">'
         +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+',transparent);opacity:0.6"></div>'
@@ -3488,7 +3602,7 @@ function renderDeposits(p){
     }).join('');
 
     const safeKey=ccy.replace(/[^a-z]/gi,'_');
-    const CCY_ACCENT={'MYR':'#a855f7','SGD':'#f97316','USD':'#3b82f6'};
+    const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
     const accent=CCY_ACCENT[ccy]||'#4fc3f7';
     return'<div style="margin-bottom:1.25rem">'
       +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-left:3px solid '+accent+';border-radius:var(--r);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.65)">'

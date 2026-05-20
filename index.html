@@ -503,7 +503,7 @@ body.privacy-on #mn span[style*="color:#f060"]{
             </div>
             <div style="border-left:1px solid var(--b1);padding-left:8px">
               <div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;padding:2px 8px 6px">Data</div>
-              <button onclick="closePfMenu();document.getElementById('bbk').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:#f59e0b;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">💾</span> Backup</button>
+              <button onclick="closePfMenu();document.getElementById('bbk').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:#84cc16;cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">💾</span> Backup</button>
               <button onclick="closePfMenu();document.getElementById('brs').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--green);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📂</span> Restore</button>
               <button onclick="closePfMenu();document.getElementById('bxl').click()" style="width:100%;text-align:left;padding:7px 10px;background:transparent;border:none;border-radius:6px;font-size:12px;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:8px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'"><span style="font-size:15px">📊</span> Download Excel</button>
             </div>
@@ -951,7 +951,7 @@ function renderSettingsPx(){
   allStocks.forEach(function(s){if(!byCcy[s.ccy])byCcy[s.ccy]=[];byCcy[s.ccy].push(s);});
   Object.keys(byCcy).forEach(function(c){byCcy[c].sort(function(a,b){return b.mktVal-a.mktVal;});});
   const ccyOrder=[...CCY_ORDER.filter(function(c){return byCcy[c];}),...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
-  const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+  const CCY_ACCENT={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
   let rowsHtml='';
   if(allStocks.length){
     // Single header row at top
@@ -1003,7 +1003,13 @@ function spxFromSettings(){
     if(!priceEl)return;
     const price=parseFloat(priceEl.value)||0;
     const ccy=ccyEl?ccyEl.value:item.ccy;
-    S.portfolios.forEach(function(pf0){if(!pf0.prices)pf0.prices={};if(pf0.prices[item.stock]!==undefined||item.pfIds.includes(pf0.id)){pf0.prices[item.stock]={price,ccy};}});
+    S.portfolios.forEach(function(pf0){
+      if(!pf0.prices)pf0.prices={};
+      const hasStock=pf0.transactions&&pf0.transactions.some(function(tx){return tx.stock===item.stock;});
+      if(hasStock||pf0.prices[item.stock]!==undefined){
+        pf0.prices[item.stock]={price,ccy};
+      }
+    });
   });
   // Save FX
   (window._settingsFxCcys||[]).forEach(function(ccy){
@@ -2402,7 +2408,7 @@ function renderModal(){
                     ...Object.keys(byCcy).filter(function(c){return CCY_ORDER.indexOf(c)<0;})];
 
     let rowsHtml='';
-    const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+    const CCY_ACCENT={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
 
     if(allStocks.length){
       ccyOrder.forEach(function(ccy){
@@ -3412,7 +3418,7 @@ function ccyMiniCardStyleDashed(ccy){
   return m[ccy]||'background:rgba(79,195,247,0.08);border:1px dashed rgba(79,195,247,0.3)';
 }
 function ccyAccent(ccy){
-  const m={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+  const m={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
   return m[ccy]||'#4fc3f7';
 }
 function ccyFlag(ccy){
@@ -3421,7 +3427,7 @@ function ccyFlag(ccy){
 }
 function ccyTag(ccy,extra){
   const cols={
-    'MYR':'background:#06b6d4;color:#fff;border-color:#06b6d4',
+    'MYR':'background:#84cc16;color:#fff;border-color:#84cc16',
     'SGD':'background:#f97316;color:#fff;border-color:#f97316',
     'USD':'background:#3b82f6;color:#fff;border-color:#3b82f6',
     'HKD':'background:#ef4444;color:#fff;border-color:#ef4444',
@@ -3539,7 +3545,7 @@ function renderDeposits(p){
       const dep=cd.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
       const wit=cd.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
       const net=dep-wit;
-      const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+      const CCY_ACCENT={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="background:rgba(255,255,255,0.03);border-radius:var(--r);border:1px solid var(--b1);border-top:2px solid '+accent+';padding:8px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)">'
         +'<div style="margin-bottom:6px">'+ccyTag(ccy)+'</div>'
@@ -3564,7 +3570,7 @@ function renderDeposits(p){
       const totDep=cdeps.filter(d=>d.type==='deposit').reduce((s,d)=>s+(+d.amount),0);
       const totWit=cdeps.filter(d=>d.type==='withdrawal').reduce((s,d)=>s+(+d.amount),0);
       const net=totDep-totWit;
-      const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+      const CCY_ACCENT={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
       const accent=CCY_ACCENT[ccy]||'#4fc3f7';
       return'<div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#080810,#0c0c18);border-radius:10px;border:1px solid rgba(255,255,255,0.06);border-top:2px solid '+accent+';padding:12px;box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)">'
         +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+accent+',transparent);opacity:0.6"></div>'
@@ -3602,7 +3608,7 @@ function renderDeposits(p){
     }).join('');
 
     const safeKey=ccy.replace(/[^a-z]/gi,'_');
-    const CCY_ACCENT={'MYR':'#06b6d4','SGD':'#f97316','USD':'#3b82f6'};
+    const CCY_ACCENT={'MYR':'#84cc16','SGD':'#f97316','USD':'#3b82f6'};
     const accent=CCY_ACCENT[ccy]||'#4fc3f7';
     return'<div style="margin-bottom:1.25rem">'
       +'<div onclick="toggleDepRows(this,\''+safeKey+'\')" style="cursor:pointer;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-left:3px solid '+accent+';border-radius:var(--r);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.65)">'
@@ -3916,7 +3922,7 @@ setTimeout(matchScanLine,300);
     <div style="padding:8px 10px">
       <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Data</div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        <button onclick="doBackup()" class="settings-btn" style="color:#f59e0b;font-size:11px">💾 Backup</button>
+        <button onclick="doBackup()" class="settings-btn" style="color:#84cc16;font-size:11px">💾 Backup</button>
         <button onclick="document.getElementById('restore-input').click()" class="settings-btn" style="color:var(--green);font-size:11px">📂 Restore</button>
         <button onclick="document.getElementById('bxl').click()" class="settings-btn" style="color:var(--blue);font-size:11px">📊 Excel</button>
       </div>

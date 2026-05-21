@@ -1147,183 +1147,95 @@ function renderDashboard(){
 
   const allCcys=[...CCY_ORDER.filter(function(c){return grandTotals[c];}),...Object.keys(grandTotals).filter(function(c){return!CCY_ORDER.includes(c);})];
 
-  const summaryCcyCards=allCcys.map(function(ccy){
-    const g=grandTotals[ccy];
-    const cashTotal=g.cash||0;
-    const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100-Math.round((g.pf||0)*100)/100)*100)/100;
-    const totPct=g.co>0?tot/g.co*100:null;
-    const pct=g.co>0?(g.mv+cashTotal-g.co)/g.co*100:null;
+  // Pre-compute grandMYR for allocation %
+  let grandMYR=0;
+  allCcys.forEach(function(ccy){const g=grandTotals[ccy];grandMYR+=toMYR((g.mv||0)+(g.cash||0),ccy);});
 
-    // Build portfolio rows with inline allocation bar
-    const activePfs=S.portfolios.filter(function(pf0){
-      const sum=getSummary(pf0);
-      const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0;
-      return mv||co||d||r;
+  const summaryCcyCards=S.portfolios.map(function(pf0){
+    const sum=getSummary(pf0);
+    const col=pf0.color||'#00d4ff';
+
+    // Compute MYR totals across all CCYs for this portfolio
+    let pfMYR=0,pfInvested=0,pfPnl=0;
+    const pfCcys=[...new Set([...Object.keys(sum.mktVal),...Object.keys(sum.divs)])].filter(Boolean);
+    pfCcys.forEach(function(ccy){
+      const mv=sum.mktVal[ccy]||0;
+      const cash=(pf0.cashBalances&&pf0.cashBalances[ccy])||0;
+      const co=sum.cost[ccy]||0;
+      const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pfee=sum.platformFees[ccy]||0;
+      pfMYR+=toMYR(mv+cash,ccy);
+      pfInvested+=toMYR(co,ccy);
+      pfPnl+=toMYR(Math.round((u+d+r-pfee)*100)/100,ccy);
     });
 
-    const pfRows=activePfs.map(function(pf0){
-      const sum=getSummary(pf0);
-      const mv=sum.mktVal[ccy]||0,co=sum.cost[ccy]||0;
-      const u=sum.unreal[ccy]||0,d=sum.divs[ccy]||0,r=sum.realized[ccy]||0,pfee=sum.platformFees[ccy]||0;
-      const t=Math.round((u+d+r-pfee)*100)/100;
-      const tp=co>0?t/co*100:null;
-      const allocPct=g.mv>0?(mv/g.mv*100):0;
-      const pfCash=(pf0.cashBalances&&pf0.cashBalances[ccy])||0;
-      const mvPlusCash=mv+pfCash;
-      const isPos=t>=0;
-      const pnlColor=isPos?'var(--green)':'var(--red)';
+    const pfPnlPct=pfInvested>0?pfPnl/pfInvested*100:null;
+    const pfPnlColor=pfPnl>=0?'var(--green)':'var(--red)';
+    const barW=pfInvested>0?Math.min(Math.abs(pfMYR/pfInvested)*100,100):0;
+    const allocPct=grandMYR>0?pfMYR/grandMYR*100:0;
 
-      return '<tr class="ck" onclick="goPortfolio(\''+pf0.id+'\')" style="border:none">'
-        +'<td colspan="4" style="padding:4px 2px">'
-        +'<div style="background:linear-gradient(135deg,'+ccyAccent(ccy)+'15,'+ccyAccent(ccy)+'06);border:1px solid '+ccyAccent(ccy)+'44;border-left:3px solid '+ccyAccent(ccy)+';border-radius:8px;padding:8px 10px;position:relative;overflow:hidden">'
-        +'<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'55,transparent)"></div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
-        +'<div style="display:flex;align-items:center;gap:6px">'
-        +'<span style="display:inline-flex;width:8px;height:8px;border-radius:50%;background:'+pf0.color+';box-shadow:0 0 5px '+pf0.color+'88;flex-shrink:0"></span>'
-        +'<span style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px">'+pf0.name+'</span>'
-        +'<span style="font-size:9px;color:'+ccyAccent(ccy)+';background:'+ccyAccent(ccy)+'18;padding:1px 5px;border-radius:3px;font-family:Courier New,monospace">'+allocPct.toFixed(1)+'%</span>'
-        +'</div>'
-        +'<span style="color:var(--t3);font-size:12px">›</span>'
-        +'</div>'
-        +'<div style="height:2px;background:rgba(255,255,255,0.06);border-radius:1px;margin-bottom:6px;overflow:hidden">'
-        +'<div style="height:100%;width:'+allocPct.toFixed(1)+'%;background:'+ccyAccent(ccy)+';border-radius:1px;box-shadow:0 0 6px '+ccyAccent(ccy)+'88"></div>'
-        +'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between">'
-        +'<div><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Holdings</div>'
-        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:#fff">'+fc(mv,ccy)+'</div></div>'
-        +'<div style="text-align:right"><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-bottom:1px">Total P&L <span style="opacity:.7">(Unreal + Real + Div - Fee)</span></div>'
-        +'<div class="pv-num" style="font-size:12px;font-weight:700;color:'+pnlColor+'">'+sgn(t,ccy)+(tp!==null?' <span style="font-size:9px;opacity:.9">'+fp(tp)+'</span>':'')+'</div>'
-        +'</div>'
-        +'</div>'
-        +'</div>'
-        +'</td>'
-        +'</tr>';
-    }).join('');
-
-
-    const mvWithCash=g.mv+cashTotal;
-    const dashMiniId='dash-mini-'+ccy;
-    const dashMiniCards=''
-      // Row 1: Total Invested | Total Holdings Value
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Invested</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.co,ccy)+'</div>'
-      +'</div>'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Total Holdings Value</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+fc(g.mv,ccy)+'</div>'
-      +'</div>'
-      +'</div>'
-      // Row 2: Unrealized P&L | Realized P&L
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Unrealized P&L</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.u)+'">'+sgn(g.u,ccy)+'</div>'
-      +'</div>'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Realized P&L</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap" class="'+sc(g.r)+'">'+sgn(g.r,ccy)+'</div>'
-      +'</div>'
-      +'</div>'
-      // Row 3: Dividends | Platform Fees
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Dividends</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(g.d>0?'+'+fc(g.d,ccy):'—')+'</div>'
-      +'</div>'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Platform Fees</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:'+((g.pf||0)>0?'var(--red)':'var(--t2)')+'">'+((g.pf||0)>0?'-'+fc(g.pf,ccy):'—')+'</div>'
-      +'</div>'
-      +'</div>'
-      // Row 4: Cash Balance
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:1rem">'
-      +'<div style="'+ccyMiniCardStyle(ccy)+';padding:8px 10px;border-radius:var(--r)">'
-      +'<div style="font-size:10px;color:var(--t2);margin-bottom:3px;letter-spacing:.3px">Cash Balance</div>'
-      +'<div style="font-size:12px;font-weight:600;white-space:nowrap;color:var(--t1)">'+(cashTotal>0?fc(cashTotal,ccy):'—')+'</div>'
-      +'</div>'
-      +'<div></div>'
-      +'</div>';
-
-    return '<div style="position:relative;overflow:hidden;'
+    return '<div onclick="goPortfolio(\''+pf0.id+'\')" style="cursor:pointer;position:relative;overflow:hidden;'
       +'background:linear-gradient(160deg,#06040f 0%,#080614 30%,#04080f 60%,#080610 100%);'
       +'border-radius:16px;padding:.9rem 1rem .85rem;margin-bottom:1rem;margin-left:-16px;margin-right:-16px;'
       +'border:1.5px solid rgba(255,255,255,0.15);'
-      +'box-shadow:0 0 0 1px '+ccyAccent(ccy)+'44,0 0 30px '+ccyAccent(ccy)+'22,0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
-      // Rainbow top stripe using currency color
-      +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,'+ccyAccent(ccy)+','+ccyAccent(ccy)+'99,rgba(255,255,255,0.6),'+ccyAccent(ccy)+'99,'+ccyAccent(ccy)+');box-shadow:0 0 12px '+ccyAccent(ccy)+',0 0 24px '+ccyAccent(ccy)+'88;pointer-events:none"></div>'
-      // Radial glow
-      +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,'+ccyAccent(ccy)+'18,transparent 60%);pointer-events:none"></div>'
-      +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,'+ccyAccent(ccy)+'08 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,'+ccyAccent(ccy)+'08 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
-      // Left rod in currency color
-      +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,'+ccyAccent(ccy)+' 20%,#fff 50%,'+ccyAccent(ccy)+' 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px '+ccyAccent(ccy)+',0 0 20px '+ccyAccent(ccy)+'88;animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
-      +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:'+ccyAccent(ccy)+';box-shadow:0 0 6px '+ccyAccent(ccy)+',0 0 12px '+ccyAccent(ccy)+'88;animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
-      // Colored corners
-      +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:2px solid '+ccyAccent(ccy)+';border-left:2px solid '+ccyAccent(ccy)+';border-radius:14px 0 0 0;pointer-events:none;box-shadow:0 0 8px '+ccyAccent(ccy)+'88;animation:cornerPulse 3s ease-in-out infinite"></div>'
+      +'box-shadow:0 0 0 1px rgba(255,255,255,0.15),0 1px 0 rgba(255,255,255,0.18) inset,0 8px 32px rgba(0,0,0,0.7);">'
+      +'<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),rgba(255,255,255,0.9),rgba(255,255,255,0.6),transparent);box-shadow:0 0 10px rgba(255,255,255,0.4);pointer-events:none"></div>'
+      +'<div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% -10%,rgba(255,255,255,0.04),transparent 60%);pointer-events:none"></div>'
+      +'<div style="position:absolute;inset:0;background:linear-gradient(105deg,rgba(255,255,255,0.02) 0%,transparent 30%,rgba(255,255,255,0.02) 50%,transparent 70%,rgba(255,255,255,0.02) 100%);animation:holoBG 8s ease-in-out infinite alternate;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:8px;left:0;bottom:8px;width:3px;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.6) 20%,#fff 50%,rgba(255,255,255,0.6) 80%,transparent);border-radius:0 2px 2px 0;box-shadow:0 0 8px rgba(255,255,255,0.7),0 0 20px rgba(255,255,255,0.3);animation:rodPulse 3s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;left:0;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff,0 0 12px rgba(255,255,255,0.6);animation:particleDrift 3s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;top:0;left:0;width:16px;height:16px;border-top:2px solid rgba(255,255,255,0.8);border-left:2px solid rgba(255,255,255,0.8);border-radius:14px 0 0 0;pointer-events:none;animation:cornerPulse 3s ease-in-out infinite"></div>'
       +'<div style="position:absolute;top:0;right:0;width:12px;height:12px;border-top:1.5px solid rgba(255,255,255,0.5);border-right:1.5px solid rgba(255,255,255,0.5);pointer-events:none"></div>'
-      +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1.5px solid '+ccyAccent(ccy)+'66;border-left:1.5px solid '+ccyAccent(ccy)+'66;border-radius:0 0 0 14px;pointer-events:none"></div>'
+      +'<div style="position:absolute;bottom:0;left:0;width:12px;height:12px;border-bottom:1.5px solid rgba(255,255,255,0.3);border-left:1.5px solid rgba(255,255,255,0.3);border-radius:0 0 0 14px;pointer-events:none"></div>'
       +'<div style="position:absolute;bottom:0;right:0;width:12px;height:12px;border-bottom:1.5px solid rgba(255,255,255,0.25);border-right:1.5px solid rgba(255,255,255,0.25);border-radius:0 0 14px 0;pointer-events:none"></div>'
-      // Scan beams
-      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+',rgba(255,255,255,0.8),'+ccyAccent(ccy)+',transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px '+ccyAccent(ccy)+'"></div>'
-      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'44,transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.6),rgba(255,255,255,0.9),rgba(255,255,255,0.6),transparent);animation:scanLine 5s ease-in-out infinite;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,0.5)"></div>'
+      +'<div style="position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:scanLine2 5s ease-in-out infinite;pointer-events:none"></div>'
       +'<div style="position:absolute;top:0;left:-120%;width:70%;height:100%;background:linear-gradient(108deg,transparent 42%,rgba(255,255,255,0.05) 50%,transparent 58%);animation:shimmerSweep 7s ease-in-out infinite;pointer-events:none;transform:skewX(-6deg)"></div>'
-      +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+'88,transparent);box-shadow:0 0 8px '+ccyAccent(ccy)+'44;animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
-      // Content
+      +'<div style="position:absolute;bottom:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);box-shadow:0 0 8px rgba(255,255,255,0.2);animation:borderPulse 4s ease-in-out infinite;pointer-events:none"></div>'
       +'<div style="position:relative;z-index:1;padding-left:10px">'
-      // Header row: CCY tag + market value
+      // Header: portfolio name + dot + MYR value
       +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem">'
-      +'<div style="display:flex;align-items:center;gap:8px">'+ccyTag(ccy,'')
-      +'<div><div style="font-size:9px;letter-spacing:1px;font-weight:700;color:rgba(255,255,255,0.5);font-family:Courier New,monospace">TOTAL MARKET VALUE</div>'
-      +'<div style="font-size:8px;color:rgba(255,255,255,0.25)">(Cash + Holdings only)</div></div>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="display:inline-flex;width:10px;height:10px;border-radius:50%;background:'+col+';box-shadow:0 0 8px '+col+';flex-shrink:0"></span>'
+      +'<div>'
+      +'<div style="font-size:9px;letter-spacing:1px;font-weight:700;color:rgba(255,255,255,0.55);font-family:Courier New,monospace;text-transform:uppercase">'+pf0.name+' PORTFOLIO VALUE</div>'
+      +'<div style="font-size:8px;color:rgba(255,255,255,0.25)">'+allocPct.toFixed(1)+'% of total · MYR equivalent</div>'
+      +'</div>'
       +'</div>'
       +'<div style="text-align:right">'
-      +'<span class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 40px '+ccyAccent(ccy)+'66">'+fc(mvWithCash,ccy)+'</span>'
+      +'<span class="pv-val" style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;white-space:nowrap;text-shadow:0 0 20px rgba(255,255,255,0.4),0 0 40px '+col+'66">RM '+pfMYR.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
       +'<span class="pv-hide" style="font-size:20px;font-weight:800;color:#fff;letter-spacing:2px">••••</span>'
       +'</div>'
       +'</div>'
       // Progress bar
       +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">'
       +'<div style="flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden">'
-      +'<div style="height:100%;width:'+(g.co>0?Math.min(Math.abs(mvWithCash/g.co)*100,100):0).toFixed(1)+'%;background:linear-gradient(90deg,'+ccyAccent(ccy)+',#fff,'+ccyAccent(ccy)+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+ccyAccent(ccy)+'88;animation:barShimmer 2s linear infinite"></div>'
+      +'<div style="height:100%;width:'+barW.toFixed(1)+'%;background:linear-gradient(90deg,'+col+',#fff,'+col+');background-size:200% 100%;border-radius:2px;box-shadow:0 0 8px '+col+'88;animation:barShimmer 2s linear infinite"></div>'
       +'</div>'
-      +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">'+ccy+' PORTFOLIO</div>'
+      +'<div style="font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:1px;white-space:nowrap;font-family:Courier New,monospace">MYR EQUIVALENT</div>'
       +'</div>'
-      // P&L row
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.875rem">'
+      // Invested + P&L
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
       +'<div><div style="font-size:8px;color:rgba(255,255,255,0.35);margin-bottom:2px">Total Invested</div>'
-      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">'+fc(g.co,ccy)+'</div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">RM '+pfInvested.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+'</div>'
       +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.85)">••••••</div>'
       +'</div>'
       +'<div style="text-align:right">'
       +'<div style="font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:2px">Total P&L / % <span style="font-size:7px;opacity:.7">(Unreal+Real+Div-Fee)</span></div>'
-      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+scColor(tot)+';text-shadow:0 0 12px '+scColor(tot)+'66" onclick="toggleMini(\''+dashMiniId+'\')">'+sgn(tot,ccy)+(totPct!==null?' ('+(totPct>=0?'+':'')+totPct.toFixed(1)+'%)':'')+'</div>'
-      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+scColor(tot)+'">•••••• (•••%)</div>'
+      +'<div class="pv-val pv-num" style="font-size:13px;font-weight:700;color:'+pfPnlColor+';text-shadow:0 0 12px '+pfPnlColor+'66">'+(pfPnl>=0?'+':'')+'RM '+Math.abs(pfPnl).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})+(pfPnlPct!==null?' ('+(pfPnlPct>=0?'+':'')+pfPnlPct.toFixed(1)+'%)':'')+'</div>'
+      +'<div class="pv-hide" style="font-size:13px;font-weight:700;color:'+pfPnlColor+'">•••••• (•••%)</div>'
       +'</div>'
       +'</div>'
-      // Mini cards
-      +'<div id="'+dashMiniId+'" style="display:none">'+dashMiniCards+'</div>'
-      // Portfolios label
-      +'<div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px">'
-      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,'+ccyAccent(ccy)+',transparent)"></div>'
-      +'<span style="font-size:8px;color:rgba(255,255,255,0.35);font-family:Courier New,monospace;letter-spacing:1px">PORTFOLIOS</span>'
-      +'<div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,'+ccyAccent(ccy)+')"></div>'
-      +'</div>'
-      +'<div style="display:flex;flex-direction:column;gap:4px;padding:4px 0"><table style="width:100%;border-collapse:collapse">'
-      +'<tbody>'+pfRows+'</tbody>'
-      +'</table></div>'
       +'</div>'
       +'</div>';
   }).join('');
 
   if(!allCcys.length)return '<div class="card m" style="text-align:center;padding:2rem">No transactions yet.</div>';
   // Grand Total MYR card
-  let grandMYR=0,grandMYRInvested=0,grandMYRPnl=0;
+  let grandMYRInvested=0,grandMYRPnl=0;
   allCcys.forEach(function(ccy){
     const g=grandTotals[ccy];
     const cashTotal=g.cash||0;
     const mvWithCash=g.mv+cashTotal;
-    grandMYR+=toMYR(mvWithCash,ccy);
     grandMYRInvested+=toMYR(g.co,ccy);
     const tot=Math.round((Math.round(g.u*100)/100+Math.round(g.d*100)/100+Math.round(g.r*100)/100-Math.round((g.pf||0)*100)/100)*100)/100;
     grandMYRPnl+=toMYR(tot,ccy);

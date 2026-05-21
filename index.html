@@ -621,7 +621,18 @@ function getHoldings(p0,ao){
     else if(tx.type==='Sell'&&tx.stock&&h[tx.stock]){const avg=h[tx.stock].qty>0?h[tx.stock].cost/h[tx.stock].qty:0;h[tx.stock].realized+=(+tx.qty)*(+tx.price)-(+tx.fee||0)-avg*(+tx.qty);h[tx.stock].cost-=avg*(+tx.qty);h[tx.stock].qty-=+tx.qty;}
     else if(tx.type==='Dividend'&&tx.stock){if(!h[tx.stock])h[tx.stock]={qty:0,cost:0,ccy:tx.ccy,divs:0,realized:0,firstDate:tx.date};h[tx.stock].divs+=tx.amount!=null?+tx.amount:0;}
   });
-  return Object.entries(h).map(([stock,v])=>{const mp=p0.prices[stock];const mktP=mp?+mp.price:0,mktCcy=mp?mp.ccy:v.ccy,mktVal=v.qty*mktP,avg=v.qty>0?v.cost/v.qty:0,unreal=v.qty>0?mktVal-v.cost:0;return{stock,...v,avg,mktP,mktCcy,mktVal,unreal};}).filter(h=>ao?h.qty>0:(h.qty>0||h.divs!==0||h.realized!==0));
+  // Build a global price lookup across ALL portfolios as fallback
+  const globalPrices={};
+  (S&&S.portfolios?S.portfolios:[]).forEach(function(pf0){
+    if(pf0.prices)Object.entries(pf0.prices).forEach(function([stk,mp]){
+      if(!globalPrices[stk])globalPrices[stk]=mp;
+    });
+  });
+  return Object.entries(h).map(([stock,v])=>{
+    const mp=p0.prices[stock]||globalPrices[stock];
+    const mktP=mp?+mp.price:0,mktCcy=mp?mp.ccy:v.ccy,mktVal=v.qty*mktP,avg=v.qty>0?v.cost/v.qty:0,unreal=v.qty>0?mktVal-v.cost:0;
+    return{stock,...v,avg,mktP,mktCcy,mktVal,unreal};
+  }).filter(h=>ao?h.qty>0:(h.qty>0||h.divs!==0||h.realized!==0));
 }
 function getSummary(p0){
   const divs={},unreal={},mktVal={},cost={},realized={},firstDate={},platformFees={};
